@@ -1,0 +1,199 @@
+{
+  "links": [
+    {
+      "id": "link-1",
+      "title": "Mechanical Keyboard Wireless Gateron Tech",
+      "url": "https://shope.ee/custom-mechanical-keyboard-gateron",
+      "category": "Shopee",
+      "clicks": 1,
+      "isActive": true,
+      "priority": 1,
+      "description": "Keyboard andalan untuk produktivitas & setup clean. Wireless dengan hot-swappable switches.",
+      "imageUrl": "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&q=80&w=800&h=400"
+    },
+    {
+      "id": "link-2",
+      "title": "Desk Mat Kulit Sapi Premium Desk",
+      "url": "https://shope.ee/premium-leather-deskmat-minimal",
+      "category": "Shopee",
+      "clicks": 0,
+      "isActive": true,
+      "priority": 2,
+      "description": "Alas meja bahan kulit sintetis/asli tahan air, memberi kesan mewah & rapi.",
+      "imageUrl": "https://images.unsplash.com/photo-1632292224971-0d45778bd364?auto=format&fit=crop&q=80&w=800&h=400"
+    },
+    {
+      "id": "link-3",
+      "title": "GaN Charger 65W Triple Port Super Fast",
+      "url": "https://tokopedia.link/gan-charger-fastcharging",
+      "category": "Tokopedia",
+      "clicks": 0,
+      "isActive": true,
+      "priority": 3,
+      "description": "Satu charger untuk semua gadget! Support laptop, tablet, dan smartphone super fast charging.",
+      "imageUrl": "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&q=80&w=800&h=400"
+    },
+    {
+      "id": "link-4",
+      "title": "Stand Holder Laptop Aluminium Adjustable",
+      "url": "https://tiktok.com/@zendharefitra/shop/laptop-stand",
+      "category": "TikTok Shop",
+      "clicks": 0,
+      "isActive": true,
+      "priority": 4,
+      "description": "Ergonomis, mengurangi pegal leher saat kerja lama di depan laptop.",
+      "imageUrl": "https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&q=80&w=800&h=400"
+    },
+    {
+      "id": "link-5",
+      "title": "Instagram Zendha Refitra - Tips Workspace & Tech",
+      "url": "https://instagram.com/zendharef_",
+      "category": "Social Media",
+      "clicks": 0,
+      "isActive": true,
+      "priority": 5,
+      "description": "Ikuti konten harian seputar setup minimalis, ulasan gadget, dan tutorial teknologi.",
+      "imageUrl": "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&q=80&w=800&h=400"
+    }
+  ],
+  "profile": {
+    "name": "Zendha Refitra",
+    "bio": "Tech Content Creator & Workspaces Enthusiast. Membagikan inspirasi setup meja kerja minimalis, ulasan gadget fungsional, dan tips produktivitas digital.",
+    "instagram": "https://instagram.com/zendharef_",
+    "tiktok": "https://tiktok.com/@zendharefitra",
+    "youtube": "https://youtube.com/@zendharefitra",
+    "email": "zendha90@gmail.com",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400&h=400",
+    "whatsapp": "https://wa.me/628123456789",
+    "heroTagline": "STYLISH SPACE & HOME UPGRADES CREATOR",
+    "heroTitle1": "We Design Digital",
+    "heroTitleHighlight": "Experiences",
+    "heroDescription": "We curate minimalist workstation setups, premium home upgrades, and cinematic tech content that captures millions of eyeballs. Welcome to Zendha Refitra's official workflow, rates, and verified organic stats.",
+    "domicile": "Lavon 2, Sindang Jaya, Kab. Tangerang, Indonesia",
+    "contactPhone": "+62-816-273-270",
+    "stats": [
+      {
+        "value": "60 K",
+        "label": "Instagram Followers",
+        "desc": "Highly engaged home & setup niche"
+      },
+      {
+        "value": "1 M",
+        "label": "Monthly Reach",
+        "desc": "Consistent organic impressions standard"
+      },
+      {
+        "value": "76 %",
+        "label": "Women Followers",
+        "desc": "Premium aesthetic layout interest"
+      },
+      {
+        "value": "6 %",
+        "label": "Engagement Rate",
+        "desc": "High conversion compared to global median"
+      },
+      {
+        "value": "8 K",
+        "label": "Tiktok Followers",
+        "desc": "Rapidly growing creative design workspace"
+      }
+    ],
+    "termsOfService": [
+      "Proses produksi konten maksimal 1 minggu setelah menerima produk/barang.",
+      "Jika ada brief atau point penting wajib disampaikan sebelum kesepakatan produksi.",
+      "Pembayaran 100% di awal sebelum produksi dimulai dan harga di atas belum termasuk pajak.",
+      "Client/Brand berhak menerima draf script konten dan diberikan kesempatan revisi maksimal 1x.",
+      "Semua video, ide kreatif, dan style editing disesuaikan dengan style visual aesthetic zendharefitra.",
+      "Diberikan kesempatan revisi minor video 1x gratis (hanya untuk editing teks atau voice over).",
+      "Negosiasi harga khusus tersedia bagi pengambilan minimal 3 SOW sekaligus.",
+      "Berhak melakukan takedown konten apabila melanggar regulasi hukum tanpa refund."
+    ]
+  },
+  "services": [
+    {
+      "id": "service-1",
+      "title": "Instagram Reels & TikTok Video Review (Shorts)",
+      "price": "Rp 1.500.000",
+      "description": "Video review berdurasi 30-60 detik. Membahas USP produk, kualitas build, dan integrasi setup. Hak guna komersial 3 bulan, posting silang Instagram Reels & TikTok.",
+      "icon": "Video",
+      "isActive": true,
+      "priority": 1,
+      "additionalFees": [
+        { "label": "Add Produk dalam 1 konten (per produk)", "value": "+ 50%" },
+        { "label": "Tag Collaboration", "value": "+ 100%" },
+        { "label": "Owning Content (maksimal 1 bulan)", "value": "+ 100%" }
+      ]
+    },
+    {
+      "id": "service-2",
+      "title": "YouTube Dedicated Review Video",
+      "price": "Rp 3.500.000",
+      "description": "Review mendalam berdurasi 5-10 menit di Channel YouTube Utama. Membahas unboxing, detail spesifikasi, perbandingan, kelebihan & kekurangan, dan link pembelian selama 6 bulan di kolom deksripsi.",
+      "icon": "Youtube",
+      "isActive": true,
+      "priority": 2,
+      "additionalFees": [
+        { "label": "Add Produk dalam 1 konten (per produk)", "value": "+ 50%" },
+        { "label": "Tag Collaboration", "value": "+ 100%" },
+        { "label": "Owning Content (maksimal 1 bulan)", "value": "+ 100%" }
+      ]
+    },
+    {
+      "id": "service-3",
+      "title": "Instagram Story Slide Promo with Link",
+      "price": "Rp 600.000",
+      "description": "3 slide berurutan (Hook -> Product Benefit -> Swipe Up/Link Sticker). Mempromosikan kampanye belanja, flash sale, atau rilis produk baru.",
+      "icon": "Instagram",
+      "isActive": true,
+      "priority": 3,
+      "additionalFees": [
+        { "label": "Add Produk dalam 1 konten (per produk)", "value": "+ 50%" },
+        { "label": "Tag Collaboration", "value": "+ 100%" },
+        { "label": "Owning Content (maksimal 1 bulan)", "value": "+ 100%" }
+      ]
+    },
+    {
+      "id": "service-4",
+      "title": "Product Photography Showcase & Setup Integration",
+      "price": "Rp 1.000.000",
+      "description": "3 Buah foto produk berkualitas tinggi terintegrasi dengan desk setup minimalis aesthetics. Bisa digunakan untuk aset sosial media brand, resolusi tinggi.",
+      "icon": "Camera",
+      "isActive": true,
+      "priority": 4,
+      "additionalFees": [
+        { "label": "Add Produk dalam 1 konten (per produk)", "value": "+ 50%" },
+        { "label": "Tag Collaboration", "value": "+ 100%" },
+        { "label": "Owning Content (maksimal 1 bulan)", "value": "+ 100%" }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "project-1",
+      "title": "PASANG AC TANPA",
+      "highlight": "bobok tembok",
+      "views": "1.3M",
+      "imageUrl": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=400",
+      "category": "Room Upgrades",
+      "url": "https://www.instagram.com/p/CzX8Y_vvaBc/"
+    },
+    {
+      "id": "project-2",
+      "title": "lah.. kamar cuma",
+      "highlight": "lebar 3 meter",
+      "views": "3M",
+      "imageUrl": "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&q=80&w=400",
+      "category": "Aesthetic Makeover",
+      "url": "https://www.instagram.com/p/Cyl23vyPrX8/"
+    },
+    {
+      "id": "project-3",
+      "title": "Lebih efisien dan rapi!",
+      "highlight": "di ACE Indonesia 😍👍",
+      "views": "2.5M",
+      "imageUrl": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=400",
+      "category": "Organization Hacks",
+      "url": "https://www.instagram.com/p/Cxl9Y_vPyzX/"
+    }
+  ]
+}

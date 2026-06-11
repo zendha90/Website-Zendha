@@ -1,0 +1,6 @@
+{
+  "name": "Zendha Refitra Linktree & Ratecard",
+  "description": "Custom Linktree, affiliate hub, and active ratecard with an administrative backend for managing content dynamically.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
