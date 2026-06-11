@@ -28,9 +28,10 @@ import {
   RefreshCw,
   Database,
   Download,
-  Upload
+  Upload,
+  Github
 } from 'lucide-react';
-import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject } from '../types';
+import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand } from '../types';
 
 interface AdminPanelProps {
   onNavigateBack: () => void;
@@ -39,6 +40,7 @@ interface AdminPanelProps {
   profile: RatecardProfile;
   services: RatecardService[];
   projects: RatecardProject[];
+  brands?: RatecardBrand[];
 }
 
 export default function AdminPanel({
@@ -47,7 +49,8 @@ export default function AdminPanel({
   links,
   profile,
   services,
-  projects
+  projects,
+  brands: initialBrands
 }: AdminPanelProps) {
   // Authentication states
   const [password, setPassword] = useState('');
@@ -56,7 +59,19 @@ export default function AdminPanel({
   const [token, setToken] = useState<string | null>(null);
 
   // Active Admin Tabs
-  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'backup'>('links');
+  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github'>('links');
+
+  // GitHub integration states
+  const [githubSettings, setGithubSettings] = useState({
+    enabled: false,
+    token: '',
+    owner: '',
+    repo: '',
+    branch: 'main',
+    path: 'uploads'
+  });
+  const [isSavingGithub, setIsSavingGithub] = useState(false);
+  const [testStatus, setTestStatus] = useState<{ message: string; type: 'success' | 'error' | 'loading' | null }>({ message: '', type: null });
 
   // Interactive link editor states
   const [editingLink, setEditingLink] = useState<Partial<AffiliateLink> | null>(null);
@@ -72,6 +87,18 @@ export default function AdminPanel({
   // Interactive project editor states
   const [editingProject, setEditingProject] = useState<Partial<RatecardProject> | null>(null);
   const [isAddingProject, setIsAddingProject] = useState(false);
+
+  // Interactive brand editor states
+  const [brands, setBrands] = useState<RatecardBrand[]>(initialBrands || []);
+  const [editingBrand, setEditingBrand] = useState<Partial<RatecardBrand> | null>(null);
+  const [isAddingBrand, setIsAddingBrand] = useState(false);
+
+  // Sync brands once loaded
+  useEffect(() => {
+    if (initialBrands) {
+      setBrands(initialBrands);
+    }
+  }, [initialBrands]);
 
   // State management for backup & restore configurations
   const [importFileContent, setImportFileContent] = useState<any>(null);
@@ -96,6 +123,30 @@ export default function AdminPanel({
       setProfileForm({ ...profile });
     }
   }, [profile]);
+
+  const fetchGithubSettings = async (currentToken = token) => {
+    if (!currentToken) return;
+    try {
+      const resp = await fetch('/api/github/settings', {
+        headers: {
+          'Authorization': `Bearer ${currentToken}`
+        }
+      });
+      const data = await resp.json();
+      if (data.success && data.settings) {
+        setGithubSettings(data.settings);
+      }
+    } catch (e) {
+      console.error("Gagal memuat pengaturan GitHub:", e);
+    }
+  };
+
+  // Load GitHub settings when logged in
+  useEffect(() => {
+    if (isLoggedIn && token) {
+      fetchGithubSettings(token);
+    }
+  }, [isLoggedIn, token]);
 
   // Dynamic CRM analytical calculations for links
   const totalClicks = links.reduce((acc, current) => acc + (current.clicks || 0), 0);
@@ -223,7 +274,7 @@ export default function AdminPanel({
 
   const [isUploading, setIsUploading] = useState<{[key: string]: boolean}>({});
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetField: 'avatarUrl' | 'link' | 'project') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetField: 'avatarUrl' | 'link' | 'project' | 'brand') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -260,6 +311,8 @@ export default function AdminPanel({
             setEditingLink(prev => ({ ...prev, imageUrl: data.url }));
           } else if (targetField === 'project') {
             setEditingProject(prev => ({ ...prev, imageUrl: data.url }));
+          } else if (targetField === 'brand') {
+            setEditingBrand(prev => ({ ...prev, logoUrl: data.url }));
           }
         } else {
           showToast(data.message || 'Gagal mengunggah gambar', 'error');
@@ -545,6 +598,72 @@ export default function AdminPanel({
   };
 
 
+  // ================= BRANDS & LOGOS OPERATIONS =================
+
+  const saveBrand = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBrand) return;
+
+    const isEdit = !!editingBrand.id;
+    const urlField = isEdit ? `/api/ratecard/brands/${editingBrand.id}` : '/api/ratecard/brands';
+    const methodField = isEdit ? 'PUT' : 'POST';
+
+    try {
+      const response = await fetch(urlField, {
+        method: methodField,
+        headers: getAuthHeader(),
+        body: JSON.stringify(editingBrand)
+      });
+      const data = await response.json();
+      if (data.success) {
+        showToast(isEdit ? 'Brand berhasil diupdate!' : 'Brand baru berhasil ditambahkan!');
+        setEditingBrand(null);
+        setIsAddingBrand(false);
+        await onRefreshData();
+      } else {
+        showToast(data.message || 'Gagal menyimpan brand', 'error');
+      }
+    } catch (err) {
+      showToast('Terjadi kesalahan jaringan', 'error');
+    }
+  };
+
+  const deleteBrand = async (id: string) => {
+    if (!window.confirm('Yakin ingin menghapus brand ini dari list kolaborasi?')) return;
+
+    try {
+      const response = await fetch(`/api/ratecard/brands/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeader()
+      });
+      const data = await response.json();
+      if (data.success) {
+        showToast('Brand berhasil dihapus!');
+        await onRefreshData();
+      } else {
+        showToast(data.message || 'Gagal menghapus brand', 'error');
+      }
+    } catch (err) {
+      showToast('Koneksi gagal', 'error');
+    }
+  };
+
+  const triggerAddBrand = () => {
+    setEditingBrand({
+      name: '',
+      logoUrl: '',
+      isActive: true,
+      priority: (brands.length > 0 ? Math.max(...brands.map(b => b.priority || 0)) + 1 : 1)
+    });
+    setIsAddingBrand(true);
+  };
+
+  const triggerEditBrand = (brand: RatecardBrand) => {
+    setEditingBrand({ ...brand });
+    setIsAddingBrand(false);
+  };
+
+
   // If NOT Logged In, Render standard beautiful Lock screen
   if (!isLoggedIn) {
     return (
@@ -600,7 +719,7 @@ export default function AdminPanel({
       {/* Toast Notification Container */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-xs font-semibold text-white animate-bounce ${
-          notification.type === 'success' ? 'bg-emerald-600' : 'bg-red-650'
+          notification.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'
         }`} id="admin-toast">
           <Sparkles className="w-4 h-4" />
           <span>{notification.message}</span>
@@ -636,63 +755,137 @@ export default function AdminPanel({
         </div>
       </div>
 
-      {/* Navigation Tabs for Dashboard Options */}
-      <div className="border-b border-slate-200 mb-8 flex gap-2">
-        <button
-          onClick={() => { setActiveTab('links'); setEditingLink(null); }}
-          className={`pb-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-            activeTab === 'links' 
-              ? 'border-indigo-600 text-indigo-600' 
-              : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
-          id="btn-tab-links"
-        >
-          <LinkIcon className="w-3.5 h-3.5" /> Affiliate Links
-        </button>
-        <button
-          onClick={() => { setActiveTab('services'); setEditingService(null); }}
-          className={`pb-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-            activeTab === 'services' 
-              ? 'border-indigo-600 text-indigo-600' 
-              : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
-          id="btn-tab-services"
-        >
-          <Briefcase className="w-3.5 h-3.5" /> Ratecard Services
-        </button>
-        <button
-          onClick={() => { setActiveTab('profile'); }}
-          className={`pb-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-            activeTab === 'profile' 
-              ? 'border-indigo-600 text-indigo-600' 
-              : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
-          id="btn-tab-profile"
-        >
-          <User className="w-3.5 h-3.5" /> Profile Info
-        </button>
-        <button
-          onClick={() => { setActiveTab('projects'); setEditingProject(null); }}
-          className={`pb-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-            activeTab === 'projects' 
-              ? 'border-indigo-600 text-indigo-600' 
-              : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
-          id="btn-tab-projects"
-        >
-          <Video className="w-3.5 h-3.5" /> Viral Videos (IG)
-        </button>
-        <button
-          onClick={() => { setActiveTab('backup'); }}
-          className={`pb-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-            activeTab === 'backup' 
-              ? 'border-indigo-600 text-indigo-600' 
-              : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
-          id="btn-tab-backup"
-        >
-          <Database className="w-3.5 h-3.5" /> Backup &amp; Restore
-        </button>
+      {/* Navigation Tabs for Dashboard Options - Symmetrical Dropdown Control Center */}
+      <div className="mb-8 bg-white border border-slate-100 rounded-3xl p-5 shadow-xs" id="dashboard-categorized-tabs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span className="text-[10px] font-mono font-extrabold tracking-wider text-slate-400 uppercase block">
+              DASHBOARD PANEL UTAMA
+            </span>
+            <h2 className="text-sm font-display font-medium text-slate-700 mt-0.5">
+              Mengelola konten <span className="font-bold underline decoration-indigo-400">zendharefitra.com</span>
+            </h2>
+          </div>
+
+          {/* Symmetrical & Elegant Dropdown Selector */}
+          <div className="relative shrink-0 min-w-full sm:min-w-[260px]">
+            <label htmlFor="admin-page-selector" className="sr-only">Pilih Halaman Editor</label>
+            <div className="relative">
+              <select
+                id="admin-page-selector"
+                value={activeTab}
+                onChange={(e) => {
+                  const targetTab = e.target.value as any;
+                  setActiveTab(targetTab);
+                  if (targetTab === 'links') setEditingLink(null);
+                  if (targetTab === 'services') setEditingService(null);
+                  if (targetTab === 'projects') setEditingProject(null);
+                  if (targetTab === 'brands') setEditingBrand(null);
+                }}
+                className="w-full pl-10 pr-10 py-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 hover:border-slate-300 rounded-2xl text-xs font-semibold text-slate-700 outline-none transition-all cursor-pointer appearance-none shadow-xs"
+              >
+                <optgroup label="Landing Page: Linktree Affiliate">
+                  <option value="links">🔗 Affiliate Links Management</option>
+                </optgroup>
+                <optgroup label="Creative Ratecard & Portfolio">
+                  <option value="services">💼 Ratecard Services List</option>
+                  <option value="projects">🎬 Instagram Viral Videos</option>
+                  <option value="brands">🏷️ Brands & Logos Portfolio</option>
+                </optgroup>
+                <optgroup label="Konfigurasi Master & Sistem">
+                  <option value="profile">👤 Profile Main Biography</option>
+                  <option value="backup">🗄️ Backup & Restore Utilities</option>
+                  <option value="github">🐙 GitHub Storage System</option>
+                </optgroup>
+              </select>
+              {/* Left Side Icon display dynamically */}
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-500 pointer-events-none">
+                {activeTab === 'links' && <LinkIcon className="w-4 h-4" />}
+                {activeTab === 'services' && <Briefcase className="w-4 h-4" />}
+                {activeTab === 'projects' && <Video className="w-4 h-4" />}
+                {activeTab === 'brands' && <Tag className="w-4 h-4" />}
+                {activeTab === 'profile' && <User className="w-4 h-4" />}
+                {activeTab === 'backup' && <Database className="w-4 h-4" />}
+                {activeTab === 'github' && <Github className="w-4 h-4" />}
+              </div>
+              {/* Right Side Chevron */}
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Visual Symmetrical Quick-Nav indicator breadcrumb for fast visual confirmation */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-100 text-[10px] font-mono">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-slate-400 uppercase tracking-wider font-extrabold">Active Target:</span>
+            <span className="px-2.5 py-1 bg-indigo-50 border border-indigo-150 rounded-lg text-indigo-700 font-bold flex items-center gap-1.5">
+              {activeTab === 'links' && <><LinkIcon className="w-3 h-3" /> LINKTREE AFFILIATE</>}
+              {activeTab === 'services' && <><Briefcase className="w-3 h-3" /> RATECARD SERVICES</>}
+              {activeTab === 'projects' && <><Video className="w-3 h-3" /> VIRAL PORTFOLIO VIDEOS</>}
+              {activeTab === 'brands' && <><Tag className="w-3 h-3" /> INDUSTRY COLLABORATION BRANDS</>}
+              {activeTab === 'profile' && <><User className="w-3 h-3" /> MAIN BIOGRAPHY PROFILE</>}
+              {activeTab === 'backup' && <><Database className="w-3 h-3" /> BACKUP & RESTORE UTILITIES</>}
+              {activeTab === 'github' && <><Github className="w-3 h-3" /> CLOUD STORAGE SYSTEM</>}
+            </span>
+          </div>
+
+          {/* Fast Switch Buttons as a perfectly symmetric row for visual ease of use on Desktop */}
+          <div className="flex flex-wrap items-center gap-1">
+            <button 
+              onClick={() => { setActiveTab('links'); setEditingLink(null); }}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'links' ? 'bg-indigo-600 text-white border-indigo-600 font-black' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+              id="quick-nav-links"
+            >
+              Affiliate
+            </button>
+            <button 
+              onClick={() => { setActiveTab('services'); setEditingService(null); }}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'services' ? 'bg-[#8B82F6] text-white border-[#8B82F6]' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+              id="quick-nav-services"
+            >
+              Services
+            </button>
+            <button 
+              onClick={() => { setActiveTab('projects'); setEditingProject(null); }}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'projects' ? 'bg-[#8B82F6] text-white border-[#8B82F6]' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+              id="quick-nav-projects"
+            >
+              Videos
+            </button>
+            <button 
+              onClick={() => { setActiveTab('brands'); setEditingBrand(null); }}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'brands' ? 'bg-[#8B82F6] text-white border-[#8B82F6]' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+              id="quick-nav-brands"
+            >
+              Brands
+            </button>
+            <button 
+              onClick={() => { setActiveTab('profile'); }}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'profile' ? 'bg-slate-800 text-white border-slate-800' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+              id="quick-nav-profile"
+            >
+              Profile
+            </button>
+            <button 
+              onClick={() => { setActiveTab('backup'); }}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'backup' ? 'bg-slate-800 text-white border-slate-800' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+              id="quick-nav-backup"
+            >
+              Backup
+            </button>
+            <button 
+              onClick={() => { setActiveTab('github'); }}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'github' ? 'bg-slate-800 text-white border-slate-800' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+              id="quick-nav-github"
+            >
+              Storage
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* ======================================================== */}
@@ -777,7 +970,7 @@ export default function AdminPanel({
               {!editingLink && (
                 <button
                   onClick={triggerAddLink}
-                  className="px-4 py-2.5 bg-indigo-650 hover:bg-indigo-750 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer font-sans"
+                  className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer font-sans"
                   id="btn-trigger-add-link"
                 >
                   <PlusCircle className="w-4 h-4" /> Tambah Link Baru
@@ -787,7 +980,7 @@ export default function AdminPanel({
 
           {/* Collapsible Add/Edit Form Box */}
           {editingLink && (
-            <div className="bg-slate-55 border border-slate-150 rounded-2xl p-6 shadow-inner" id="link-form-container">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-inner" id="link-form-container">
               <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">
                 {isAddingLink ? 'TAMBAH LINK BARU' : `EDIT LINK: ${editingLink.title}`}
               </h3>
@@ -1017,7 +1210,7 @@ export default function AdminPanel({
             {!editingService && (
               <button
                 onClick={triggerAddService}
-                className="px-4 py-2.5 bg-indigo-650 hover:bg-indigo-750 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer font-sans"
+                className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer font-sans"
                 id="btn-trigger-add-service"
               >
                 <PlusCircle className="w-4 h-4" /> Tambah Layanan Baru
@@ -1027,7 +1220,7 @@ export default function AdminPanel({
 
           {/* Collapsible Add/Edit Service form */}
           {editingService && (
-            <div className="bg-slate-55 border border-slate-150 rounded-2xl p-6 shadow-inner" id="service-form-container">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-inner" id="service-form-container">
               <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">
                 {isAddingService ? 'TAMBAH SERVICE BARU' : `EDIT SERVICE RATE: ${editingService.title}`}
               </h3>
@@ -1416,6 +1609,34 @@ export default function AdminPanel({
               </div>
             </div>
 
+            {/* NEW: Gelar & Tahun Studio Customize Tab */}
+            <div className="border-t border-slate-100 pt-5 mt-6">
+              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">Gelar Kreator &amp; Tahun Berdiri</h3>
+              <p className="text-xs text-slate-400 mb-4">Sesuaikan gelar utama (misal STUDIO DIRECTOR) dan tahun berdiri (misal ESTD 2026) yang tampil di samping foto profil Anda.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Gelar Utama (Director Title)</label>
+                  <input 
+                    type="text" 
+                    value={profileForm.studioDirectorTitle || ''}
+                    placeholder="e.g. STUDIO DIRECTOR"
+                    onChange={(e) => setProfileForm({...profileForm, studioDirectorTitle: e.target.value})}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-[#8B82F6] uppercase mb-1">Tahun Berdiri (Estd Year / Text)</label>
+                  <input 
+                    type="text" 
+                    value={profileForm.studioEstdYear || ''}
+                    placeholder="e.g. 2026"
+                    onChange={(e) => setProfileForm({...profileForm, studioEstdYear: e.target.value})}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans font-mono font-semibold text-slate-800"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* NEW: Interactive Stats Editor Curation */}
             <div className="border-t border-slate-100 pt-5 mt-6">
               <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-1">
@@ -1570,7 +1791,7 @@ export default function AdminPanel({
             {!editingProject && (
               <button
                 onClick={triggerAddProject}
-                className="px-4 py-2.5 bg-indigo-650 hover:bg-indigo-750 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer font-sans"
+                className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer font-sans"
                 id="btn-trigger-add-project"
               >
                 <Plus className="w-4 h-4" /> Tambah Video Baru
@@ -1580,7 +1801,7 @@ export default function AdminPanel({
 
           {/* New/Edit Project Form Overlay */}
           {editingProject && (
-            <div className="bg-slate-55 border border-slate-150 rounded-2xl p-6 shadow-inner" id="project-form-container">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-inner" id="project-form-container">
               <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">
                 {isAddingProject ? 'TAMBAH VIDEO PROJECT BARU' : `EDIT VIDEO: ${editingProject.title}`}
               </h3>
@@ -1758,6 +1979,189 @@ export default function AdminPanel({
         </div>
       )}
 
+      {/* ======================================================== */}
+      {/* 4.5. MANAGE BRANDS & LOGOS TAB */}
+      {/* ======================================================== */}
+      {activeTab === 'brands' && (
+        <div className="space-y-6" id="tab-content-brands">
+          <div className="flex justify-between items-center bg-slate-50 border border-slate-100 rounded-3xl p-6 shadow-xs flex-col sm:flex-row gap-4">
+            <div>
+              <h2 className="text-md font-display font-bold text-slate-800">Daftar Brand &amp; Kolaborasi Industri</h2>
+              <p className="text-xs text-slate-400">Atur logo brand-brand ternama yang bekerjasama dengan Anda pada halaman Ratecard.</p>
+            </div>
+            <button 
+              onClick={triggerAddBrand}
+              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs select-none"
+              id="btn-add-brand"
+            >
+              <PlusCircle className="w-4 h-4" /> Tambah Brand Baru
+            </button>
+          </div>
+
+          {/* Form to edit or add brand inline */}
+          {editingBrand && (
+            <div className="bg-slate-50 border border-indigo-100 rounded-3xl p-6 shadow-xs animate-fadeIn" id="form-brand-editor">
+              <h3 className="text-xs font-mono font-bold text-indigo-600 uppercase tracking-widest mb-4">
+                {isAddingBrand ? 'Tambah Brand Baru' : 'Edit Detail Brand'}
+              </h3>
+              <form onSubmit={saveBrand} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Nama Brand</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="e.g. IKEA, BOSE, Samsung"
+                      value={editingBrand.name || ''}
+                      onChange={(e) => setEditingBrand({...editingBrand, name: e.target.value})}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Prioritas Urutan (Kecil = Tampil Pertama)</label>
+                    <input 
+                      type="number" 
+                      required
+                      min={1}
+                      placeholder="e.g. 1, 2, 3..."
+                      value={editingBrand.priority || 1}
+                      onChange={(e) => setEditingBrand({...editingBrand, priority: Number(e.target.value)})}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Logo Brand (Kosongkan jika ingin memakai fallback SVG visual bawaan)</label>
+                  <div className="flex gap-2 items-center">
+                    <input 
+                      type="text" 
+                      placeholder="https://images.unsplash.com/photo-... atau url gambar transparan"
+                      value={editingBrand.logoUrl || ''}
+                      onChange={(e) => setEditingBrand({...editingBrand, logoUrl: e.target.value})}
+                      className="flex-1 px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400 font-mono"
+                    />
+                    <label className="px-3.5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-xs font-bold cursor-pointer transition-colors shrink-0 text-center select-none">
+                      {isUploading['brand'] ? 'Uploading...' : 'Unggah File'}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => handleFileUpload(e, 'brand')} 
+                        className="hidden" 
+                      />
+                    </label>
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Format gambar transparan (.png / .svg) dengan warna kontras terang sangat direkomendasikan untuk tema gelap Ratecard.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <input 
+                    type="checkbox" 
+                    id="brand-active" 
+                    checked={editingBrand.isActive !== false}
+                    onChange={(e) => setEditingBrand({...editingBrand, isActive: e.target.checked})}
+                    className="w-3.5 h-3.5 accent-indigo-600"
+                  />
+                  <label htmlFor="brand-active" className="text-xs text-slate-600 font-semibold cursor-pointer">Tampilkan Brand ini pada halaman utama Ratecard</label>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4 border-t border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => { setEditingBrand(null); setIsAddingBrand(false); }}
+                    className="px-4 py-2 border border-slate-200 rounded-lg text-xs text-slate-500 hover:bg-slate-100 transition-colors font-sans"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors font-sans flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Save className="w-3.5 h-3.5" /> Simpan Brand
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Grid list display of Collaborating Brands */}
+          <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden" id="admin-brands-list">
+            <div className="divide-y divide-slate-100">
+              {brands && brands.length > 0 ? (
+                brands
+                  .sort((a, b) => (a.priority || 0) - (b.priority || 0))
+                  .map((brand) => (
+                    <div 
+                      key={brand.id}
+                      className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-center p-2 shrink-0">
+                          {brand.logoUrl ? (
+                            <img 
+                              src={brand.logoUrl} 
+                              alt={brand.name} 
+                              className="max-h-full max-w-full object-contain filter brightness-110" 
+                            />
+                          ) : (
+                            <div className="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-tighter truncate w-full text-center">
+                              {brand.name}
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[10px] font-mono bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded text-indigo-700 uppercase">
+                              Prioritas: {brand.priority || 1}
+                            </span>
+                            {brand.isActive !== false ? (
+                              <span className="text-[10px] font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">
+                                ● Aktif
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded">
+                                Nonaktif
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="font-display font-bold text-slate-800 text-sm mt-1.5 leading-snug">
+                            {brand.name}
+                          </h3>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 justify-end">
+                        <button 
+                          onClick={() => triggerEditBrand(brand)}
+                          className="p-2 text-slate-400 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 border border-slate-100 hover:border-indigo-100 rounded-lg transition-colors cursor-pointer"
+                          title="Edit Brand"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button 
+                          onClick={() => deleteBrand(brand.id)}
+                          className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 border border-slate-100 hover:border-red-100 rounded-lg transition-colors cursor-pointer"
+                          title="Hapus Brand"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                    </div>
+                  ))
+              ) : (
+                <div className="p-8 text-center text-slate-400 text-xs">
+                  Belum ada brand terdaftar. Klik 'Tambah Brand Baru' diatas untuk mengisi.
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+      )}
+
       {activeTab === 'backup' && (
         <div className="space-y-6" id="tab-content-backup">
           
@@ -1883,6 +2287,210 @@ export default function AdminPanel({
 
           </div>
 
+        </div>
+      )}
+
+      {activeTab === 'github' && (
+        <div className="space-y-6" id="tab-content-github">
+          
+          {/* Informational Hero Card */}
+          <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono bg-indigo-50 border border-indigo-150 px-2.5 py-1 rounded text-indigo-700 uppercase font-black tracking-wider">
+                GitHub Storage Cloud Sync (Permanent)
+              </span>
+              <h2 className="text-base font-display font-medium text-slate-800 mt-2">
+                Simpan Gambar Hasil Upload secara Permanen di GitHub
+              </h2>
+              <p className="text-xs text-slate-400 max-w-xl">
+                Karena server website berjalan pada container cloud yang bersifat sementara (ephemeral), file gambar yang diupload ke server lokal akan hilang otomatis ketika server melakukan restart atau update code. <strong className="text-slate-600">Integrasi GitHub</strong> mengatasi ini dengan langsung mengirimkan file gambar hasil upload Anda ke repository GitHub pribadi/publik Anda, sehingga gambar memiliki link absolut permanen dan tidak akan pernah hilang.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 md:p-8 shadow-xs">
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              setIsSavingGithub(true);
+              try {
+                const resp = await fetch('/api/github/settings', {
+                  method: 'POST',
+                  headers: getAuthHeader(),
+                  body: JSON.stringify(githubSettings)
+                });
+                const data = await resp.json();
+                if (data.success) {
+                  showToast('Pengaturan GitHub Storage berhasil disimpan!');
+                  fetchGithubSettings();
+                } else {
+                  showToast(data.message || 'Gagal menyimpan pengaturan.', 'error');
+                }
+              } catch (err: any) {
+                showToast('Koneksi ke backend bermasalah: ' + err.message, 'error');
+              } finally {
+                setIsSavingGithub(false);
+              }
+            }} className="space-y-6">
+              
+              <div className="flex items-center justify-between p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                <div>
+                  <h3 className="text-xs font-bold font-mono text-slate-600 uppercase">Status Fitur</h3>
+                  <p className="text-xs text-slate-400 mt-1">Aktifkan untuk mulai mengupload gambar ke GitHub secara langsung</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={githubSettings.enabled}
+                    onChange={(e) => setGithubSettings({ ...githubSettings, enabled: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase">
+                    GitHub Personal Access Token (PAT)
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    required={githubSettings.enabled}
+                    value={githubSettings.token}
+                    onChange={(e) => setGithubSettings({ ...githubSettings, token: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white outline-none focus:border-indigo-400 font-mono transition-colors"
+                  />
+                  <p className="text-[10px] text-slate-400">
+                    Gunakan token GitHub (Classic) dengan scope <code className="bg-slate-100 px-1 py-0.5 rounded">repo</code> untuk memberikan akses modifikasi file.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase">
+                    Repository Owner Username (GitHub Username)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. zendharefitra"
+                    required={githubSettings.enabled}
+                    value={githubSettings.owner}
+                    onChange={(e) => setGithubSettings({ ...githubSettings, owner: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white outline-none focus:border-indigo-400 transition-colors"
+                  />
+                  <p className="text-[10px] text-slate-400">
+                    Nama akun/username GitHub Anda.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase">
+                    Repository Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. portfolio-assets"
+                    required={githubSettings.enabled}
+                    value={githubSettings.repo}
+                    onChange={(e) => setGithubSettings({ ...githubSettings, repo: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white outline-none focus:border-indigo-400 transition-colors"
+                  />
+                  <p className="text-[10px] text-slate-400">
+                    Nama repository tempat menyimpan file. Pastikan repository ini sudah dibuat terlebih dahulu di GitHub Anda.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase">
+                    Branch Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. main"
+                    value={githubSettings.branch}
+                    onChange={(e) => setGithubSettings({ ...githubSettings, branch: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white outline-none focus:border-indigo-400 font-mono transition-colors"
+                  />
+                  <p className="text-[10px] text-slate-400">
+                    Nama target cabang/branch (biasanya <code className="bg-slate-100 px-1 py-0.5 rounded">main</code> atau <code className="bg-slate-100 px-1 py-0.5 rounded">master</code>).
+                  </p>
+                </div>
+
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase">
+                    Upload Folder Path
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. uploads (or leave empty)"
+                    value={githubSettings.path}
+                    onChange={(e) => setGithubSettings({ ...githubSettings, path: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white outline-none focus:border-indigo-400 font-mono transition-colors"
+                  />
+                  <p className="text-[10px] text-slate-400">
+                    Direktori/jalur penyimpanan folder di dalam repository (misalnya <code className="bg-slate-100 px-1 py-0.5 rounded">uploads</code> atau <code className="bg-slate-100 px-1 py-0.5 rounded">assets/images</code>).
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons for GitHub Config */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-150">
+                <button
+                  type="submit"
+                  disabled={isSavingGithub}
+                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-750 text-white rounded-xl text-xs font-semibold shadow-xs disabled:opacity-50 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isSavingGithub ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  Simpan Pengaturan GitHub
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setTestStatus({ message: 'Sedang menguji koneksi (mengirim berkas percobaan)...', type: 'loading' });
+                    try {
+                      const resp = await fetch('/api/github/test', {
+                        method: 'POST',
+                        headers: getAuthHeader(),
+                        body: JSON.stringify(githubSettings)
+                      });
+                      const data = await resp.json();
+                      if (data.success) {
+                        setTestStatus({ message: data.message, type: 'success' });
+                      } else {
+                        setTestStatus({ message: data.message || 'Gagal menghubungkan ke GitHub. Silakan periksa kredensial Anda.', type: 'error' });
+                      }
+                    } catch (e: any) {
+                      setTestStatus({ message: 'Gagal menghubungi server untuk pengujian: ' + e.message, type: 'error' });
+                    }
+                  }}
+                  disabled={testStatus.type === 'loading'}
+                  className="px-5 py-3 bg-slate-100 hover:bg-slate-150 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer select-none"
+                >
+                  {testStatus.type === 'loading' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-indigo-500" />}
+                  Uji Koneksi (Test Sync)
+                </button>
+              </div>
+
+              {/* Status Indicator Feedback */}
+              {testStatus.type && (
+                <div className={`p-4 rounded-2xl border text-xs leading-relaxed transition-all ${
+                  testStatus.type === 'success' 
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                    : testStatus.type === 'error'
+                      ? 'bg-rose-50 border-rose-200 text-rose-800'
+                      : 'bg-slate-50 border-slate-200 text-slate-600 animate-pulse'
+                }`}>
+                  <div className="flex gap-2 items-start font-sans">
+                    <span className="font-bold uppercase tracking-wide shrink-0">
+                      [{testStatus.type === 'success' ? 'SUKSES' : testStatus.type === 'error' ? 'GAGAL' : 'MENGUJI'}]
+                    </span>
+                    <span>{testStatus.message}</span>
+                  </div>
+                </div>
+              )}
+
+            </form>
+          </div>
         </div>
       )}
     </div>

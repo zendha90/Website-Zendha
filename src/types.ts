@@ -29,6 +29,10 @@ export interface RatecardProfile {
   contactPhone?: string;
   stats?: Array<{ value: string; label: string; desc: string }>;
   termsOfService?: string[];
+  
+  // New Customizable Titles
+  studioDirectorTitle?: string;
+  studioEstdYear?: string;
 }
 
 export interface RatecardService {
@@ -52,9 +56,28 @@ export interface RatecardProject {
   url: string;
 }
 
+export interface GitHubSettings {
+  enabled: boolean;
+  token: string;
+  owner: string;
+  repo: string;
+  branch: string;
+  path: string;
+}
+
+export interface RatecardBrand {
+  id: string;
+  name: string;
+  logoUrl?: string;
+  isActive: boolean;
+  priority: number;
+}
+
 export interface AppData {
   links: AffiliateLink[];
   profile: RatecardProfile;
   services: RatecardService[];
   projects: RatecardProject[];
+  githubSettings?: GitHubSettings;
+  brands?: RatecardBrand[];
 }

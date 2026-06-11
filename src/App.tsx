@@ -162,6 +162,7 @@ export default function App() {
                 profile={data.profile}
                 services={data.services}
                 projects={data.projects}
+                brands={data.brands || []}
                 onNavigateBack={() => navigateTo('home')}
                 onNavigateToAdmin={() => navigateTo('admin')}
               />
@@ -184,6 +185,7 @@ export default function App() {
                 profile={data.profile}
                 services={data.services}
                 projects={data.projects}
+                brands={data.brands}
               />
             </motion.div>
           )}

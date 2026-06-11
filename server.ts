@@ -47,6 +47,10 @@ interface RatecardProfile {
   contactPhone?: string;
   stats?: Array<{ value: string; label: string; desc: string }>;
   termsOfService?: string[];
+  
+  // New Customizable Titles
+  studioDirectorTitle?: string;
+  studioEstdYear?: string;
 }
 
 interface RatecardService {
@@ -70,11 +74,30 @@ interface RatecardProject {
   url: string;
 }
 
+interface GitHubSettings {
+  enabled: boolean;
+  token: string;
+  owner: string;
+  repo: string;
+  branch: string;
+  path: string;
+}
+
+interface RatecardBrand {
+  id: string;
+  name: string;
+  logoUrl?: string;
+  isActive: boolean;
+  priority: number;
+}
+
 interface DatabaseSchema {
   links: AffiliateLink[];
   profile: RatecardProfile;
   services: RatecardService[];
   projects: RatecardProject[];
+  githubSettings?: GitHubSettings;
+  brands?: RatecardBrand[];
 }
 
 // Default Data Seed
@@ -226,12 +249,32 @@ const DEFAULT_DB: DatabaseSchema = {
     {
       id: "project-3",
       title: "Lebih efisien dan rapi!",
-      highlight: "di ACE Indonesia 😍👍",
+      highlight: "di ACE Indonesia  😍👍",
       views: "2.5M",
       imageUrl: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=400",
       category: "Organization Hacks",
       url: "https://www.instagram.com/p/Cxl9Y_vPyzX/"
     }
+  ],
+  githubSettings: {
+    enabled: false,
+    token: '',
+    owner: '',
+    repo: '',
+    branch: 'main',
+    path: 'uploads'
+  },
+  brands: [
+    { id: "brand-1", name: "IKEA", logoUrl: "", priority: 1, isActive: true },
+    { id: "brand-2", name: "BOSE", logoUrl: "", priority: 2, isActive: true },
+    { id: "brand-3", name: "Midea", logoUrl: "", priority: 3, isActive: true },
+    { id: "brand-4", name: "Indomaret", logoUrl: "", priority: 4, isActive: true },
+    { id: "brand-5", name: "MR DIY", logoUrl: "", priority: 5, isActive: true },
+    { id: "brand-6", name: "Olymplast", logoUrl: "", priority: 6, isActive: true },
+    { id: "brand-7", name: "Polki", logoUrl: "", priority: 7, isActive: true },
+    { id: "brand-8", name: "Home Guard", logoUrl: "", priority: 8, isActive: true },
+    { id: "brand-9", name: "Meco", logoUrl: "", priority: 9, isActive: true },
+    { id: "brand-10", name: "Advance", logoUrl: "", priority: 10, isActive: true }
   ]
 };
 
@@ -241,8 +284,27 @@ function readDb(): DatabaseSchema {
     if (fs.existsSync(DATA_FILE)) {
       const content = fs.readFileSync(DATA_FILE, 'utf-8');
       const db = JSON.parse(content);
+      let changed = false;
       if (!db.projects) {
         db.projects = DEFAULT_DB.projects;
+        changed = true;
+      }
+      if (!db.githubSettings) {
+        db.githubSettings = {
+          enabled: false,
+          token: '',
+          owner: '',
+          repo: '',
+          branch: 'main',
+          path: 'uploads'
+        };
+        changed = true;
+      }
+      if (!db.brands || db.brands.length === 0) {
+        db.brands = DEFAULT_DB.brands;
+        changed = true;
+      }
+      if (changed) {
         writeDb(db);
       }
       return db;
@@ -316,7 +378,7 @@ app.get('/api/auth/profile', (req, res) => {
 });
 
 // Image Upload Endpoint (handles Base64 input)
-app.post('/api/upload', (req, res) => {
+app.post('/api/upload', async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
   
   const { fileName, base64Data } = req.body;
@@ -332,12 +394,56 @@ app.post('/api/upload', (req, res) => {
     // Generate clean unique file name
     const ext = path.extname(fileName) || '.jpg';
     const cleanFileName = `img-${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`;
-    const filePath = path.join(UPLOADS_DIR, cleanFileName);
     
-    fs.writeFileSync(filePath, buffer);
-    
-    const url = `/uploads/${cleanFileName}`;
-    res.json({ success: true, url });
+    const db = readDb();
+    const github = db.githubSettings;
+
+    if (github && github.enabled && github.token && github.owner && github.repo) {
+      // Clean path directory
+      const cleanPath = github.path ? github.path.replace(/^\/+|\/+$/g, '') : 'uploads';
+      const githubFilePath = cleanPath ? `${cleanPath}/${cleanFileName}` : cleanFileName;
+      const url = `https://api.github.com/repos/${github.owner}/${github.repo}/contents/${githubFilePath}`;
+      
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${github.token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'Node-Portfolio-App'
+        },
+        body: JSON.stringify({
+          message: `Upload image ${cleanFileName} via admin portfolio`,
+          content: base64Image,
+          branch: github.branch || 'main'
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`GitHub API error: ${response.status} - ${errText}`);
+      }
+
+      // Compute the premium Raw URL
+      const publicUrl = `https://raw.githubusercontent.com/${github.owner}/${github.repo}/${github.branch || 'main'}/${githubFilePath}`;
+      
+      // Save local backup copy as fallback
+      try {
+        const filePath = path.join(UPLOADS_DIR, cleanFileName);
+        fs.writeFileSync(filePath, buffer);
+      } catch (e) {
+        console.warn("Failed local backup write:", e);
+      }
+
+      return res.json({ success: true, url: publicUrl });
+    } else {
+      // Local server save fallback
+      const filePath = path.join(UPLOADS_DIR, cleanFileName);
+      fs.writeFileSync(filePath, buffer);
+      
+      const url = `/uploads/${cleanFileName}`;
+      res.json({ success: true, url });
+    }
   } catch (err: any) {
     console.error("Error writing upload file:", err);
     res.status(500).json({ success: false, message: 'Gagal mengupload file: ' + err.message });
@@ -375,6 +481,105 @@ app.post('/api/backup/import', (req, res) => {
     res.json({ success: true, message: 'Database zendharefitra berhasil dipulihkan secara penuh!' });
   } catch (err: any) {
     res.status(500).json({ success: false, message: 'Gagal memulihkan database: ' + err.message });
+  }
+});
+
+// GET GitHub Settings (admin only, hides token)
+app.get('/api/github/settings', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+  const db = readDb();
+  const settings = db.githubSettings || { enabled: false, token: '', owner: '', repo: '', branch: 'main', path: 'uploads' };
+  
+  // Mask token for safety
+  const maskedToken = settings.token 
+    ? (settings.token.length > 8 ? `${settings.token.substring(0, 4)}...${settings.token.substring(settings.token.length - 4)}` : '********')
+    : '';
+    
+  res.json({
+    success: true,
+    settings: {
+      ...settings,
+      token: maskedToken
+    }
+  });
+});
+
+// POST Save GitHub Settings (admin only)
+app.post('/api/github/settings', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+  const { enabled, token, owner, repo, branch, path: folderPath } = req.body;
+  const db = readDb();
+  
+  const currentSettings = db.githubSettings || { enabled: false, token: '', owner: '', repo: '', branch: 'main', path: 'uploads' };
+  
+  let finalToken = token;
+  // If user preserves the masked representation, keep original from DB
+  if (token && (token.includes('...') || token === '********')) {
+    finalToken = currentSettings.token;
+  }
+  
+  db.githubSettings = {
+    enabled: !!enabled,
+    token: finalToken || '',
+    owner: owner || '',
+    repo: repo || '',
+    branch: branch || 'main',
+    path: folderPath || 'uploads'
+  };
+  
+  writeDb(db);
+  res.json({ success: true, message: 'Pengaturan GitHub Storage berhasil disimpan!' });
+});
+
+// POST Test GitHub Integration File Commit Connection
+app.post('/api/github/test', async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+  const { token, owner, repo, branch, path: folderPath } = req.body;
+  const db = readDb();
+  
+  const currentSettings = db.githubSettings || { enabled: false, token: '', owner: '', repo: '', branch: 'main', path: 'uploads' };
+  
+  let finalToken = token;
+  if (token && (token.includes('...') || token === '********')) {
+    finalToken = currentSettings.token;
+  }
+  
+  if (!finalToken || !owner || !repo) {
+    return res.status(400).json({ success: false, message: 'Token, Owner, dan Repo wajib diisi untuk melakukan test!' });
+  }
+  
+  const cleanFolderPath = folderPath ? folderPath.replace(/^\/+|\/+$/g, '') : 'uploads';
+  const testFileName = `test-connection-${Date.now()}.txt`;
+  const githubPath = cleanFolderPath ? `${cleanFolderPath}/${testFileName}` : testFileName;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${githubPath}`;
+  
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${finalToken}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Node-Portfolio-App'
+      },
+      body: JSON.stringify({
+        message: 'Test Connection via portfolio admin panel',
+        content: Buffer.from(`Koneksi Sukses! Dibuat otomatis oleh Sistem Portfolio Zendha Refitra pada ${new Date().toISOString()}`).toString('base64'),
+        branch: branch || 'main'
+      })
+    });
+    
+    if (!response.ok) {
+      const errText = await response.text();
+      return res.status(response.status).json({ success: false, message: `Gagal ke GitHub: ${response.status} - ${errText}` });
+    }
+    
+    res.json({ success: true, message: `Koneksi berhasil! File test dibuat di repository pada jalur /${githubPath}` });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: 'Koneksi gagal: ' + err.message });
   }
 });
 
@@ -479,7 +684,7 @@ app.put('/api/ratecard/profile', (req, res) => {
   const { 
     name, bio, instagram, tiktok, youtube, email, avatarUrl, whatsapp,
     heroTagline, heroTitle1, heroTitleHighlight, heroDescription, domicile, contactPhone,
-    stats, termsOfService
+    stats, termsOfService, studioDirectorTitle, studioEstdYear
   } = req.body;
   const db = readDb();
   
@@ -499,7 +704,9 @@ app.put('/api/ratecard/profile', (req, res) => {
     domicile: domicile !== undefined ? domicile : db.profile.domicile,
     contactPhone: contactPhone !== undefined ? contactPhone : db.profile.contactPhone,
     stats: stats !== undefined ? stats : db.profile.stats,
-    termsOfService: termsOfService !== undefined ? termsOfService : db.profile.termsOfService
+    termsOfService: termsOfService !== undefined ? termsOfService : db.profile.termsOfService,
+    studioDirectorTitle: studioDirectorTitle !== undefined ? studioDirectorTitle : db.profile.studioDirectorTitle,
+    studioEstdYear: studioEstdYear !== undefined ? studioEstdYear : db.profile.studioEstdYear
   };
   
   writeDb(db);
@@ -650,6 +857,79 @@ app.delete('/api/ratecard/projects/:id', (req, res) => {
   
   writeDb(db);
   res.json({ success: true, message: 'Project berhasil dihapus' });
+});
+
+
+// Add New Ratecard Brand
+app.post('/api/ratecard/brands', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+  const { name, logoUrl, priority, isActive } = req.body;
+  if (!name) {
+    return res.status(400).json({ success: false, message: 'Nama brand wajib diisi' });
+  }
+  
+  const db = readDb();
+  if (!db.brands) db.brands = [];
+  
+  const newBrand = {
+    id: `brand-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    name,
+    logoUrl: logoUrl || '',
+    priority: priority !== undefined ? Number(priority) : db.brands.length + 1,
+    isActive: isActive !== undefined ? !!isActive : true
+  };
+  
+  db.brands.push(newBrand);
+  writeDb(db);
+  
+  res.status(201).json({ success: true, brand: newBrand });
+});
+
+// Update Ratecard Brand
+app.put('/api/ratecard/brands/:id', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+  const { id } = req.params;
+  const { name, logoUrl, priority, isActive } = req.body;
+  
+  const db = readDb();
+  if (!db.brands) db.brands = [];
+  
+  const index = db.brands.findIndex(b => b.id === id);
+  if (index === -1) {
+    return res.status(404).json({ success: false, message: 'Brand tidak ditemukan' });
+  }
+  
+  db.brands[index] = {
+    ...db.brands[index],
+    name: name !== undefined ? name : db.brands[index].name,
+    logoUrl: logoUrl !== undefined ? logoUrl : db.brands[index].logoUrl,
+    priority: priority !== undefined ? Number(priority) : db.brands[index].priority,
+    isActive: isActive !== undefined ? !!isActive : db.brands[index].isActive
+  };
+  
+  writeDb(db);
+  res.json({ success: true, brand: db.brands[index] });
+});
+
+// Delete Ratecard Brand
+app.delete('/api/ratecard/brands/:id', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+  const { id } = req.params;
+  const db = readDb();
+  if (!db.brands) db.brands = [];
+  
+  const initialLength = db.brands.length;
+  db.brands = db.brands.filter(b => b.id !== id);
+  
+  if (db.brands.length === initialLength) {
+    return res.status(404).json({ success: false, message: 'Brand tidak ditemukan' });
+  }
+  
+  writeDb(db);
+  res.json({ success: true, message: 'Brand berhasil dihapus' });
 });
 
 

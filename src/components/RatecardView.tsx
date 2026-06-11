@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowLeft, 
   Instagram, 
@@ -16,12 +16,13 @@ import {
   Globe,
   Monitor
 } from 'lucide-react';
-import { RatecardProfile, RatecardService, RatecardProject } from '../types';
+import { RatecardProfile, RatecardService, RatecardProject, RatecardBrand } from '../types';
 
 interface RatecardViewProps {
   profile: RatecardProfile;
   services: RatecardService[];
   projects: RatecardProject[];
+  brands?: RatecardBrand[];
   onNavigateBack: () => void;
   onNavigateToAdmin: () => void;
 }
@@ -38,35 +39,35 @@ const WhatsAppIcon = ({ className = "w-5 h-5", ...props }: { className?: string 
   </svg>
 );
 
-const BrandLogoList = () => {
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center justify-center pt-2 w-full">
-      {/* IKEA */}
-      <div className="bg-[#12121 open]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300" title="IKEA">
-        <svg viewBox="0 0 100 40" className="w-full h-full opacity-80 hover:opacity-100 transition-opacity">
-          <rect width="100" height="40" fill="#FFDA1A" rx="4" />
-          <ellipse cx="50" cy="20" rx="46" ry="17" fill="#0051BA" />
-          <text x="50" y="27" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="20" fill="#FFDA1A" textAnchor="middle" letterSpacing="0.5">IKEA</text>
-        </svg>
-      </div>
-
-      {/* BOSE */}
-      <div className="bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300" title="BOSE">
-        <svg viewBox="0 0 100 40" className="w-full h-full opacity-70 hover:opacity-100 transition-opacity">
-          <text x="50" y="26" fontFamily="sans-serif" fontWeight="900" fontStyle="italic" fontSize="22" fill="#FFFFFF" textAnchor="middle" letterSpacing="-1">BOSE</text>
-        </svg>
-      </div>
-
-      {/* MIDEA */}
-      <div className="bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300" title="Midea">
-        <svg viewBox="0 0 100 40" className="w-full h-full opacity-80 hover:opacity-100 transition-opacity">
-          <text x="45" y="24" fontFamily="sans-serif" fontWeight="bold" fontSize="16" fill="#0072C6" textAnchor="middle">Midea</text>
-          <path d="M72,12 C78,16 78,24 72,28" stroke="#F18A00" strokeWidth="3" fill="none" strokeLinecap="round" />
-        </svg>
-      </div>
-
-      {/* INDOMARET */}
-      <div className="bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex flex-col items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300" title="Indomaret">
+const renderDefaultSvg = (name: string) => {
+  const normalized = name.toLowerCase().trim();
+  if (normalized === 'ikea') {
+    return (
+      <svg viewBox="0 0 100 40" className="w-full h-full opacity-80 hover:opacity-100 transition-opacity">
+        <rect width="100" height="40" fill="#FFDA1A" rx="4" />
+        <ellipse cx="50" cy="20" rx="46" ry="17" fill="#0051BA" />
+        <text x="50" y="27" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="20" fill="#FFDA1A" textAnchor="middle" letterSpacing="0.5">IKEA</text>
+      </svg>
+    );
+  }
+  if (normalized === 'bose') {
+    return (
+      <svg viewBox="0 0 100 40" className="w-full h-full opacity-70 hover:opacity-100 transition-opacity">
+        <text x="50" y="26" fontFamily="sans-serif" fontWeight="900" fontStyle="italic" fontSize="22" fill="#FFFFFF" textAnchor="middle" letterSpacing="-1">BOSE</text>
+      </svg>
+    );
+  }
+  if (normalized === 'midea') {
+    return (
+      <svg viewBox="0 0 100 40" className="w-full h-full opacity-80 hover:opacity-100 transition-opacity">
+        <text x="45" y="24" fontFamily="sans-serif" fontWeight="bold" fontSize="16" fill="#0072C6" textAnchor="middle">Midea</text>
+        <path d="M72,12 C78,16 78,24 72,28" stroke="#F18A00" strokeWidth="3" fill="none" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (normalized === 'indomaret') {
+    return (
+      <div className="w-full h-full flex flex-col justify-center">
         <div className="w-full h-1.5 flex">
           <div className="flex-1 bg-[#004A99] rounded-tl-sm" />
           <div className="flex-1 bg-[#E41F26]" />
@@ -76,52 +77,86 @@ const BrandLogoList = () => {
           <span className="text-[10px] font-black tracking-wider text-white">Indomaret</span>
         </div>
       </div>
-
-      {/* MR DIY */}
-      <div className="bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300" title="MR. D.I.Y">
-        <div className="flex items-center gap-1.5 opacity-85">
-          <div className="w-4 h-4 rounded-full bg-[#FFD700] border border-[#D81E21] flex items-center justify-center text-[8px] font-black text-[#D81E21]">🛠️</div>
-          <span className="text-[11px] font-black text-[#D81E21] tracking-tighter">MR.D.I.Y</span>
-        </div>
+    );
+  }
+  if (normalized === 'mr diy' || normalized === 'mr.d.i.y' || normalized === 'mr. d.i.y') {
+    return (
+      <div className="flex items-center gap-1.5 opacity-85">
+        <div className="w-4 h-4 rounded-full bg-[#FFD700] border border-[#D81E21] flex items-center justify-center text-[8px] font-black text-[#D81E21]">🛠️</div>
+        <span className="text-[11px] font-black text-[#D81E21] tracking-tighter">MR.D.I.Y</span>
       </div>
-
-      {/* OLYMPLAST */}
-      <div className="bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300" title="Olymplast">
-        <div className="flex flex-col items-center justify-center opacity-80">
-          <span className="text-[10px] font-black text-emerald-400 tracking-tight">OLYMPLAST</span>
-          <span className="text-[5px] font-bold text-slate-500 uppercase tracking-widest">Furniture</span>
-        </div>
+    );
+  }
+  if (normalized === 'olymplast') {
+    return (
+      <div className="flex flex-col items-center justify-center opacity-80">
+        <span className="text-[10px] font-black text-emerald-400 tracking-tight">OLYMPLAST</span>
+        <span className="text-[5px] font-bold text-slate-500 uppercase tracking-widest">Furniture</span>
       </div>
-
-      {/* POLKI */}
-      <div className="bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300" title="Polki">
-        <div className="flex items-center gap-1 opacity-80">
-          <span className="text-xs font-black font-mono italic text-blue-400 tracking-wider">POLKI</span>
-          <span className="text-xs">✨</span>
-        </div>
+    );
+  }
+  if (normalized === 'polki') {
+    return (
+      <div className="flex items-center gap-1 opacity-80">
+        <span className="text-xs font-black font-mono italic text-blue-400 tracking-wider">POLKI</span>
+        <span className="text-xs">✨</span>
       </div>
-
-      {/* HOME GUARD */}
-      <div className="bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300" title="Home Guard">
-        <div className="flex items-center gap-1 text-[10px] font-black text-rose-400 opacity-80">
-          <span>🛡️</span>
-          <span className="leading-none text-left tracking-tighter text-[8px]">HOME GUARD</span>
-        </div>
+    );
+  }
+  if (normalized === 'home guard') {
+    return (
+      <div className="flex items-center gap-1 text-[10px] font-black text-rose-400 opacity-80">
+        <span>🛡️</span>
+        <span className="leading-none text-left tracking-tighter text-[8px]">HOME GUARD</span>
       </div>
-
-      {/* MECO */}
-      <div className="bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300" title="Meco">
-        <div className="flex items-center gap-1.5 opacity-80">
-          <div className="w-3 h-3 rounded-full bg-pink-500" />
-          <span className="text-[10px] font-black text-pink-400 font-sans tracking-widest">meco</span>
-        </div>
+    );
+  }
+  if (normalized === 'meco') {
+    return (
+      <div className="flex items-center gap-1.5 opacity-80">
+        <div className="w-3 h-3 rounded-full bg-pink-500" />
+        <span className="text-[10px] font-black text-pink-400 font-sans tracking-widest">meco</span>
       </div>
-
-      {/* ADVANCE */}
-      <div className="bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex flex-col items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300" title="Advance">
+    );
+  }
+  if (normalized === 'advance') {
+    return (
+      <div className="flex flex-col items-center justify-center">
         <span className="text-[10px] font-black text-sky-400 italic uppercase">ADVANCE</span>
         <span className="text-[5px] font-bold text-slate-500 uppercase tracking-widest">Advancing Life</span>
       </div>
+    );
+  }
+  return <span className="text-xs font-bold text-slate-300 group-hover:text-white uppercase tracking-widest text-center px-1 truncate">{name}</span>;
+}
+
+const BrandLogoList = ({ brands = [], onImageLoad }: { brands?: RatecardBrand[]; onImageLoad?: () => void }) => {
+  const activeBrands = (brands || [])
+    .filter(b => b.isActive !== false)
+    .sort((a, b) => (a.priority || 0) - (b.priority || 0));
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center justify-center pt-2 w-full">
+      {activeBrands.map(brand => (
+        <div 
+          key={brand.id} 
+          className="bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300 group" 
+          title={brand.name}
+        >
+          {brand.logoUrl ? (
+            <img 
+              src={brand.logoUrl} 
+              alt={brand.name} 
+              referrerPolicy="no-referrer"
+              onLoad={onImageLoad}
+              onError={onImageLoad}
+              className="max-h-full max-w-full object-contain opacity-80 hover:opacity-100 transition-opacity" 
+            />
+          ) : (
+            renderDefaultSvg(brand.name)
+          )}
+        </div>
+      ))}
     </div>
   );
 };
@@ -130,10 +165,55 @@ export default function RatecardView({
   profile, 
   services, 
   projects,
+  brands = [],
   onNavigateBack,
   onNavigateToAdmin
 }: RatecardViewProps) {
   
+  // Track image load counts and progress
+  const activeBrandsWithImg = (brands || []).filter(b => b.isActive !== false && b.logoUrl);
+  const totalExpectedImages = 1 + (projects?.length || 0) + activeBrandsWithImg.length;
+  
+  const [imagesLoadedCount, setImagesLoadedCount] = React.useState(0);
+  const [isPageLoaded, setIsPageLoaded] = React.useState(false);
+  const [isUserScrolling, setIsUserScrolling] = React.useState(false);
+
+  const handleImageLoad = () => {
+    setImagesLoadedCount(prev => {
+      const newVal = prev + 1;
+      if (newVal >= totalExpectedImages) {
+        setIsPageLoaded(true);
+      }
+      return newVal;
+    });
+  };
+
+  // Safe loading backup timeout (to prevent infinite spinners on slower speeds)
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoaded(true);
+    }, 2000); // 2 seconds safety curtain
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Track scroll activity to show subtle bottom notification if NOT fully loaded
+  React.useEffect(() => {
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      setIsUserScrolling(true);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setIsUserScrolling(false);
+      }, 1000);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, []);
+
   const stats = profile.stats && profile.stats.length > 0 ? profile.stats : [
     { value: "60 K", label: "Instagram Followers", desc: "Highly engaged home & setup niche" },
     { value: "1 M", label: "Monthly Reach", desc: "Consistent organic impressions standard" },
@@ -190,14 +270,6 @@ export default function RatecardView({
             <span className="text-[10px] font-mono tracking-[0.25em] text-[#8B82F6] font-bold uppercase py-1 px-3 rounded-full bg-[#8B82F6]/10 border border-[#8B82F6]/15">
               CREATIVE PORTFOLIO
             </span>
-            <button 
-              onClick={onNavigateToAdmin}
-              className="p-2.5 bg-white/[0.02] hover:bg-[#8B82F6]/10 text-slate-500 hover:text-[#8B82F6] rounded-xl border border-white/5 hover:border-[#8B82F6]/20 transition-all duration-300"
-              title="Admin Panel"
-              id="premium-header-admin"
-            >
-              <Lock className="w-3.5 h-3.5" />
-            </button>
           </div>
         </div>
       </div>
@@ -263,19 +335,30 @@ export default function RatecardView({
                 <img 
                   src={profile.avatarUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2"} 
                   alt={profile.name} 
+                  onLoad={handleImageLoad}
+                  onError={handleImageLoad}
                   className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0F]/90 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 font-mono text-[10px] tracking-[0.2em] font-extrabold uppercase bg-white/10 backdrop-blur-md text-[#8B82F6] py-1.5 px-3 rounded-full border border-white/15">
-                  ESTD 2026
+                  {(() => {
+                    const val = profile.studioEstdYear || "2026";
+                    const normalized = val.toUpperCase();
+                    if (normalized.includes("EST") || normalized.includes("SINCE") || normalized.includes("ESTABLISHED")) {
+                      return val;
+                    }
+                    return `ESTD ${val}`;
+                  })()}
                 </div>
               </div>
 
               {/* Identity Descriptions */}
               <div className="flex-1 space-y-6">
                 <div>
-                  <span className="text-xs font-mono tracking-[0.3em] font-extrabold text-[#8B82F6] uppercase">STUDIO DIRECTOR</span>
+                  <span className="text-xs font-mono tracking-[0.3em] font-extrabold text-[#8B82F6] uppercase">
+                    {profile.studioDirectorTitle || "STUDIO DIRECTOR"}
+                  </span>
                   <h2 className="text-4xl sm:text-5xl font-sans font-black text-white tracking-tight mt-1.5">
                     {profile.name}
                   </h2>
@@ -366,24 +449,38 @@ export default function RatecardView({
 
           {/* Premium Glowing Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {stats.map((stat, idx) => (
-              <div 
-                key={idx}
-                className="group relative bg-[#111115]/60 hover:bg-[#141419]/90 border border-white/[0.04] hover:border-[#8B82F6]/20 rounded-3xl p-8 transition-all duration-300 shadow-xl overflow-hidden flex flex-col justify-between"
-              >
-                {/* Micro Accent Glow on top corner */}
-                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-tr from-transparent to-[#8B82F6]/5 group-hover:to-[#8B82F6]/15 rounded-full transition-all duration-500 blur-md" />
-                
-                <div className="w-14 h-14 rounded-2xl bg-white/[0.02] border border-white/[0.06] group-hover:border-[#8B82F6]/30 group-hover:bg-[#8B82F6]/5 flex items-center justify-center transition-all duration-500 mb-6">
-                  <span className="text-lg sm:text-xl font-mono font-black text-white group-hover:text-[#8B82F6]">{stat.value}</span>
+            {stats.map((stat, idx) => {
+              const match = stat.value.trim().match(/^([\d.,]+)\s*(.*)$/);
+              const numPart = match ? match[1] : stat.value;
+              const suffixPart = match ? match[2] : "";
+
+              return (
+                <div 
+                  key={idx}
+                  className="group relative bg-[#0E0E13] border border-white/[0.03] hover:border-[#8B82F6]/25 rounded-[1.8rem] p-7 transition-all duration-300 shadow-xl overflow-hidden flex flex-col justify-between min-h-[190px]"
+                >
+                  {/* Micro Accent Glow on top corner */}
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-tr from-transparent to-[#8B82F6]/5 group-hover:to-[#8B82F6]/12 rounded-full transition-all duration-500 blur-xl pointer-events-none" />
+                  
+                  {/* Dynamic clean elegant number rendering */}
+                  <div className="flex items-start font-sans font-black tracking-tighter text-[#E6E4D9]">
+                    <span className="text-5xl sm:text-6xl leading-none">{numPart}</span>
+                    {suffixPart && (
+                      <span className="text-xl sm:text-2xl font-bold text-[#E6E4D9]/80 ml-0.5 leading-none pt-1">
+                        {suffixPart}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="mt-8">
+                    <h4 className="text-base sm:text-[17px] font-bold font-sans text-slate-200 tracking-tight leading-[1.12] group-hover:text-white transition-colors">
+                      {stat.label}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 font-sans mt-2 leading-snug group-hover:text-slate-400 transition-colors">{stat.desc}</p>
+                  </div>
                 </div>
-                
-                <div>
-                  <h4 className="text-xs font-mono font-bold text-slate-200 uppercase tracking-wider">{stat.label}</h4>
-                  <p className="text-[11px] text-slate-500 font-sans mt-2.5 leading-snug">{stat.desc}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
@@ -414,6 +511,8 @@ export default function RatecardView({
                     <img 
                       src={project.imageUrl || "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&q=80&w=400"} 
                       alt={project.title} 
+                      onLoad={handleImageLoad}
+                      onError={handleImageLoad}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100"
                       referrerPolicy="no-referrer"
                     />
@@ -572,7 +671,7 @@ export default function RatecardView({
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6">
-            <BrandLogoList />
+            <BrandLogoList brands={brands} onImageLoad={handleImageLoad} />
           </div>
           
           <p className="text-[10px] font-mono text-slate-500 text-center uppercase tracking-[0.25em] pt-4">AND MORE THAN 50+ HOME DECOR &amp; TECH PARTNERS</p>
@@ -678,16 +777,73 @@ export default function RatecardView({
         <div className="max-w-7xl mx-auto px-6 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-slate-500 font-mono">
           <p>© 2026 zendharefitra.com. All trademark and intellectual properties reserved.</p>
           <div className="flex items-center gap-6">
-            <a href="/admin" onClick={(e) => {
-              e.preventDefault();
-              window.history.pushState(null, '', '/admin');
-              window.dispatchEvent(new PopStateEvent('popstate'));
-            }} className="hover:text-white transition-colors">Admin Gateway</a>
-            <span className="text-slate-700">|</span>
             <p className="text-[#8B82F6]/60">Design studio powered by Antigravity</p>
           </div>
         </div>
       </footer>
+
+      {/* Dynamic Full Screen Loading Curtain */}
+      <AnimatePresence>
+        {!isPageLoaded && (
+          <motion.div
+            key="curtain-loader"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="fixed inset-0 bg-[#0B0B0F] z-[9999] flex flex-col items-center justify-center p-6"
+          >
+            {/* Background glowing orb */}
+            <div className="absolute w-[80vw] h-[80vw] sm:w-[40vw] sm:h-[40vw] max-w-[500px] bg-[#8B82F6]/10 rounded-full blur-[100px] pointer-events-none" />
+            
+            <div className="text-center space-y-6 max-w-xs relative z-10">
+              {/* Small top badge */}
+              <span className="text-[10px] font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block animate-pulse">
+                CREATIVE PORTFOLIO
+              </span>
+              
+              {/* Main Title */}
+              <h1 className="text-2xl font-sans font-black text-white tracking-widest uppercase">
+                ZENDHA REFITRA
+              </h1>
+              
+              {/* Progress Track */}
+              <div className="w-48 h-[3px] bg-white/[0.05] rounded-full overflow-hidden mx-auto">
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-[#8B82F6] to-[#D580FF]"
+                  initial={{ width: '0%' }}
+                  animate={{ width: `${Math.min(100, totalExpectedImages > 0 ? (imagesLoadedCount / totalExpectedImages) * 100 : 0)}%` }}
+                  transition={{ duration: 0.2 }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between font-mono text-[10px] text-slate-500 w-48 mx-auto">
+                <span>CURATING CONTENT</span>
+                <span>{Math.round(Math.min(100, totalExpectedImages > 0 ? (imagesLoadedCount / totalExpectedImages) * 100 : 0))}%</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating HUD loader if scrolling before loaded */}
+      <AnimatePresence>
+        {isUserScrolling && !isPageLoaded && (
+          <motion.div
+            key="hud-scroller"
+            initial={{ opacity: 0, y: 50, x: "-50%", scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
+            exit={{ opacity: 0, y: 50, x: "-50%", scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#121218]/90 backdrop-blur-xl border border-[#8B82F6]/30 px-5 py-3 rounded-full shadow-[0_10px_30px_rgba(139,130,246,0.25)] flex items-center gap-2.5 font-mono text-[11px] text-slate-200"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8B82F6] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#8B82F6]"></span>
+            </span>
+            <span>Optimizing layout ({imagesLoadedCount}/{totalExpectedImages})...</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

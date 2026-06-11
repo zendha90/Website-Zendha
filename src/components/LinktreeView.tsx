@@ -60,13 +60,20 @@ export default function LinktreeView({
     .slice(0, 3)
     .map(link => link.id);
 
-  // Filter links based purely on the search criteria (No Category filtering tabs as requested)
-  const filteredLinks = links.filter(link => {
-    if (!link.isActive) return false;
+  // All active links which define their permanent original index/ID numbers
+  const activeLinks = links.filter(l => l.isActive);
+
+  // Filter links based purely on the search criteria, including matching their permanent index
+  const filteredLinks = activeLinks.filter((link, index) => {
+    const permanentNumber = (index + 1).toString();
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
     
-    return link.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-           (link.description && link.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-           link.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return link.title.toLowerCase().includes(query) || 
+           (link.description && link.description.toLowerCase().includes(query)) ||
+           link.category.toLowerCase().includes(query) ||
+           permanentNumber === query ||
+           permanentNumber.includes(query);
   });
 
   const toggleExpand = (id: string, e: React.MouseEvent) => {
@@ -256,7 +263,9 @@ export default function LinktreeView({
           {filteredLinks.length > 0 ? (
             filteredLinks.map((link, idx) => {
               const isExpanded = expandedLinkId === link.id;
-              const sequenceNumber = idx + 1;
+              // Retrieve the permanent index of the product inside all active links
+              const activeIndex = activeLinks.findIndex(l => l.id === link.id);
+              const sequenceNumber = activeIndex !== -1 ? activeIndex + 1 : idx + 1;
               return (
                 <motion.div
                   key={link.id}
@@ -363,20 +372,6 @@ export default function LinktreeView({
       <div className="text-center mt-16 text-[11px] text-slate-400 font-mono space-y-2">
         <p>© 2026 zendharefitra.com. All intellectual rights reserved.</p>
         <p className="text-slate-350">Aesthetic workspace gear &amp; layout curations.</p>
-        <div className="pt-2 flex justify-center gap-4">
-          <a 
-            href="/admin" 
-            onClick={(e) => { 
-              e.preventDefault(); 
-              window.history.pushState(null, '', '/admin'); 
-              window.dispatchEvent(new PopStateEvent('popstate')); 
-            }}
-            className="text-[10px] text-slate-300 hover:text-indigo-450 hover:underline transition-colors font-mono"
-            id="admin-footer-link"
-          >
-            Admin Panel
-          </a>
-        </div>
       </div>
     </div>
   );
