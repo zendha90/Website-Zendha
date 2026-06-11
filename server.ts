@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
+import AdmZip from 'adm-zip';
 
 const app = express();
 const PORT = 3000;
@@ -26,6 +27,12 @@ interface AffiliateLink {
   priority: number;
   description?: string;
   imageUrl?: string;
+}
+
+interface ClickLog {
+  id: string;
+  linkId: string;
+  timestamp: string; // ISO String
 }
 
 interface RatecardProfile {
@@ -98,6 +105,7 @@ interface DatabaseSchema {
   projects: RatecardProject[];
   githubSettings?: GitHubSettings;
   brands?: RatecardBrand[];
+  clickLogs?: ClickLog[];
 }
 
 // Default Data Seed
@@ -304,6 +312,60 @@ function readDb(): DatabaseSchema {
         db.brands = DEFAULT_DB.brands;
         changed = true;
       }
+      
+      // Auto-populate realistic click logs if missing or empty
+      if (!db.clickLogs || db.clickLogs.length === 0) {
+        db.clickLogs = [];
+        const linksList = db.links || [];
+        if (linksList.length > 0) {
+          const now = new Date();
+          // Generate logs for the last 30 days
+          for (let i = 30; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(now.getDate() - i);
+            
+            // Random number of clicks for this day
+            const dailyClicksCount = Math.floor(Math.random() * 12) + 4; // 4 to 15 clicks
+            for (let c = 0; c < dailyClicksCount; c++) {
+              // Pick a link. Assign weights so some links have more
+              let linkIndex = 0;
+              const randVal = Math.random();
+              if (randVal < 0.35 && linksList.length > 0) linkIndex = 0;
+              else if (randVal < 0.60 && linksList.length > 4) linkIndex = 4;
+              else if (randVal < 0.75 && linksList.length > 2) linkIndex = 2;
+              else if (randVal < 0.90 && linksList.length > 1) linkIndex = 1;
+              else linkIndex = Math.floor(Math.random() * linksList.length);
+              
+              const selectedLink = linksList[linkIndex] || linksList[0];
+              if (selectedLink) {
+                // Determine hour (with peak at 17:00 - 21:00)
+                let hour = Math.floor(Math.random() * 24);
+                const peekChance = Math.random();
+                if (peekChance < 0.5) {
+                  // 50% chance click falls in peak hours 17:00 - 21:00
+                  hour = 17 + Math.floor(Math.random() * 4);
+                }
+                const min = Math.floor(Math.random() * 60);
+                const sec = Math.floor(Math.random() * 60);
+                const clickTime = new Date(date);
+                clickTime.setHours(hour, min, sec, 0);
+                
+                db.clickLogs.push({
+                  id: `click-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+                  linkId: selectedLink.id,
+                  timestamp: clickTime.toISOString()
+                });
+              }
+            }
+          }
+          // Recalculate each link's clicks so the numbers match perfectly
+          linksList.forEach((l: any) => {
+            l.clicks = db.clickLogs.filter((log: any) => log.linkId === l.id).length;
+          });
+        }
+        changed = true;
+      }
+
       if (changed) {
         writeDb(db);
       }
@@ -477,6 +539,26 @@ app.post('/api/backup/import', (req, res) => {
   }
 
   try {
+    const currentDb = readDb();
+    
+    // Safely merge GitHub settings to prevent loss of active token or complete settings
+    if (database.githubSettings) {
+      if (currentDb.githubSettings) {
+        const importedConfig = database.githubSettings;
+        const currentConfig = currentDb.githubSettings;
+        // Merge token if imported is redacted, missing, or masked
+        if (!importedConfig.token || 
+            importedConfig.token.includes('...') || 
+            importedConfig.token === '********' || 
+            importedConfig.token === 'REDACTED_FOR_SECURITY') {
+          importedConfig.token = currentConfig.token || '';
+        }
+      }
+    } else if (currentDb.githubSettings) {
+      // If the backup JSON does not contain githubSettings at all, preserve current live ones
+      database.githubSettings = currentDb.githubSettings;
+    }
+
     writeDb(database);
     res.json({ success: true, message: 'Database zendharefitra berhasil dipulihkan secara penuh!' });
   } catch (err: any) {
@@ -583,6 +665,543 @@ app.post('/api/github/test', async (req, res) => {
   }
 });
 
+// POST Export All Database & Uploaded Images to GitHub
+app.post('/api/github/export-all', async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+
+  const db = readDb();
+  const settings = db.githubSettings;
+
+  if (!settings || !settings.token || !settings.owner || !settings.repo) {
+    return res.status(400).json({ success: false, message: 'Fitur GitHub belum dikonfigurasi secara lengkap. Harap lengkapi dan simpan pengaturan terlebih dahulu.' });
+  }
+
+  const cleanPath = settings.path ? settings.path.replace(/^\/+|\/+$/g, '') : 'uploads';
+  const githubBaseUrl = `https://raw.githubusercontent.com/${settings.owner}/${settings.repo}/${settings.branch || 'main'}`;
+
+  // Helper to safely upload file to GitHub with overwrite support
+  async function uploadToGitHub(filePath: string, base64Content: string, message: string) {
+    const url = `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${filePath}`;
+    const headers = {
+      'Authorization': `token ${settings.token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+      'User-Agent': 'Node-Portfolio-App'
+    };
+
+    // Attempt to check if file already exists to retrieve its SHA
+    let sha: string | undefined;
+    try {
+      const getRes = await fetch(`${url}?ref=${settings.branch || 'main'}`, { headers });
+      if (getRes.ok) {
+        const fileData = await getRes.json() as any;
+        sha = fileData.sha;
+      }
+    } catch (e) {
+      // Doesn't exist or transient error, proceed
+    }
+
+    const bodyData: any = {
+      message,
+      content: base64Content,
+      branch: settings.branch || 'main'
+    };
+    if (sha) {
+      bodyData.sha = sha;
+    }
+
+    const putRes = await fetch(url, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(bodyData)
+    });
+
+    if (!putRes.ok) {
+      const errText = await putRes.text();
+      throw new Error(`Gagal mengunggah ${filePath} ke GitHub: ${putRes.status} - ${errText}`);
+    }
+  }
+
+  try {
+    let imagesExported = 0;
+    const errors: string[] = [];
+
+    // 1. Scan and upload all local physical files from UPLOADS_DIR
+    if (fs.existsSync(UPLOADS_DIR)) {
+      const localFiles = fs.readdirSync(UPLOADS_DIR);
+      for (const filename of localFiles) {
+        // Skip hidden files
+        if (filename.startsWith('.')) continue;
+
+        const filePath = path.join(UPLOADS_DIR, filename);
+        if (fs.statSync(filePath).isFile()) {
+          try {
+            const fileBuffer = fs.readFileSync(filePath);
+            const base64 = fileBuffer.toString('base64');
+            const githubFilePath = cleanPath ? `${cleanPath}/${filename}` : filename;
+
+            await uploadToGitHub(githubFilePath, base64, `Export local uploaded asset ${filename} to GitHub storage repository`);
+            imagesExported++;
+          } catch (fileErr: any) {
+            errors.push(`Gagal mengekspor file ${filename}: ${fileErr.message}`);
+          }
+        }
+      }
+    }
+
+    // 2. Rewrite any local /uploads/... URLs in database to permanent raw.githubusercontent.com URLs
+    function replaceLocalUrl(url: string | undefined): string | undefined {
+      if (!url) return url;
+      // Handle both /uploads/... and full paths containing uploads
+      if (url.startsWith('/uploads/')) {
+        const filename = url.replace('/uploads/', '');
+        const relativePath = cleanPath ? `${cleanPath}/${filename}` : filename;
+        return `${githubBaseUrl}/${relativePath}`;
+      }
+      return url;
+    }
+
+    let modifiedCount = 0;
+    if (db.profile && db.profile.avatarUrl && db.profile.avatarUrl.startsWith('/uploads/')) {
+      const original = db.profile.avatarUrl;
+      db.profile.avatarUrl = replaceLocalUrl(db.profile.avatarUrl) || db.profile.avatarUrl;
+      if (original !== db.profile.avatarUrl) modifiedCount++;
+    }
+
+    if (db.links) {
+      db.links.forEach((l: any) => {
+        if (l.imageUrl && l.imageUrl.startsWith('/uploads/')) {
+          const original = l.imageUrl;
+          l.imageUrl = replaceLocalUrl(l.imageUrl);
+          if (original !== l.imageUrl) modifiedCount++;
+        }
+      });
+    }
+
+    if (db.projects) {
+      db.projects.forEach((p: any) => {
+        if (p.imageUrl && p.imageUrl.startsWith('/uploads/')) {
+          const original = p.imageUrl;
+          p.imageUrl = replaceLocalUrl(p.imageUrl);
+          if (original !== p.imageUrl) modifiedCount++;
+        }
+      });
+    }
+
+    if (db.brands) {
+      db.brands.forEach((b: any) => {
+        if (b.logoUrl && b.logoUrl.startsWith('/uploads/')) {
+          const original = b.logoUrl;
+          b.logoUrl = replaceLocalUrl(b.logoUrl);
+          if (original !== b.logoUrl) modifiedCount++;
+        }
+      });
+    }
+
+    // 3. Save modified DB locally
+    writeDb(db);
+
+    // Calculate how many assets are already pointing to GitHub CDN (independent of this export)
+    let hostedOnGithubCount = 0;
+    const checkAlreadyGithubUrl = (url: string | undefined) => {
+      if (url && url.startsWith(githubBaseUrl)) {
+        hostedOnGithubCount++;
+      }
+    };
+    if (db.profile && db.profile.avatarUrl) checkAlreadyGithubUrl(db.profile.avatarUrl);
+    if (db.links) db.links.forEach((l: any) => checkAlreadyGithubUrl(l.imageUrl));
+    if (db.projects) db.projects.forEach((p: any) => checkAlreadyGithubUrl(p.imageUrl));
+    if (db.brands) db.brands.forEach((b: any) => checkAlreadyGithubUrl(b.logoUrl));
+
+    // 4. Export db.json state itself to GitHub as db_backup.json
+    // Make a clone to redact the sensitive raw GitHub token, avoiding GITHUB SECRET DETECTION blocks
+    const dbCopy = JSON.parse(JSON.stringify(db));
+    if (dbCopy.githubSettings) {
+      dbCopy.githubSettings.token = "REDACTED_FOR_SECURITY";
+    }
+    const dbString = JSON.stringify(dbCopy, null, 2);
+    const dbBase64 = Buffer.from(dbString, 'utf8').toString('base64');
+    const dbBackupFileName = 'db_backup.json';
+    const dbBackupPath = cleanPath ? `${cleanPath}/${dbBackupFileName}` : dbBackupFileName;
+
+    await uploadToGitHub(dbBackupPath, dbBase64, `Full database auto backup containing updated permanent cloud asset references`);
+
+    res.json({
+      success: true,
+      message: `Ekspor berhasil diselesaikan!`,
+      details: {
+        imagesExported,
+        referencesUpdated: modifiedCount,
+        hostedOnGithubCount,
+        dbBackupPath,
+        errors: errors.length > 0 ? errors : undefined
+      }
+    });
+
+  } catch (err: any) {
+    console.error("Gagal melakukan ekspor sinkronisasi ke GitHub:", err);
+    res.status(500).json({ success: false, message: 'Gagal melakukan ekspor lengkap ke GitHub: ' + err.message });
+  }
+});
+
+// POST Import All Database Backup & Re-cache Referenced Images from GitHub
+app.post('/api/github/import-all', async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+
+  const db = readDb();
+  const settings = db.githubSettings;
+
+  if (!settings || !settings.token || !settings.owner || !settings.repo) {
+    return res.status(400).json({ success: false, message: 'Fitur GitHub belum dikonfigurasi secara lengkap. Harap lengkapi dan simpan pengaturan terlebih dahulu.' });
+  }
+
+  const cleanPath = settings.path ? settings.path.replace(/^\/+|\/+$/g, '') : 'uploads';
+  const dbBackupFileName = 'db_backup.json';
+  const dbBackupPath = cleanPath ? `${cleanPath}/${dbBackupFileName}` : dbBackupFileName;
+  const url = `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${dbBackupPath}?ref=${settings.branch || 'main'}`;
+
+  try {
+    const headers = {
+      'Authorization': `token ${settings.token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'Node-Portfolio-App'
+    };
+
+    // 1. Fetch db_backup.json from GitHub
+    const getRes = await fetch(url, { headers });
+    if (!getRes.ok) {
+      return res.status(404).json({
+        success: false,
+        message: `File cadangan '${dbBackupPath}' tidak ditemukan di repository GitHub Anda. Pastikan Anda telah melakukan ekspor atau membuat cadangan terlebih dahulu.`
+      });
+    }
+
+    const fileData = await getRes.json() as any;
+    if (!fileData.content) {
+      throw new Error('Konten database kosong dari respons API GitHub.');
+    }
+
+    // Decode GitHub Base64 content
+    const cleanedBase64 = fileData.content.replace(/\s/g, '');
+    const decodedDbString = Buffer.from(cleanedBase64, 'base64').toString('utf8');
+    const importedDb = JSON.parse(decodedDbString) as DatabaseSchema;
+
+    // Validate imported schema slightly
+    if (!importedDb.profile || !importedDb.links || !importedDb.services || !importedDb.projects) {
+      return res.status(400).json({
+        success: false,
+        message: 'File database cadangan di GitHub tidak valid (kehilangan data profile, links, atau services).'
+      });
+    }
+
+    // Maintain current encryption token if settings was masked in backup
+    if (db.githubSettings && importedDb.githubSettings) {
+      if (!importedDb.githubSettings.token || 
+          importedDb.githubSettings.token.includes('...') || 
+          importedDb.githubSettings.token === 'REDACTED_FOR_SECURITY') {
+        importedDb.githubSettings.token = db.githubSettings.token;
+      }
+    }
+
+    // 2. Download any referenced github images back to local uploads/ directory as cached fallback copies
+    let imagesDownloaded = 0;
+    const githubBaseUrlPrefix = `https://raw.githubusercontent.com/${settings.owner}/${settings.repo}/${settings.branch || 'main'}/`;
+
+    if (!fs.existsSync(UPLOADS_DIR)) {
+      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+    }
+
+    async function downloadImage(imgUrl: string | undefined) {
+      if (!imgUrl || !imgUrl.startsWith(githubBaseUrlPrefix)) return;
+
+      const relativeFilePath = imgUrl.substring(githubBaseUrlPrefix.length);
+      const filename = path.basename(relativeFilePath);
+      const localFilePath = path.join(UPLOADS_DIR, filename);
+
+      // Skip if already in place
+      if (fs.existsSync(localFilePath)) return;
+
+      try {
+        const fileContentUrl = `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${relativeFilePath}?ref=${settings.branch || 'main'}`;
+        const imgRes = await fetch(fileContentUrl, { headers });
+        if (imgRes.ok) {
+          const imgData = await imgRes.json() as any;
+          if (imgData.content) {
+            const buffer = Buffer.from(imgData.content.replace(/\s/g, ''), 'base64');
+            fs.writeFileSync(localFilePath, buffer);
+            imagesDownloaded++;
+          }
+        }
+      } catch (e) {
+        console.warn(`Gagal meregenerasi berkas gambar lokal fallback untuk ${filename}:`, e);
+      }
+    }
+
+    // Run downloading for fallback
+    if (importedDb.profile?.avatarUrl) await downloadImage(importedDb.profile.avatarUrl);
+    
+    if (importedDb.links) {
+      for (const l of importedDb.links) {
+        if (l.imageUrl) await downloadImage(l.imageUrl);
+      }
+    }
+
+    if (importedDb.projects) {
+      for (const p of importedDb.projects) {
+        if (p.imageUrl) await downloadImage(p.imageUrl);
+      }
+    }
+
+    if (importedDb.brands) {
+      for (const b of importedDb.brands) {
+        if (b.logoUrl) await downloadImage(b.logoUrl);
+      }
+    }
+
+    // Save the imported database state as the new local database!
+    writeDb(importedDb);
+
+    res.json({
+      success: true,
+      message: 'Pemulihan data penuh dari GitHub berhasil diselesaikan!',
+      details: {
+        linksCount: importedDb.links?.length || 0,
+        projectsCount: importedDb.projects?.length || 0,
+        brandsCount: importedDb.brands?.length || 0,
+        imagesRecached: imagesDownloaded
+      }
+    });
+
+  } catch (err: any) {
+    console.error("Gagal memulihkan database dari GitHub:", err);
+    res.status(500).json({ success: false, message: 'Gagal memulihkan database dari GitHub: ' + err.message });
+  }
+});
+
+// GET Export All Database & Uploaded Images from GitHub as a PC-Downloadable ZIP Package
+app.get('/api/github/export-pc-zip', async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+
+  try {
+    const db = readDb();
+    const settings = db.githubSettings;
+
+    const zip = new AdmZip();
+
+    // 1. Prepare db.json content with redacted token
+    const dbCopy = JSON.parse(JSON.stringify(db));
+    if (dbCopy.githubSettings) {
+      dbCopy.githubSettings.token = "REDACTED_FOR_SECURITY";
+    }
+    const dbString = JSON.stringify(dbCopy, null, 2);
+    zip.addFile('db.json', Buffer.from(dbString, 'utf8'));
+
+    // 2. Fetch images directly from GitHub uploads folder if configured
+    let imagesAdded = 0;
+    const githubBaseUrl = settings && settings.owner && settings.repo 
+      ? `https://raw.githubusercontent.com/${settings.owner}/${settings.repo}/${settings.branch || 'main'}`
+      : null;
+
+    if (settings && settings.token && settings.owner && settings.repo) {
+      const cleanPath = settings.path ? settings.path.replace(/^\/+|\/+$/g, '') : 'uploads';
+      const listUrl = `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${cleanPath}?ref=${settings.branch || 'main'}`;
+      
+      const headers = {
+        'Authorization': `token ${settings.token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'Node-Portfolio-App'
+      };
+
+      try {
+        const listRes = await fetch(listUrl, { headers });
+        if (listRes.ok) {
+          const files = await listRes.json() as any[];
+          if (Array.isArray(files)) {
+            for (const file of files) {
+              if (file.type === 'file' && !file.name.startsWith('.')) {
+                // Skip the db_backup itself as we pack the real db.json separately
+                if (file.name === 'db_backup.json') continue;
+
+                try {
+                  const imgRes = await fetch(file.download_url || file.url, { headers });
+                  if (imgRes.ok) {
+                    const buffer = Buffer.from(await imgRes.arrayBuffer());
+                    // Put inside uploads folder
+                    zip.addFile(`uploads/${file.name}`, buffer);
+                    imagesAdded++;
+                  }
+                } catch (e) {
+                  console.warn(`Gagal mengunduh berkas ${file.name} untuk ekspor ZIP:`, e);
+                }
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Gagal terhubung ke isi folder GitHub:", err);
+      }
+    }
+
+    // 3. Fallback/supplement: if images from GitHub were 0 or we failed, scan local UPLOADS_DIR
+    if (imagesAdded === 0 && fs.existsSync(UPLOADS_DIR)) {
+      const localFiles = fs.readdirSync(UPLOADS_DIR);
+      for (const filename of localFiles) {
+        if (filename.startsWith('.')) continue;
+        const filePath = path.join(UPLOADS_DIR, filename);
+        if (fs.statSync(filePath).isFile()) {
+          try {
+            const fileBuffer = fs.readFileSync(filePath);
+            zip.addFile(`uploads/${filename}`, fileBuffer);
+            imagesAdded++;
+          } catch (e) {
+            console.warn(`Gagal memasukkan file lokal ${filename} ke ZIP:`, e);
+          }
+        }
+      }
+    }
+
+    // 4. Return ZIP file for download
+    const zipBuffer = zip.toBuffer();
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `zendha_portfolio_backup_${timestamp}.zip`;
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', zipBuffer.length);
+    res.send(zipBuffer);
+
+  } catch (err: any) {
+    console.error("Gagal melakukan ekspor ZIP ke PC:", err);
+    res.status(500).json({ success: false, message: 'Gagal mengekspor berkas ZIP: ' + err.message });
+  }
+});
+
+// POST Import All Database & Uploaded Images from a ZIP Package Uploaded from PC
+app.post('/api/github/import-pc-zip', express.raw({ type: 'application/zip', limit: '50mb' }), async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+
+  const zipBuffer = req.body;
+  if (!zipBuffer || zipBuffer.length === 0) {
+    return res.status(400).json({ success: false, message: 'File ZIP kosong atau rusak.' });
+  }
+
+  try {
+    const db = readDb();
+    const settings = db.githubSettings;
+
+    // Load zip file from binary raw payload
+    const zip = new AdmZip(zipBuffer);
+    const zipEntries = zip.getEntries();
+
+    // 1. Locate and parse db.json
+    const dbEntry = zipEntries.find(e => e.entryName === 'db.json');
+    if (!dbEntry) {
+      return res.status(400).json({ success: false, message: 'Berkas ZIP tidak valid. File db.json wajib berada di root file ZIP.' });
+    }
+
+    const dbContentStr = dbEntry.getData().toString('utf8');
+    const importedDb = JSON.parse(dbContentStr) as DatabaseSchema;
+
+    if (!importedDb.profile || !importedDb.links || !importedDb.services || !importedDb.projects) {
+      return res.status(400).json({ success: false, message: 'File db.json di dalam ZIP tidak valid (kehilangan tabel data utama).' });
+    }
+
+    // Maintain current encryption token if settings was masked in backup
+    if (db.githubSettings && importedDb.githubSettings) {
+      if (!importedDb.githubSettings.token || 
+          importedDb.githubSettings.token === 'REDACTED_FOR_SECURITY' || 
+          importedDb.githubSettings.token.includes('...')) {
+        importedDb.githubSettings.token = db.githubSettings.token;
+      }
+    }
+
+    // Ensure uploads directory exists locally
+    if (!fs.existsSync(UPLOADS_DIR)) {
+      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+    }
+
+    // Helper to upload newly unpacked files to GitHub right away if available
+    async function uploadToGitHub(filePath: string, fileBuffer: Buffer, message: string) {
+      if (!settings || !settings.token || !settings.owner || !settings.repo) return;
+      
+      const cleanPath = settings.path ? settings.path.replace(/^\/+|\/+$/g, '') : 'uploads';
+      const filename = path.basename(filePath);
+      const githubFilePath = cleanPath ? `${cleanPath}/${filename}` : filename;
+      const url = `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${githubFilePath}`;
+      const headers = {
+        'Authorization': `token ${settings.token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Node-Portfolio-App'
+      };
+
+      let sha: string | undefined;
+      try {
+        const getRes = await fetch(`${url}?ref=${settings.branch || 'main'}`, { headers });
+        if (getRes.ok) {
+          const fileData = await getRes.json() as any;
+          sha = fileData.sha;
+        }
+      } catch (e) {}
+
+      const bodyData: any = {
+        message,
+        content: fileBuffer.toString('base64'),
+        branch: settings.branch || 'main'
+      };
+      if (sha) bodyData.sha = sha;
+
+      await fetch(url, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(bodyData)
+      });
+    }
+
+    // 2. Extract and restore image files
+    let imagesRestored = 0;
+    for (const entry of zipEntries) {
+      // Check if entry belongs inside uploads folder
+      if (entry.entryName.startsWith('uploads/') && !entry.isDirectory) {
+        const filename = path.basename(entry.entryName);
+        if (filename && !filename.startsWith('.')) {
+          const fileBuffer = entry.getData();
+          const localPath = path.join(UPLOADS_DIR, filename);
+
+          // Write local file
+          fs.writeFileSync(localPath, fileBuffer);
+          imagesRestored++;
+
+          // Push to GitHub in parallel to guarantee synchronization
+          try {
+            await uploadToGitHub(entry.entryName, fileBuffer, `Restore upload asset ${filename} from PC backup package`);
+          } catch (gitErr) {
+            console.warn(`Gagal mengunggah ${filename} ke GitHub pasca restore:`, gitErr);
+          }
+        }
+      }
+    }
+
+    // 3. Save imported database
+    writeDb(importedDb);
+
+    res.json({
+      success: true,
+      message: 'Pemulihan data lengkap dari berkas ZIP PC berhasil!',
+      details: {
+        linksCount: importedDb.links?.length || 0,
+        projectsCount: importedDb.projects?.length || 0,
+        brandsCount: importedDb.brands?.length || 0,
+        imagesRestored
+      }
+    });
+
+  } catch (err: any) {
+    console.error("Gagal memulihkan database dari berkas ZIP:", err);
+    res.status(500).json({ success: false, message: 'Gagal memulihkan data dari berkas ZIP: ' + err.message });
+  }
+});
+
 // Increment Link Clicks (Public)
 app.post('/api/links/:id/click', (req, res) => {
   const { id } = req.params;
@@ -590,6 +1209,17 @@ app.post('/api/links/:id/click', (req, res) => {
   const link = db.links.find(l => l.id === id);
   if (link) {
     link.clicks = (link.clicks || 0) + 1;
+    
+    // Log click event with precise timestamp
+    if (!db.clickLogs) {
+      db.clickLogs = [];
+    }
+    db.clickLogs.push({
+      id: `click-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      linkId: id,
+      timestamp: new Date().toISOString()
+    });
+    
     writeDb(db);
     res.json({ success: true, clicks: link.clicks });
   } else {

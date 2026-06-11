@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts';
+import { 
   ArrowLeft, 
   Trash2, 
   Edit3, 
@@ -31,7 +40,7 @@ import {
   Upload,
   Github
 } from 'lucide-react';
-import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand } from '../types';
+import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog } from '../types';
 
 interface AdminPanelProps {
   onNavigateBack: () => void;
@@ -41,6 +50,7 @@ interface AdminPanelProps {
   services: RatecardService[];
   projects: RatecardProject[];
   brands?: RatecardBrand[];
+  clickLogs?: ClickLog[];
 }
 
 export default function AdminPanel({
@@ -50,7 +60,8 @@ export default function AdminPanel({
   profile,
   services,
   projects,
-  brands: initialBrands
+  brands: initialBrands,
+  clickLogs = []
 }: AdminPanelProps) {
   // Authentication states
   const [password, setPassword] = useState('');
@@ -59,7 +70,11 @@ export default function AdminPanel({
   const [token, setToken] = useState<string | null>(null);
 
   // Active Admin Tabs
-  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github'>('links');
+  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github' | 'analytics'>('links');
+
+  // Analytics View States
+  const [analyticsTimeRange, setAnalyticsTimeRange] = useState<'today' | 'yesterday' | '7days' | '30days'>('yesterday');
+  const [analyticsSource, setAnalyticsSource] = useState<'all' | 'shopee' | 'medsos'>('all');
 
   // GitHub integration states
   const [githubSettings, setGithubSettings] = useState({
@@ -72,6 +87,11 @@ export default function AdminPanel({
   });
   const [isSavingGithub, setIsSavingGithub] = useState(false);
   const [testStatus, setTestStatus] = useState<{ message: string; type: 'success' | 'error' | 'loading' | null }>({ message: '', type: null });
+  const [isExportingGithub, setIsExportingGithub] = useState(false);
+  const [isImportingGithub, setIsImportingGithub] = useState(false);
+  const [isExportingPCZip, setIsExportingPCZip] = useState(false);
+  const [isImportingPCZip, setIsImportingPCZip] = useState(false);
+  const [githubSyncStatus, setGithubSyncStatus] = useState<{ message: string; type: 'success' | 'error' | 'loading' | null }>({ message: '', type: null });
 
   // Interactive link editor states
   const [editingLink, setEditingLink] = useState<Partial<AffiliateLink> | null>(null);
@@ -138,6 +158,177 @@ export default function AdminPanel({
       }
     } catch (e) {
       console.error("Gagal memuat pengaturan GitHub:", e);
+    }
+  };
+
+  const handleExportToGithub = async () => {
+    setIsExportingGithub(true);
+    setGithubSyncStatus({ message: 'Mengekspor seluruh database dan gambar lokal ke repositori GitHub...', type: 'loading' });
+    try {
+      const resp = await fetch('/api/github/export-all', {
+        method: 'POST',
+        headers: getAuthHeader()
+      });
+      const data = await resp.json();
+      if (data.success) {
+        let displayMessage = '';
+        const { imagesExported, referencesUpdated, hostedOnGithubCount, dbBackupPath } = data.details;
+        
+        if (imagesExported === 0 && referencesUpdated === 0 && hostedOnGithubCount > 0) {
+          displayMessage = `Ekspor selesai! Seluruh berkas media portofolio Anda (${hostedOnGithubCount} gambar) sudah tersimpan & menggunakan tautan permanen CDN GitHub secara langsung sejak awal diunggah. Tidak ada file gambar lokal baru di server yang perlu dikonversi ulang. Berkas database cadangan 'db_backup.json' telah sukses diperbarui di GitHub.`;
+        } else if (imagesExported === 0 && referencesUpdated === 0) {
+          displayMessage = `Ekspor selesai! File cadangan '${dbBackupPath}' berhasil diunggah ke GitHub. Tidak ada file gambar lokal baru atau referensi link lokal di database yang perlu dikonversi.`;
+        } else {
+          displayMessage = `Ekspor selesai! Berhasil mengunggah ${imagesExported} berkas gambar baru ke GitHub, memperbarui ${referencesUpdated} tautan referensi database ke tautan permanen CDN GitHub, dan menyimpan file cadangan di '/${dbBackupPath}'.`;
+        }
+
+        setGithubSyncStatus({ 
+          message: displayMessage, 
+          type: 'success' 
+        });
+        showToast('Sukses mencadangkan data dan media ke GitHub!');
+        await onRefreshData();
+      } else {
+        setGithubSyncStatus({ message: data.message || 'Gagal mengekspor data.', type: 'error' });
+        showToast(data.message || 'Gagal mengekspor data.', 'error');
+      }
+    } catch (err: any) {
+      setGithubSyncStatus({ message: 'Koneksi ke backend bermasalah: ' + err.message, type: 'error' });
+      showToast('Koneksi bermasalah saat mengekspor: ' + err.message, 'error');
+    } finally {
+      setIsExportingGithub(false);
+    }
+  };
+
+  const handleImportFromGithub = async () => {
+    if (!window.confirm('Apakah Anda yakin ingin menimpa database lokal saat ini dengan data cadangan yang tersimpan di GitHub? File gambar cadangan juga akan diunduh & dicache kembali secara otomatis.')) {
+      return;
+    }
+    setIsImportingGithub(true);
+    setGithubSyncStatus({ message: 'Mengunduh data cadangan penuh dan mengunduh ulang gambar dari GitHub...', type: 'loading' });
+    try {
+      const resp = await fetch('/api/github/import-all', {
+        method: 'POST',
+        headers: getAuthHeader()
+      });
+      const data = await resp.json();
+      if (data.success) {
+        setGithubSyncStatus({ 
+          message: `Impor berhasil diselesaikan! Database berhasil dipulihkan (${data.details.linksCount} link, ${data.details.projectsCount} project, ${data.details.brandsCount} brand). Mengunduh ulang ${data.details.imagesRecached} berkas gambar sebagai cadangan cache lokal.`, 
+          type: 'success' 
+        });
+        showToast('Sukses memulihkan seluruh data dari GitHub!');
+        await onRefreshData();
+        await fetchGithubSettings();
+      } else {
+        setGithubSyncStatus({ message: data.message || 'Gagal mengimpor data.', type: 'error' });
+        showToast(data.message || 'Gagal mengimpor data_backup.', 'error');
+      }
+    } catch (err: any) {
+      setGithubSyncStatus({ message: 'Koneksi ke backend bermasalah: ' + err.message, type: 'error' });
+      showToast('Koneksi bermasalah saat mengimpor: ' + err.message, 'error');
+    } finally {
+      setIsImportingGithub(false);
+    }
+  };
+
+  const handleExportZipToPC = async () => {
+    setIsExportingPCZip(true);
+    setGithubSyncStatus({ message: 'Menyiapkan berkas ZIP cadangan (database & seluruh gambar dari GitHub)...', type: 'loading' });
+    try {
+      const headers = getAuthHeader();
+      const resp = await fetch('/api/github/export-pc-zip', {
+        method: 'GET',
+        headers
+      });
+      if (!resp.ok) {
+        let msg = 'Gagal melakukan ekspor berkas ZIP.';
+        try {
+          const errData = await resp.json();
+          msg = errData.message || msg;
+        } catch (e) {}
+        throw new Error(msg);
+      }
+
+      const blob = await resp.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      
+      const contentDisposition = resp.headers.get('content-disposition');
+      let filename = `zendha_portfolio_backup_${new Date().toISOString().substring(0, 10)}.zip`;
+      if (contentDisposition) {
+        const matches = /filename="([^"]+)"/.exec(contentDisposition);
+        if (matches && matches[1]) {
+          filename = matches[1];
+        }
+      }
+      
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setGithubSyncStatus({
+        message: 'Sukses mengunduh cadangan lengkap! Seluruh file gambar dan database Anda telah dikompresi ke dalam folder ZIP dan diunduh ke komputer Anda.',
+        type: 'success'
+      });
+      showToast('Cadangan ZIP sukses diunduh ke komputer!');
+    } catch (err: any) {
+      setGithubSyncStatus({ message: 'Gagal melakukan ekspor berkas ZIP: ' + err.message, type: 'error' });
+      showToast('Ekspor ZIP gagal: ' + err.message, 'error');
+    } finally {
+      setIsExportingPCZip(false);
+    }
+  };
+
+  const handleImportZipFromPC = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!window.confirm(`Apakah Anda yakin ingin mengimpor cadangan dari komputer Anda (${file.name})? Ini akan sepenuhnya menimpa database saat ini, memulihkan seluruh media gambar ke folder server lokal, dan mengunggahnya secara sinkron ke repository GitHub.`)) {
+      e.target.value = '';
+      return;
+    }
+
+    setIsImportingPCZip(true);
+    setGithubSyncStatus({ message: `Membaca & mengekstrak berkas ZIP cadangan (${file.name})...`, type: 'loading' });
+    try {
+      const authHeaders = getAuthHeader();
+      const headers = {
+        ...authHeaders,
+        'Content-Type': 'application/zip'
+      };
+
+      const arrayBuffer = await file.arrayBuffer();
+
+      const resp = await fetch('/api/github/import-pc-zip', {
+        method: 'POST',
+        headers,
+        body: arrayBuffer
+      });
+
+      const data = await resp.json();
+      if (data.success) {
+        setGithubSyncStatus({
+          message: `Pulihkan data penuh dari berkas ZIP lokal sukses! Berhasil mengimpor database (${data.details.linksCount} link, ${data.details.projectsCount} project, ${data.details.brandsCount} brand) dan memulihkan ${data.details.imagesRestored} berkas gambar ke folder uploads server lokal & server cadangan GitHub.`,
+          type: 'success'
+        });
+        showToast('Sukses memulihkan seluruh data portofolio dari komputer!');
+        await onRefreshData();
+        await fetchGithubSettings();
+      } else {
+        setGithubSyncStatus({ message: data.message || 'Gagal mengimpor file backup ZIP.', type: 'error' });
+        showToast(data.message || 'Gagal mengimpor file backup ZIP.', 'error');
+      }
+    } catch (err: any) {
+      setGithubSyncStatus({ message: 'Koneksi ke backend bermasalah: ' + err.message, type: 'error' });
+      showToast('Koneksi bermasalah saat mengimpor ZIP: ' + err.message, 'error');
+    } finally {
+      setIsImportingPCZip(false);
+      e.target.value = '';
     }
   };
 
@@ -435,6 +626,7 @@ export default function AdminPanel({
         setImportFileContent(null);
         setImportFileName('');
         await onRefreshData();
+        await fetchGithubSettings();
       } else {
         showToast(data.message || 'Gagal memulihkan data', 'error');
       }
@@ -786,6 +978,7 @@ export default function AdminPanel({
               >
                 <optgroup label="Landing Page: Linktree Affiliate">
                   <option value="links">🔗 Affiliate Links Management</option>
+                  <option value="analytics">📊 Laporan Performa (Clicks Metric)</option>
                 </optgroup>
                 <optgroup label="Creative Ratecard & Portfolio">
                   <option value="services">💼 Ratecard Services List</option>
@@ -801,6 +994,7 @@ export default function AdminPanel({
               {/* Left Side Icon display dynamically */}
               <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-500 pointer-events-none">
                 {activeTab === 'links' && <LinkIcon className="w-4 h-4" />}
+                {activeTab === 'analytics' && <TrendingUp className="w-4 h-4 text-[#ee4d2d]" />}
                 {activeTab === 'services' && <Briefcase className="w-4 h-4" />}
                 {activeTab === 'projects' && <Video className="w-4 h-4" />}
                 {activeTab === 'brands' && <Tag className="w-4 h-4" />}
@@ -824,6 +1018,7 @@ export default function AdminPanel({
             <span className="text-slate-400 uppercase tracking-wider font-extrabold">Active Target:</span>
             <span className="px-2.5 py-1 bg-indigo-50 border border-indigo-150 rounded-lg text-indigo-700 font-bold flex items-center gap-1.5">
               {activeTab === 'links' && <><LinkIcon className="w-3 h-3" /> LINKTREE AFFILIATE</>}
+              {activeTab === 'analytics' && <><TrendingUp className="w-3 h-3 text-[#ee4d2d]" /> LAPORAN PERFORMA (METRIK KLIK)</>}
               {activeTab === 'services' && <><Briefcase className="w-3 h-3" /> RATECARD SERVICES</>}
               {activeTab === 'projects' && <><Video className="w-3 h-3" /> VIRAL PORTFOLIO VIDEOS</>}
               {activeTab === 'brands' && <><Tag className="w-3 h-3" /> INDUSTRY COLLABORATION BRANDS</>}
@@ -841,6 +1036,13 @@ export default function AdminPanel({
               id="quick-nav-links"
             >
               Affiliate
+            </button>
+            <button 
+              onClick={() => { setActiveTab('analytics'); }}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'analytics' ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+              id="quick-nav-analytics"
+            >
+              Performa
             </button>
             <button 
               onClick={() => { setActiveTab('services'); setEditingService(null); }}
@@ -2287,6 +2489,105 @@ export default function AdminPanel({
 
           </div>
 
+          {/* 💻 Cadangan Lokal Komputer (Ekspor / Impor Berkas ZIP) */}
+          <div className="mt-8 pt-8 border-t border-slate-150 space-y-4">
+            <div className="flex items-center gap-2">
+              <Database className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider font-mono">
+                💻 Cadangan Lokal Komputer (Ekspor / Impor Berkas ZIP)
+              </h3>
+            </div>
+            <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
+              Gunakan panel ini untuk mengunduh seluruh data portofolio (file database <code className="bg-slate-100 px-1 rounded font-normal text-slate-600">db.json</code> beserta seluruh media gambar yang telah terunggah) ke dalam satu file ZIP di komputer Anda. Anda juga bisa mengunggah kembali file ZIP tersebut untuk memulihkan seluruh portfolio secara instan.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              {/* Export ZIP to PC */}
+              <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+                <div>
+                  <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 mb-4">
+                    <Download className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-sm font-display font-bold text-slate-800">Unduh Cadangan Lengkap ke Komputer (.zip)</h3>
+                  <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
+                    Mendownload bundel data utuh berisi database serta seluruh berkas gambar yang tersimpan ke dalam komputer Anda dalam satu folder berkas ZIP yang aman dan lengkap.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  disabled={isExportingPCZip || isImportingPCZip}
+                  onClick={handleExportZipToPC}
+                  className="w-full py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer font-sans"
+                >
+                  {isExportingPCZip ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Menyiapkan Berkas ZIP...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      Unduh Cadangan ZIP ke PC
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Import ZIP from PC */}
+              <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+                <div>
+                  <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
+                    <Upload className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-sm font-display font-bold text-slate-800">Unggah &amp; Pulihkan Cadangan ZIP dari Komputer</h3>
+                  <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
+                    Pilih file ZIP cadangan dari komputer Anda untuk memulihkan seluruh database, meregenerasi file gambar-gambar di server, serta menyinkronkannya kembali secara sinkron ke repository GitHub Anda (jika aktif).
+                  </p>
+                </div>
+                <label className={`w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer font-sans text-center select-none ${
+                  (isExportingPCZip || isImportingPCZip) ? 'opacity-50 pointer-events-none' : ''
+                }`}>
+                  {isImportingPCZip ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Memulihkan Berkas ZIP...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      Pilih & Unggah File ZIP PC
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept=".zip"
+                    disabled={isExportingPCZip || isImportingPCZip}
+                    onChange={handleImportZipFromPC}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* Sync / ZIP status indicator */}
+            {githubSyncStatus.type && (
+              <div className={`p-4 rounded-xl border text-xs leading-relaxed transition-all mt-3 ${
+                githubSyncStatus.type === 'success' 
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                  : githubSyncStatus.type === 'error'
+                    ? 'bg-rose-50 border-rose-200 text-rose-800'
+                    : 'bg-indigo-50 border-indigo-200 text-indigo-800 animate-pulse'
+              }`}>
+                <div className="flex gap-2 items-start font-sans">
+                  <span className="font-bold shrink-0">
+                    {githubSyncStatus.type === 'success' ? '✓ SUKSES:' : githubSyncStatus.type === 'error' ? '✗ GAGAL:' : '⚡ PROSES:'}
+                  </span>
+                  <span>{githubSyncStatus.message}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
       )}
 
@@ -2489,10 +2790,484 @@ export default function AdminPanel({
                 </div>
               )}
 
-            </form>
-          </div>
+          </form>
         </div>
-      )}
+      </div>
+    )}
+
+    {activeTab === 'analytics' && (() => {
+      const now = new Date();
+      const getStartOfDay = (d: Date) => {
+        const res = new Date(d);
+        res.setHours(0, 0, 0, 0);
+        return res;
+      };
+      const getEndOfDay = (d: Date) => {
+        const res = new Date(d);
+        res.setHours(23, 59, 59, 999);
+        return res;
+      };
+      
+      let currentStart = new Date();
+      let currentEnd = new Date();
+      let prevStart = new Date();
+      let prevEnd = new Date();
+      let dateLabel = '';
+      
+      if (analyticsTimeRange === 'today') {
+        currentStart = getStartOfDay(now);
+        currentEnd = getEndOfDay(now);
+        
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        prevStart = getStartOfDay(yesterday);
+        prevEnd = getEndOfDay(yesterday);
+        
+        dateLabel = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      } else if (analyticsTimeRange === 'yesterday') {
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        currentStart = getStartOfDay(yesterday);
+        currentEnd = getEndOfDay(yesterday);
+        
+        const twoDaysAgo = new Date(now);
+        twoDaysAgo.setDate(now.getDate() - 2);
+        prevStart = getStartOfDay(twoDaysAgo);
+        prevEnd = getEndOfDay(twoDaysAgo);
+        
+        dateLabel = yesterday.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      } else if (analyticsTimeRange === '7days') {
+        currentEnd = getEndOfDay(now);
+        currentStart = getStartOfDay(now);
+        currentStart.setDate(now.getDate() - 6);
+        
+        prevEnd = new Date(currentStart);
+        prevEnd.setMilliseconds(prevEnd.getMilliseconds() - 1);
+        prevStart = new Date(prevEnd);
+        prevStart.setDate(prevStart.getDate() - 6);
+        
+        const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short' };
+        dateLabel = `${currentStart.toLocaleDateString('id-ID', options)} - ${currentEnd.toLocaleDateString('id-ID', options)}`;
+      } else {
+        // 30days
+        currentEnd = getEndOfDay(now);
+        currentStart = getStartOfDay(now);
+        currentStart.setDate(now.getDate() - 29);
+        
+        prevEnd = new Date(currentStart);
+        prevEnd.setMilliseconds(prevEnd.getMilliseconds() - 1);
+        prevStart = new Date(prevEnd);
+        prevStart.setDate(prevStart.getDate() - 29);
+        
+        const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short' };
+        dateLabel = `${currentStart.toLocaleDateString('id-ID', options)} - ${currentEnd.toLocaleDateString('id-ID', options)}`;
+      }
+      
+      const sourceFilter = (log: ClickLog) => {
+        const link = links.find(l => l.id === log.linkId);
+        if (!link) return false;
+        if (analyticsSource === 'shopee') {
+          return link.category.toLowerCase() === 'shopee';
+        }
+        if (analyticsSource === 'medsos') {
+          return link.category.toLowerCase() !== 'shopee';
+        }
+        return true;
+      };
+      
+      const currentLogs = clickLogs.filter(log => {
+        const logTime = new Date(log.timestamp);
+        return logTime >= currentStart && logTime <= currentEnd && sourceFilter(log);
+      });
+      
+      const prevLogs = clickLogs.filter(log => {
+        const logTime = new Date(log.timestamp);
+        return logTime >= prevStart && logTime <= prevEnd && sourceFilter(log);
+      });
+      
+      const totalClicks = currentLogs.length;
+      const prevClicks = prevLogs.length;
+      
+      const percentChange = prevClicks > 0 
+        ? Math.round(((totalClicks - prevClicks) / prevClicks) * 100)
+        : totalClicks > 0 ? 100 : 0;
+      const trendSymbol = percentChange >= 0 ? '+' : '';
+      const trendColor = percentChange > 0 
+        ? 'text-emerald-500 font-extrabold' 
+        : percentChange < 0 
+          ? 'text-rose-500 font-extrabold' 
+          : 'text-slate-400 font-bold';
+          
+      let avgDailyClicks = totalClicks.toString();
+      if (analyticsTimeRange === '7days') {
+        avgDailyClicks = (totalClicks / 7).toFixed(1);
+      } else if (analyticsTimeRange === '30days') {
+        avgDailyClicks = (totalClicks / 30).toFixed(1);
+      }
+      
+      const freq: Record<string, number> = {};
+      currentLogs.forEach(l => {
+        freq[l.linkId] = (freq[l.linkId] || 0) + 1;
+      });
+      let topLinkId = '';
+      let topLinkCount = 0;
+      Object.entries(freq).forEach(([id, count]) => {
+        if (count > topLinkCount) {
+          topLinkCount = count;
+          topLinkId = id;
+        }
+      });
+      const topLink = links.find(l => l.id === topLinkId);
+      const topLinkContribution = totalClicks > 0 && topLinkCount > 0
+        ? Math.round((topLinkCount / totalClicks) * 100)
+        : 0;
+
+      let chartData: Array<{ name: string; klik: number }> = [];
+      if (analyticsTimeRange === 'today' || analyticsTimeRange === 'yesterday') {
+        const hours = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
+        const bucketCounts = [0, 0, 0, 0, 0, 0, 0, 0];
+        
+        currentLogs.forEach(log => {
+          const logTime = new Date(log.timestamp);
+          const hr = logTime.getHours();
+          const index = Math.min(Math.floor(hr / 3), 7);
+          bucketCounts[index]++;
+        });
+        
+        chartData = hours.map((name, i) => ({
+          name,
+          klik: bucketCounts[i]
+        }));
+      } else {
+        const dayCount = analyticsTimeRange === '7days' ? 7 : 30;
+        const days = [];
+        const bucketCounts = Array(dayCount).fill(0);
+        
+        for (let i = dayCount - 1; i >= 0; i--) {
+          const d = new Date(currentEnd);
+          d.setDate(currentEnd.getDate() - i);
+          days.push(d);
+        }
+        
+        currentLogs.forEach(log => {
+          const logTime = new Date(log.timestamp);
+          const dayDiff = Math.floor((logTime.getTime() - getStartOfDay(days[0]).getTime()) / (1000 * 60 * 60 * 24));
+          if (dayDiff >= 0 && dayDiff < dayCount) {
+            bucketCounts[dayDiff]++;
+          }
+        });
+        
+        chartData = days.map((day, i) => ({
+          name: day.toLocaleDateString('id-ID', { day: '2-digit', month: 'numeric' }),
+          klik: bucketCounts[i]
+        }));
+      }
+
+      const rankedLinksList = links
+        .map(link => {
+          const clicksInRange = currentLogs.filter(log => log.linkId === link.id).length;
+          return {
+            ...link,
+            clicksInRange
+          };
+        })
+        .filter(link => {
+          if (analyticsSource === 'shopee') return link.category.toLowerCase() === 'shopee';
+          if (analyticsSource === 'medsos') return link.category.toLowerCase() !== 'shopee';
+          return true;
+        })
+        .sort((a, b) => b.clicksInRange - a.clicksInRange);
+
+      return (
+        <div className="space-y-6" id="tab-content-analytics">
+          
+          <div className="bg-white border border-slate-100 rounded-3xl p-5 md:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div onClick={() => setActiveTab('links')} className="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition-colors cursor-pointer border border-slate-100">
+                <ArrowLeft className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-base font-display font-medium text-slate-800 flex items-center gap-2">
+                  📊 Laporan Performa Toko (Clicks Metric)
+                </h2>
+                <p className="text-xs text-slate-400 font-sans mt-0.5">
+                  Laporan analisis performa konversi klik Linktree Affiliate ala Shopee
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#ee4d2d]">
+              <span className="px-2.5 py-1 bg-orange-50 border border-orange-100 rounded-full flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+                <Sliders className="w-3 h-3 text-[#ee4d2d]" /> Realtime Analytics Live
+              </span>
+            </div>
+          </div>
+
+          <div className="border-b border-slate-100 bg-white rounded-3xl p-3 md:p-4 shadow-3xs flex flex-wrap gap-2 text-xs font-sans">
+            <button
+              type="button"
+              onClick={() => setAnalyticsSource('all')}
+              className={`px-4 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none ${
+                analyticsSource === 'all' ? 'bg-[#ee4d2d] text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+              }`}
+            >
+              Semua
+            </button>
+            <button
+              type="button"
+              onClick={() => setAnalyticsSource('shopee')}
+              className={`px-4 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none ${
+                analyticsSource === 'shopee' ? 'bg-[#ee4d2d] text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+              }`}
+            >
+              Tautan Shopee
+            </button>
+            <button
+              type="button"
+              onClick={() => setAnalyticsSource('medsos')}
+              className={`px-4 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none ${
+                analyticsSource === 'medsos' ? 'bg-[#ee4d2d] text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+              }`}
+            >
+              Media Sosial &amp; Lainnya
+            </button>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setAnalyticsTimeRange('today')}
+              className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all cursor-pointer select-none ${
+                analyticsTimeRange === 'today'
+                  ? 'bg-orange-50/50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
+                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              Hari Ini
+            </button>
+            <button
+              type="button"
+              onClick={() => setAnalyticsTimeRange('yesterday')}
+              className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all cursor-pointer select-none ${
+                analyticsTimeRange === 'yesterday'
+                  ? 'bg-orange-50/50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
+                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              Kemarin
+            </button>
+            <button
+              type="button"
+              onClick={() => setAnalyticsTimeRange('7days')}
+              className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all cursor-pointer select-none ${
+                analyticsTimeRange === '7days'
+                  ? 'bg-orange-50/50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
+                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              7 Hari Terakhir
+            </button>
+            <button
+              type="button"
+              onClick={() => setAnalyticsTimeRange('30days')}
+              className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all cursor-pointer select-none ${
+                analyticsTimeRange === '30days'
+                  ? 'bg-orange-50/50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
+                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              30 Hari Terakhir
+            </button>
+          </div>
+
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-1.5">
+                <h3 className="text-sm font-display font-medium text-slate-800">Metrik Utama</h3>
+                <div className="group relative">
+                  <span className="text-slate-400 cursor-help text-xs font-serif italic border border-slate-250 rounded-full w-4 h-4 inline-flex items-center justify-center">?</span>
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2.5 bg-slate-900 text-white rounded-lg text-[9px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity leading-normal z-50 shadow-sm font-sans">
+                    Menampilkan total klik pada periode berjalan dan perbandingan persentase terhadap periode setara sebelumnya.
+                  </div>
+                </div>
+              </div>
+              <span className="text-xs font-mono font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-100 self-start sm:self-auto select-none">
+                📅 {dateLabel}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+              <div className="border border-orange-100 bg-[#ee4d2d]/3 rounded-2xl p-4 flex flex-col justify-between transition-all hover:bg-[#ee4d2d]/5 select-none">
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase text-[#ee4d2d] tracking-wider">Klik Tautan</span>
+                  <h4 className="text-2xl font-bold font-sans text-[#ee4d2d] mt-1.5">{totalClicks}</h4>
+                </div>
+                <div className={`text-[10px] sm:text-[9.5px] mt-3 shrink-0 flex items-center gap-1 font-sans ${trendColor}`}>
+                  <span>Pertumbuhan: </span>
+                  <span className="font-extrabold">{trendSymbol}{percentChange}%</span>
+                  <span className="opacity-70">vs lalu</span>
+                </div>
+              </div>
+
+              <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4 flex flex-col justify-between hover:bg-slate-50 select-none">
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider">Rata-rata Klik / Hari</span>
+                  <h4 className="text-2xl font-bold font-sans text-slate-700 mt-1.5">{avgDailyClicks}</h4>
+                </div>
+                <span className="text-[10px] text-slate-400 mt-3 block font-sans">Rasio rata-rata klik harian</span>
+              </div>
+
+              <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4 flex flex-col justify-between hover:bg-slate-50 select-none">
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider">Produk Terpopuler</span>
+                  <h4 className="text-xs font-display font-medium text-slate-800 line-clamp-1 mt-2 mb-1">
+                    {topLink ? topLink.title : 'Tidak ada data'}
+                  </h4>
+                </div>
+                <div className="text-[10px] text-slate-400 mt-1 shrink-0 flex items-center justify-between font-sans">
+                  <span>{topLinkCount} klik</span>
+                  {topLink && <span className="font-mono text-emerald-600 font-extrabold">{topLinkContribution}% Share</span>}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-sm font-display font-medium text-slate-800">Grafik Klik</h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">Grafik dinamik logaritmik konversi klik per waktu</p>
+              </div>
+              <div className="w-2 h-2 rounded-full bg-[#ee4d2d] animate-pulse" />
+            </div>
+            
+            <div className="w-full h-64 md:h-80 font-sans" id="recharts-click-analytics-wrapper">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorKlik" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ee4d2d" stopOpacity={0.35}/>
+                      <stop offset="95%" stopColor="#ee4d2d" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} 
+                    axisLine={false} 
+                    tickLine={false} 
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} 
+                    axisLine={false} 
+                    tickLine={false} 
+                    allowDecimals={false} 
+                  />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.98)', border: '1px solid #f1f5f9', borderRadius: '16px', fontSize: '11px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                    labelClassName="font-extrabold text-slate-800"
+                    itemStyle={{ color: '#ee4d2d', fontWeight: 'bold' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="klik" 
+                    stroke="#ee4d2d" 
+                    strokeWidth={3} 
+                    fillOpacity={1} 
+                    fill="url(#colorKlik)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs space-y-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-display font-medium text-slate-800">Performa Produk</h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">Urutan performa produk linktree berdasarkan total klik dalam rentang waktu terfilter</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {rankedLinksList.length === 0 ? (
+                <div className="text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-slate-100 text-xs text-slate-400 font-sans">
+                  Tidak ada data interaksi klik dalam rentang waktu ini.
+                </div>
+              ) : (
+                rankedLinksList.slice(0, 15).map((link, index) => {
+                  const rank = index + 1;
+                  let rankBg = 'bg-slate-100 text-slate-500 border border-slate-200';
+                  if (rank === 1) rankBg = 'bg-[#ee4d2d] text-white font-extrabold border border-[#ee4d2d]';
+                  else if (rank === 2) rankBg = 'bg-orange-500 text-white font-extrabold border border-orange-500';
+                  else if (rank === 3) rankBg = 'bg-amber-500 text-white font-extrabold border border-amber-500';
+
+                  let catBg = 'bg-slate-50 text-slate-500 border-slate-150';
+                  if (link.category === 'Shopee') catBg = 'bg-orange-50 text-orange-600 border-orange-100';
+                  else if (link.category === 'Tokopedia') catBg = 'bg-emerald-50 text-emerald-600 border-emerald-100';
+                  else if (link.category === 'TikTok Shop') catBg = 'bg-rose-50 text-rose-600 border-rose-100';
+
+                  return (
+                    <div 
+                      key={link.id} 
+                      className="p-4 bg-slate-50/40 hover:bg-slate-50/80 border border-slate-100 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors font-sans"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-xs select-none ${rankBg}`}>
+                          {rank}
+                        </div>
+
+                        <div className="w-12 h-12 rounded-xl bg-white border border-slate-150 shrink-0 overflow-hidden flex items-center justify-center relative shadow-3xs">
+                          {link.imageUrl ? (
+                            <img 
+                              src={link.imageUrl} 
+                              alt="" 
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <LinkIcon className="w-4 h-4 text-slate-300" />
+                          )}
+                        </div>
+
+                        <div className="space-y-1">
+                          <h4 className="text-xs font-bold text-slate-800 line-clamp-1 leading-snug">{link.title}</h4>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className={`text-[9px] px-2 py-0.5 rounded border uppercase tracking-wider font-extrabold ${catBg}`}>
+                              {link.category}
+                            </span>
+                            <span className="text-[10px] text-slate-400 line-clamp-1 truncate max-w-[200px]" title={link.url}>
+                              {link.url}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between sm:justify-end gap-6 border-t sm:border-t-0 border-slate-100/50 pt-3 sm:pt-0 shrink-0">
+                        <div className="text-left sm:text-right">
+                          <span className="text-[10px] font-mono text-slate-400 block font-bold uppercase tracking-wider">Tautan Diklik</span>
+                          <span className="text-sm font-sans font-bold text-slate-700">
+                            {link.clicksInRange} <span className="text-[10px] font-normal text-slate-400 font-sans">klik</span>
+                          </span>
+                        </div>
+                        
+                        <div className="text-right">
+                          <span className="text-[10px] font-mono text-slate-400 block font-bold uppercase tracking-wider">Persentase</span>
+                          <span className="text-sm font-mono font-bold text-[#ee4d2d] block">
+                            {totalClicks > 0 ? Math.round((link.clicksInRange / totalClicks) * 100) : 0}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+        </div>
+      );
+    })()}
     </div>
   );
 }

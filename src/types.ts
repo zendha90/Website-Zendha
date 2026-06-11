@@ -73,6 +73,12 @@ export interface RatecardBrand {
   priority: number;
 }
 
+export interface ClickLog {
+  id: string;
+  linkId: string;
+  timestamp: string; // ISO String
+}
+
 export interface AppData {
   links: AffiliateLink[];
   profile: RatecardProfile;
@@ -80,4 +86,5 @@ export interface AppData {
   projects: RatecardProject[];
   githubSettings?: GitHubSettings;
   brands?: RatecardBrand[];
+  clickLogs?: ClickLog[];
 }

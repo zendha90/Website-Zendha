@@ -186,6 +186,7 @@ export default function App() {
                 services={data.services}
                 projects={data.projects}
                 brands={data.brands}
+                clickLogs={data.clickLogs}
               />
             </motion.div>
           )}
