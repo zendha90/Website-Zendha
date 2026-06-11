@@ -56,15 +56,6 @@ export interface RatecardProject {
   url: string;
 }
 
-export interface GitHubSettings {
-  enabled: boolean;
-  token: string;
-  owner: string;
-  repo: string;
-  branch: string;
-  path: string;
-}
-
 export interface RatecardBrand {
   id: string;
   name: string;
@@ -84,7 +75,6 @@ export interface AppData {
   profile: RatecardProfile;
   services: RatecardService[];
   projects: RatecardProject[];
-  githubSettings?: GitHubSettings;
   brands?: RatecardBrand[];
   clickLogs?: ClickLog[];
 }

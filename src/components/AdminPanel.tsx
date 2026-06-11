@@ -947,148 +947,53 @@ export default function AdminPanel({
         </div>
       </div>
 
-      {/* Navigation Tabs for Dashboard Options - Symmetrical Dropdown Control Center */}
-      <div className="mb-8 bg-white border border-slate-100 rounded-3xl p-5 shadow-xs" id="dashboard-categorized-tabs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <span className="text-[10px] font-mono font-extrabold tracking-wider text-slate-400 uppercase block">
-              DASHBOARD PANEL UTAMA
-            </span>
-            <h2 className="text-sm font-display font-medium text-slate-700 mt-0.5">
-              Mengelola konten <span className="font-bold underline decoration-indigo-400">zendharefitra.com</span>
-            </h2>
-          </div>
-
-          {/* Symmetrical & Elegant Dropdown Selector */}
-          <div className="relative shrink-0 min-w-full sm:min-w-[260px]">
-            <label htmlFor="admin-page-selector" className="sr-only">Pilih Halaman Editor</label>
-            <div className="relative">
-              <select
-                id="admin-page-selector"
-                value={activeTab}
-                onChange={(e) => {
-                  const targetTab = e.target.value as any;
-                  setActiveTab(targetTab);
-                  if (targetTab === 'links') setEditingLink(null);
-                  if (targetTab === 'services') setEditingService(null);
-                  if (targetTab === 'projects') setEditingProject(null);
-                  if (targetTab === 'brands') setEditingBrand(null);
-                }}
-                className="w-full pl-10 pr-10 py-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 hover:border-slate-300 rounded-2xl text-xs font-semibold text-slate-700 outline-none transition-all cursor-pointer appearance-none shadow-xs"
-              >
-                <optgroup label="Landing Page: Linktree Affiliate">
-                  <option value="links">🔗 Affiliate Links Management</option>
-                  <option value="analytics">📊 Laporan Performa (Clicks Metric)</option>
-                </optgroup>
-                <optgroup label="Creative Ratecard & Portfolio">
-                  <option value="services">💼 Ratecard Services List</option>
-                  <option value="projects">🎬 Instagram Viral Videos</option>
-                  <option value="brands">🏷️ Brands & Logos Portfolio</option>
-                </optgroup>
-                <optgroup label="Konfigurasi Master & Sistem">
-                  <option value="profile">👤 Profile Main Biography</option>
-                  <option value="backup">🗄️ Backup & Restore Utilities</option>
-                  <option value="github">🐙 GitHub Storage System</option>
-                </optgroup>
-              </select>
-              {/* Left Side Icon display dynamically */}
-              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-500 pointer-events-none">
-                {activeTab === 'links' && <LinkIcon className="w-4 h-4" />}
-                {activeTab === 'analytics' && <TrendingUp className="w-4 h-4 text-[#ee4d2d]" />}
-                {activeTab === 'services' && <Briefcase className="w-4 h-4" />}
-                {activeTab === 'projects' && <Video className="w-4 h-4" />}
-                {activeTab === 'brands' && <Tag className="w-4 h-4" />}
-                {activeTab === 'profile' && <User className="w-4 h-4" />}
-                {activeTab === 'backup' && <Database className="w-4 h-4" />}
-                {activeTab === 'github' && <Github className="w-4 h-4" />}
-              </div>
-              {/* Right Side Chevron */}
-              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
+      <div className="flex flex-col md:flex-row gap-8" id="admin-dashboard-container">
+        
+        {/* Sidebar Navigation */}
+        <aside className="w-full md:w-72 shrink-0 space-y-6">
+          <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs space-y-6">
+            
+            {/* Manajemen Section */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-mono font-extrabold tracking-wider text-slate-400 uppercase block pl-2">MANAJEMEN</span>
+              <button onClick={() => { setActiveTab('links'); setEditingLink(null); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'links' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+                <LinkIcon className="w-4 h-4" /> Affiliate Links
+              </button>
+              <button onClick={() => { setActiveTab('analytics'); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'analytics' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+                <TrendingUp className="w-4 h-4" /> Performa
+              </button>
             </div>
-          </div>
-        </div>
 
-        {/* Visual Symmetrical Quick-Nav indicator breadcrumb for fast visual confirmation */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-100 text-[10px] font-mono">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-slate-400 uppercase tracking-wider font-extrabold">Active Target:</span>
-            <span className="px-2.5 py-1 bg-indigo-50 border border-indigo-150 rounded-lg text-indigo-700 font-bold flex items-center gap-1.5">
-              {activeTab === 'links' && <><LinkIcon className="w-3 h-3" /> LINKTREE AFFILIATE</>}
-              {activeTab === 'analytics' && <><TrendingUp className="w-3 h-3 text-[#ee4d2d]" /> LAPORAN PERFORMA (METRIK KLIK)</>}
-              {activeTab === 'services' && <><Briefcase className="w-3 h-3" /> RATECARD SERVICES</>}
-              {activeTab === 'projects' && <><Video className="w-3 h-3" /> VIRAL PORTFOLIO VIDEOS</>}
-              {activeTab === 'brands' && <><Tag className="w-3 h-3" /> INDUSTRY COLLABORATION BRANDS</>}
-              {activeTab === 'profile' && <><User className="w-3 h-3" /> MAIN BIOGRAPHY PROFILE</>}
-              {activeTab === 'backup' && <><Database className="w-3 h-3" /> BACKUP & RESTORE UTILITIES</>}
-              {activeTab === 'github' && <><Github className="w-3 h-3" /> CLOUD STORAGE SYSTEM</>}
-            </span>
-          </div>
+            {/* Ratecard Section */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-mono font-extrabold tracking-wider text-slate-400 uppercase block pl-2">RATECARD</span>
+              <button onClick={() => { setActiveTab('services'); setEditingService(null); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'services' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+                <Briefcase className="w-4 h-4" /> Services
+              </button>
+              <button onClick={() => { setActiveTab('projects'); setEditingProject(null); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'projects' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+                <Video className="w-4 h-4" /> Portfolio Videos
+              </button>
+              <button onClick={() => { setActiveTab('brands'); setEditingBrand(null); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'brands' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+                <Tag className="w-4 h-4" /> Brands
+              </button>
+            </div>
 
-          {/* Fast Switch Buttons as a perfectly symmetric row for visual ease of use on Desktop */}
-          <div className="flex flex-wrap items-center gap-1">
-            <button 
-              onClick={() => { setActiveTab('links'); setEditingLink(null); }}
-              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'links' ? 'bg-indigo-600 text-white border-indigo-600 font-black' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
-              id="quick-nav-links"
-            >
-              Affiliate
-            </button>
-            <button 
-              onClick={() => { setActiveTab('analytics'); }}
-              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'analytics' ? 'bg-[#ee4d2d] text-white border-[#ee4d2d]' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
-              id="quick-nav-analytics"
-            >
-              Performa
-            </button>
-            <button 
-              onClick={() => { setActiveTab('services'); setEditingService(null); }}
-              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'services' ? 'bg-[#8B82F6] text-white border-[#8B82F6]' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
-              id="quick-nav-services"
-            >
-              Services
-            </button>
-            <button 
-              onClick={() => { setActiveTab('projects'); setEditingProject(null); }}
-              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'projects' ? 'bg-[#8B82F6] text-white border-[#8B82F6]' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
-              id="quick-nav-projects"
-            >
-              Videos
-            </button>
-            <button 
-              onClick={() => { setActiveTab('brands'); setEditingBrand(null); }}
-              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'brands' ? 'bg-[#8B82F6] text-white border-[#8B82F6]' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
-              id="quick-nav-brands"
-            >
-              Brands
-            </button>
-            <button 
-              onClick={() => { setActiveTab('profile'); }}
-              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'profile' ? 'bg-slate-800 text-white border-slate-800' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
-              id="quick-nav-profile"
-            >
-              Profile
-            </button>
-            <button 
-              onClick={() => { setActiveTab('backup'); }}
-              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'backup' ? 'bg-slate-800 text-white border-slate-800' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
-              id="quick-nav-backup"
-            >
-              Backup
-            </button>
-            <button 
-              onClick={() => { setActiveTab('github'); }}
-              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer border ${activeTab === 'github' ? 'bg-slate-800 text-white border-slate-800' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
-              id="quick-nav-github"
-            >
-              Storage
-            </button>
+            {/* Sistem Section */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-mono font-extrabold tracking-wider text-slate-400 uppercase block pl-2">SISTEM</span>
+              <button onClick={() => { setActiveTab('profile'); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'profile' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+                <User className="w-4 h-4" /> Profile Main
+              </button>
+              <button onClick={() => { setActiveTab('backup'); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'backup' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+                <Database className="w-4 h-4" /> Backup & Restore
+              </button>
+            </div>
+            
           </div>
-        </div>
-      </div>
+        </aside>
+
+        {/* Main Content Area */}
+        <main className="flex-1 min-w-0">
 
       {/* ======================================================== */}
       {/* 1. MANAGE AFFILIATE LINKS VIEW TAB */}
@@ -2996,9 +2901,9 @@ export default function AdminPanel({
               </div>
             </div>
             
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#ee4d2d]">
-              <span className="px-2.5 py-1 bg-orange-50 border border-orange-100 rounded-full flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
-                <Sliders className="w-3 h-3 text-[#ee4d2d]" /> Realtime Analytics Live
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-indigo-600">
+              <span className="px-2.5 py-1 bg-indigo-50 border border-indigo-100 rounded-full flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+                <Sliders className="w-3 h-3 text-indigo-600" /> Realtime Analytics Live
               </span>
             </div>
           </div>
@@ -3008,7 +2913,7 @@ export default function AdminPanel({
               type="button"
               onClick={() => setAnalyticsSource('all')}
               className={`px-4 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none ${
-                analyticsSource === 'all' ? 'bg-[#ee4d2d] text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                analyticsSource === 'all' ? 'bg-indigo-600 text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
               }`}
             >
               Semua
@@ -3017,7 +2922,7 @@ export default function AdminPanel({
               type="button"
               onClick={() => setAnalyticsSource('shopee')}
               className={`px-4 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none ${
-                analyticsSource === 'shopee' ? 'bg-[#ee4d2d] text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                analyticsSource === 'shopee' ? 'bg-indigo-600 text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
               }`}
             >
               Tautan Shopee
@@ -3026,7 +2931,7 @@ export default function AdminPanel({
               type="button"
               onClick={() => setAnalyticsSource('medsos')}
               className={`px-4 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none ${
-                analyticsSource === 'medsos' ? 'bg-[#ee4d2d] text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                analyticsSource === 'medsos' ? 'bg-indigo-600 text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
               }`}
             >
               Media Sosial &amp; Lainnya
@@ -3039,7 +2944,7 @@ export default function AdminPanel({
               onClick={() => setAnalyticsTimeRange('today')}
               className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all cursor-pointer select-none ${
                 analyticsTimeRange === 'today'
-                  ? 'bg-orange-50/50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
+                  ? 'bg-indigo-50/50 border-indigo-600 text-indigo-600 shadow-2xs font-extrabold'
                   : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
               }`}
             >
@@ -3050,7 +2955,7 @@ export default function AdminPanel({
               onClick={() => setAnalyticsTimeRange('yesterday')}
               className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all cursor-pointer select-none ${
                 analyticsTimeRange === 'yesterday'
-                  ? 'bg-orange-50/50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
+                  ? 'bg-indigo-50/50 border-indigo-600 text-indigo-600 shadow-2xs font-extrabold'
                   : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
               }`}
             >
@@ -3097,10 +3002,10 @@ export default function AdminPanel({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-              <div className="border border-orange-100 bg-[#ee4d2d]/3 rounded-2xl p-4 flex flex-col justify-between transition-all hover:bg-[#ee4d2d]/5 select-none">
+              <div className="border border-indigo-100 bg-indigo-600/3 rounded-2xl p-4 flex flex-col justify-between transition-all hover:bg-indigo-600/5 select-none">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase text-[#ee4d2d] tracking-wider">Klik Tautan</span>
-                  <h4 className="text-2xl font-bold font-sans text-[#ee4d2d] mt-1.5">{totalClicks}</h4>
+                  <span className="text-[10px] font-mono font-bold uppercase text-indigo-600 tracking-wider">Klik Tautan</span>
+                  <h4 className="text-2xl font-bold font-sans text-indigo-600 mt-1.5">{totalClicks}</h4>
                 </div>
                 <div className={`text-[10px] sm:text-[9.5px] mt-3 shrink-0 flex items-center gap-1 font-sans ${trendColor}`}>
                   <span>Pertumbuhan: </span>
@@ -3138,7 +3043,7 @@ export default function AdminPanel({
                 <h3 className="text-sm font-display font-medium text-slate-800">Grafik Klik</h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">Grafik dinamik logaritmik konversi klik per waktu</p>
               </div>
-              <div className="w-2 h-2 rounded-full bg-[#ee4d2d] animate-pulse" />
+              <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
             </div>
             
             <div className="w-full h-64 md:h-80 font-sans" id="recharts-click-analytics-wrapper">
@@ -3146,8 +3051,8 @@ export default function AdminPanel({
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorKlik" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ee4d2d" stopOpacity={0.35}/>
-                      <stop offset="95%" stopColor="#ee4d2d" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.35}/>
+                      <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -3166,12 +3071,12 @@ export default function AdminPanel({
                   <Tooltip 
                     contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.98)', border: '1px solid #f1f5f9', borderRadius: '16px', fontSize: '11px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                     labelClassName="font-extrabold text-slate-800"
-                    itemStyle={{ color: '#ee4d2d', fontWeight: 'bold' }}
+                    itemStyle={{ color: '#4f46e5', fontWeight: 'bold' }}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="klik" 
-                    stroke="#ee4d2d" 
+                    stroke="#4f46e5" 
                     strokeWidth={3} 
                     fillOpacity={1} 
                     fill="url(#colorKlik)" 
@@ -3198,14 +3103,14 @@ export default function AdminPanel({
                 rankedLinksList.slice(0, 15).map((link, index) => {
                   const rank = index + 1;
                   let rankBg = 'bg-slate-100 text-slate-500 border border-slate-200';
-                  if (rank === 1) rankBg = 'bg-[#ee4d2d] text-white font-extrabold border border-[#ee4d2d]';
-                  else if (rank === 2) rankBg = 'bg-orange-500 text-white font-extrabold border border-orange-500';
-                  else if (rank === 3) rankBg = 'bg-amber-500 text-white font-extrabold border border-amber-500';
+                  if (rank === 1) rankBg = 'bg-indigo-600 text-white font-extrabold border border-indigo-600';
+                  else if (rank === 2) rankBg = 'bg-blue-500 text-white font-extrabold border border-blue-500';
+                  else if (rank === 3) rankBg = 'bg-sky-500 text-white font-extrabold border border-sky-500';
 
                   let catBg = 'bg-slate-50 text-slate-500 border-slate-150';
-                  if (link.category === 'Shopee') catBg = 'bg-orange-50 text-orange-600 border-orange-100';
-                  else if (link.category === 'Tokopedia') catBg = 'bg-emerald-50 text-emerald-600 border-emerald-100';
-                  else if (link.category === 'TikTok Shop') catBg = 'bg-rose-50 text-rose-600 border-rose-100';
+                  if (link.category === 'Shopee') catBg = 'bg-indigo-50 text-indigo-600 border-indigo-100';
+                  else if (link.category === 'Tokopedia') catBg = 'bg-indigo-50 text-indigo-600 border-indigo-100';
+                  else if (link.category === 'TikTok Shop') catBg = 'bg-indigo-50 text-indigo-600 border-indigo-100';
 
                   return (
                     <div 
@@ -3253,7 +3158,7 @@ export default function AdminPanel({
                         
                         <div className="text-right">
                           <span className="text-[10px] font-mono text-slate-400 block font-bold uppercase tracking-wider">Persentase</span>
-                          <span className="text-sm font-mono font-bold text-[#ee4d2d] block">
+                          <span className="text-sm font-mono font-bold text-indigo-600 block">
                             {totalClicks > 0 ? Math.round((link.clicksInRange / totalClicks) * 100) : 0}%
                           </span>
                         </div>
@@ -3268,6 +3173,8 @@ export default function AdminPanel({
         </div>
       );
     })()}
+        </main>
+      </div>
     </div>
   );
 }

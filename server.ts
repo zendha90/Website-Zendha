@@ -103,7 +103,6 @@ interface DatabaseSchema {
   profile: RatecardProfile;
   services: RatecardService[];
   projects: RatecardProject[];
-  githubSettings?: GitHubSettings;
   brands?: RatecardBrand[];
   clickLogs?: ClickLog[];
 }
@@ -264,14 +263,6 @@ const DEFAULT_DB: DatabaseSchema = {
       url: "https://www.instagram.com/p/Cxl9Y_vPyzX/"
     }
   ],
-  githubSettings: {
-    enabled: false,
-    token: '',
-    owner: '',
-    repo: '',
-    branch: 'main',
-    path: 'uploads'
-  },
   brands: [
     { id: "brand-1", name: "IKEA", logoUrl: "", priority: 1, isActive: true },
     { id: "brand-2", name: "BOSE", logoUrl: "", priority: 2, isActive: true },
@@ -297,17 +288,7 @@ function readDb(): DatabaseSchema {
         db.projects = DEFAULT_DB.projects;
         changed = true;
       }
-      if (!db.githubSettings) {
-        db.githubSettings = {
-          enabled: false,
-          token: '',
-          owner: '',
-          repo: '',
-          branch: 'main',
-          path: 'uploads'
-        };
-        changed = true;
-      }
+
       if (!db.brands || db.brands.length === 0) {
         db.brands = DEFAULT_DB.brands;
         changed = true;
@@ -458,54 +439,13 @@ app.post('/api/upload', async (req, res) => {
     const cleanFileName = `img-${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`;
     
     const db = readDb();
-    const github = db.githubSettings;
-
-    if (github && github.enabled && github.token && github.owner && github.repo) {
-      // Clean path directory
-      const cleanPath = github.path ? github.path.replace(/^\/+|\/+$/g, '') : 'uploads';
-      const githubFilePath = cleanPath ? `${cleanPath}/${cleanFileName}` : cleanFileName;
-      const url = `https://api.github.com/repos/${github.owner}/${github.repo}/contents/${githubFilePath}`;
+    
+    // Local server save
+    const filePath = path.join(UPLOADS_DIR, cleanFileName);
+    fs.writeFileSync(filePath, buffer);
       
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${github.token}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json',
-          'User-Agent': 'Node-Portfolio-App'
-        },
-        body: JSON.stringify({
-          message: `Upload image ${cleanFileName} via admin portfolio`,
-          content: base64Image,
-          branch: github.branch || 'main'
-        })
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`GitHub API error: ${response.status} - ${errText}`);
-      }
-
-      // Compute the premium Raw URL
-      const publicUrl = `https://raw.githubusercontent.com/${github.owner}/${github.repo}/${github.branch || 'main'}/${githubFilePath}`;
-      
-      // Save local backup copy as fallback
-      try {
-        const filePath = path.join(UPLOADS_DIR, cleanFileName);
-        fs.writeFileSync(filePath, buffer);
-      } catch (e) {
-        console.warn("Failed local backup write:", e);
-      }
-
-      return res.json({ success: true, url: publicUrl });
-    } else {
-      // Local server save fallback
-      const filePath = path.join(UPLOADS_DIR, cleanFileName);
-      fs.writeFileSync(filePath, buffer);
-      
-      const url = `/uploads/${cleanFileName}`;
-      res.json({ success: true, url });
-    }
+    const url = `/uploads/${cleanFileName}`;
+    res.json({ success: true, url });
   } catch (err: any) {
     console.error("Error writing upload file:", err);
     res.status(500).json({ success: false, message: 'Gagal mengupload file: ' + err.message });
@@ -613,56 +553,6 @@ app.post('/api/github/settings', (req, res) => {
   
   writeDb(db);
   res.json({ success: true, message: 'Pengaturan GitHub Storage berhasil disimpan!' });
-});
-
-// POST Test GitHub Integration File Commit Connection
-app.post('/api/github/test', async (req, res) => {
-  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
-  
-  const { token, owner, repo, branch, path: folderPath } = req.body;
-  const db = readDb();
-  
-  const currentSettings = db.githubSettings || { enabled: false, token: '', owner: '', repo: '', branch: 'main', path: 'uploads' };
-  
-  let finalToken = token;
-  if (token && (token.includes('...') || token === '********')) {
-    finalToken = currentSettings.token;
-  }
-  
-  if (!finalToken || !owner || !repo) {
-    return res.status(400).json({ success: false, message: 'Token, Owner, dan Repo wajib diisi untuk melakukan test!' });
-  }
-  
-  const cleanFolderPath = folderPath ? folderPath.replace(/^\/+|\/+$/g, '') : 'uploads';
-  const testFileName = `test-connection-${Date.now()}.txt`;
-  const githubPath = cleanFolderPath ? `${cleanFolderPath}/${testFileName}` : testFileName;
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${githubPath}`;
-  
-  try {
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `token ${finalToken}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json',
-        'User-Agent': 'Node-Portfolio-App'
-      },
-      body: JSON.stringify({
-        message: 'Test Connection via portfolio admin panel',
-        content: Buffer.from(`Koneksi Sukses! Dibuat otomatis oleh Sistem Portfolio Zendha Refitra pada ${new Date().toISOString()}`).toString('base64'),
-        branch: branch || 'main'
-      })
-    });
-    
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(response.status).json({ success: false, message: `Gagal ke GitHub: ${response.status} - ${errText}` });
-    }
-    
-    res.json({ success: true, message: `Koneksi berhasil! File test dibuat di repository pada jalur /${githubPath}` });
-  } catch (err: any) {
-    res.status(500).json({ success: false, message: 'Koneksi gagal: ' + err.message });
-  }
 });
 
 // POST Export All Database & Uploaded Images to GitHub
