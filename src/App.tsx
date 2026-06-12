@@ -66,6 +66,21 @@ export default function App() {
     loadData();
   }, []);
 
+  // Sync document title to match Creator's Name dynamically
+  useEffect(() => {
+    if (currentView === 'admin') {
+      document.title = 'Admin Dashboard | Creator Workspace';
+    } else if (data?.profile?.name) {
+      if (currentView === 'ratecard') {
+        document.title = `${data.profile.name} | Premium Ratecard`;
+      } else {
+        document.title = `${data.profile.name} | Affiliate Links & Portfolio`;
+      }
+    } else {
+      document.title = 'Creator Linktree & Premium Ratecard';
+    }
+  }, [currentView, data?.profile?.name]);
+
   // Increment click counts in the background
   const registerClick = async (linkId: string) => {
     try {
