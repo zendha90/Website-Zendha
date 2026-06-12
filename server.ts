@@ -337,25 +337,26 @@ function readDb(): DatabaseSchema {
 
       if (db.profile) {
         if (!db.profile.designSettings) {
-          db.profile.designSettings = DEFAULT_DB.profile.designSettings;
+          db.profile.designSettings = { ...DEFAULT_DB.profile.designSettings! };
           changed = true;
         } else {
-          // Ensure sub-fields exist for older DB versions
-          if (!db.profile.designSettings.header) {
-            db.profile.designSettings.header = DEFAULT_DB.profile.designSettings!.header;
-            changed = true;
-          }
-          if (!db.profile.designSettings.typography) {
-            db.profile.designSettings.typography = DEFAULT_DB.profile.designSettings!.typography;
-            changed = true;
-          }
-          if (!db.profile.designSettings.buttons) {
-            db.profile.designSettings.buttons = DEFAULT_DB.profile.designSettings!.buttons;
-            changed = true;
-          }
-          if (!db.profile.designSettings.colors) {
-            db.profile.designSettings.colors = DEFAULT_DB.profile.designSettings!.colors;
-            changed = true;
+          // Deep merge sub-fields to ensure no field is missing in runtime
+          const ds = db.profile.designSettings;
+          const defDs = DEFAULT_DB.profile.designSettings!;
+          
+          if (!ds.header) { ds.header = { ...defDs.header }; changed = true; }
+          if (!ds.typography) { ds.typography = { ...defDs.typography }; changed = true; }
+          if (!ds.buttons) { ds.buttons = { ...defDs.buttons }; changed = true; }
+          if (!ds.colors) { ds.colors = { ...defDs.colors }; changed = true; }
+          
+          // Ensure nested color fields exist (handling partial color objects)
+          if (ds.colors) {
+            Object.keys(defDs.colors).forEach((colorKey) => {
+              if (!(ds.colors as any)[colorKey]) {
+                (ds.colors as any)[colorKey] = (defDs.colors as any)[colorKey];
+                changed = true;
+              }
+            });
           }
         }
       }
@@ -427,11 +428,13 @@ function readDb(): DatabaseSchema {
   return DEFAULT_DB;
 }
 
-function writeDb(data: DatabaseSchema): void {
+function writeDb(data: DatabaseSchema): boolean {
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    return true;
   } catch (err) {
-    console.error("Error writing database file:", err);
+    console.error("CRITICAL ERROR: Gagal menulis ke database file (db.json). Periksa izin akses file di server!", err);
+    return false;
   }
 }
 

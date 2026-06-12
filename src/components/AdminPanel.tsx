@@ -1021,6 +1021,12 @@ export default function AdminPanel({
               >
                 <Database className="w-4 h-4" /> Backup & Restore
               </button>
+              <button 
+                onClick={() => { setActiveTab('history' as any); }} 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === ('history' as any) ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
+                <History className="w-4 h-4" /> System Logs
+              </button>
             </div>
           </div>
         </aside>
@@ -3234,6 +3240,84 @@ export default function AdminPanel({
         </div>
       );
     })()}
+
+      {/* ======================================================== */}
+      {/* 9. VERSION HISTORY / SYSTEM LOGS VIEW TAB */}
+      {/* ======================================================== */}
+      {(activeTab as any) === 'history' && (
+        <div className="space-y-6" id="tab-content-history">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-md font-display font-bold text-slate-800">Riwayat Pembaruan Sistem</h2>
+              <p className="text-xs text-slate-400">Rekapitulasi log perubahan versi Admin Dashboard</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* Latest Update v1.2.0 */}
+            <div className="bg-white border-2 border-indigo-100 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50 rounded-full translate-x-24 -translate-y-24 -z-10" />
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                    <span className="font-mono font-black text-sm text-white">1.2</span>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-display font-bold text-slate-800">Version 1.2.0 (Latest Release)</h3>
+                    <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Released: 12 June 2026</p>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-bold rounded-full font-mono border border-emerald-100 uppercase animate-pulse">Running Now</span>
+              </div>
+              
+              <ul className="space-y-3">
+                <li className="flex gap-3">
+                  <div className="shrink-0 w-5 h-5 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-indigo-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Optimasi Sinkronisasi Real-time</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Memperbaiki delay pembaruan desain di Linktree publik & mengoptimalkan persistence pada server CPanel.</p>
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <div className="shrink-0 w-5 h-5 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                    <PlusCircle className="w-3 h-3 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Improved CTA Controls</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Penambahan kolom "Nama Tombol CTA" untuk kustomisasi label klik (e.g. "Beli Sekarang", "Cek Promo").</p>
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <div className="shrink-0 w-5 h-5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
+                    <Palette className="w-3 h-3 text-slate-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Design & Typography Polishing</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Fix bug penggantian Typography, Button Shape & Shadow yang tidak terdeteksi pada preview kecil.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Previous v1.1.0 */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 opacity-80">
+              <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-200/50">
+                <div className="flex items-center gap-3">
+                  <span className="px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] font-mono font-bold rounded">v1.1.0</span>
+                  <p className="text-xs font-display font-medium text-slate-500 italic">Stability & Feature Baseline</p>
+                </div>
+              </div>
+              <ul className="space-y-2 text-[10px] text-slate-400">
+                <li>• Initial release of Dark Theme support for Ratecard Profile.</li>
+                <li>• Social icons integration (WhatsApp & YouTube redirect).</li>
+                <li>• Design Tab Beta (Typography selection - Inter, Space Grotesk).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
         </main>
       </div>
 
