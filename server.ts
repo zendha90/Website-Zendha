@@ -467,6 +467,10 @@ function isAdmin(req: express.Request): boolean {
 // Get All Public Data
 app.get('/api/data', (req, res) => {
   const db = readDb();
+  // Ensure no caching for live data
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   res.json(db);
 });
 
@@ -1248,7 +1252,8 @@ app.put('/api/links/:id', (req, res) => {
   db.links.sort((a, b) => a.priority - b.priority);
   writeDb(db);
   
-  res.json({ success: true, link: db.links[index] });
+  const updatedLink = db.links.find(l => l.id === id);
+  res.json({ success: true, link: updatedLink });
 });
 
 // Delete Link

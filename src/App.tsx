@@ -48,7 +48,8 @@ export default function App() {
   // Fetch all initial linktree and ratecard content
   const loadData = async () => {
     try {
-      const res = await fetch('/api/data');
+      // Added timestamp parameter to prevent browser caching on production/CPanel
+      const res = await fetch(`/api/data?t=${Date.now()}`);
       if (!res.ok) throw new Error('Gagal mengambil data dari server database');
       const json = await res.json();
       setData(json);
