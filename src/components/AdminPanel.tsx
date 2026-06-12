@@ -39,7 +39,8 @@ import {
   Download,
   Upload,
   Github,
-  Palette
+  Palette,
+  History
 } from 'lucide-react';
 import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog } from '../types';
 import DesignSettingsForm from './DesignSettingsForm';
@@ -923,14 +924,16 @@ export default function AdminPanel({
       )}
 
       {/* Top Welcome Panel */}
-      <div className="bg-slate-900 text-slate-100 rounded-3xl p-6 shadow-lg mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="bg-slate-900 text-slate-100 rounded-3xl p-6 shadow-lg mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4 text-center md:text-left">
-          <div className="p-3 bg-white/10 rounded-2xl hidden md:block">
-            <Sliders className="w-6 h-6 text-indigo-200" />
+          <div className="p-3 bg-indigo-500/10 rounded-2xl hidden md:block">
+            <Sliders className="w-6 h-6 text-indigo-400" />
           </div>
           <div>
             <h1 className="text-lg md:text-xl font-display font-bold">Halo Admin Zendha! 👋</h1>
-            <p className="text-xs text-indigo-200">Kelola real-time link affiliate dan detail ratecard bisnis Anda disini.</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 font-mono uppercase tracking-widest mt-1">
+              Admin Dashboard v1.2.0 | Control Center
+            </p>
           </div>
         </div>
         <div className="flex gap-2.5">
@@ -1196,6 +1199,17 @@ export default function AdminPanel({
                     value={editingLink.description || ''}
                     rows={2}
                     onChange={(e) => setEditingLink({...editingLink, description: e.target.value})}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400 font-sans"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Nama Tombol CTA (Default: Beli Sekarang)</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. Cek di Shopee, Lihat Produk, Selengkapnya..."
+                    value={editingLink.buttonLabel || ''}
+                    onChange={(e) => setEditingLink({...editingLink, buttonLabel: e.target.value})}
                     className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400 font-sans"
                   />
                 </div>
@@ -2534,12 +2548,6 @@ export default function AdminPanel({
                  <h3 className="text-xl font-display font-bold text-slate-800">Pengaturan Tampilan</h3>
                  <p className="text-xs text-slate-400">Sesuaikan warna dan tema Linktree Anda secara real-time.</p>
                </div>
-               <button 
-                 onClick={onNavigateBack}
-                 className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
-               >
-                 <Eye className="w-4 h-4" /> Lihat Linktree
-               </button>
             </div>
             <DesignSettingsForm profile={profileForm} onSave={(newProfile) => { 
                 setProfileForm(newProfile); 
@@ -3231,7 +3239,7 @@ export default function AdminPanel({
 
       {/* Footer Administration Panel */}
       <div className="w-full text-center py-8 text-xs text-slate-400 font-mono mt-8 border-t border-slate-100">
-        <p>Admin Dashboard v1.1.0 | ZenDhA Refitra Personal Workspace</p>
+        <p>Admin Dashboard v1.2.0 | ZenDhA Refitra Personal Workspace</p>
       </div>
     </div>
   );

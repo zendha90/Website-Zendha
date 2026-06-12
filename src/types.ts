@@ -7,6 +7,7 @@ export interface AffiliateLink {
   isActive: boolean;
   priority: number;
   description?: string;
+  buttonLabel?: string;
   imageUrl?: string;
 }
 
@@ -15,6 +16,13 @@ export interface DesignSettings {
   header: {
     layout: 'classic' | 'hero' | 'banner' | 'cutout' | 'shape';
     titleStyle: 'text' | 'logo';
+  };
+  typography: {
+    fontFamily: 'sans' | 'display' | 'mono' | 'serif';
+  };
+  buttons: {
+    style: 'rounded-full' | 'rounded-2xl' | 'rounded-lg' | 'rounded-none';
+    shadow: 'none' | 'soft' | 'hard';
   };
   colors: {
     background: string;

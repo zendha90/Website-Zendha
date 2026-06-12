@@ -120,11 +120,11 @@ export default function App() {
 
   const appBgColor = currentView === 'ratecard' 
     ? '#0B0B0F' 
-    : (currentView === 'home' && data?.profile.designSettings?.colors.background) || '#f8fafc';
+    : data?.profile.designSettings?.colors.background || '#f8fafc';
 
   return (
     <div 
-      className={`min-h-screen w-full relative transition-colors duration-500 selection:bg-indigo-500 selection:text-white ${currentView === 'home' ? '' : 'pb-20'}`} 
+      className={`min-h-screen w-full relative transition-colors duration-500 selection:bg-indigo-500 selection:text-white ${currentView === 'ratecard' ? '' : 'pb-20'}`} 
       id="main-application-frame"
       style={{ backgroundColor: appBgColor }}
     >

@@ -26,6 +26,7 @@ interface AffiliateLink {
   isActive: boolean;
   priority: number;
   description?: string;
+  buttonLabel?: string;
   imageUrl?: string;
 }
 
@@ -33,6 +34,28 @@ interface ClickLog {
   id: string;
   linkId: string;
   timestamp: string; // ISO String
+}
+
+interface DesignSettings {
+  theme: string;
+  header: {
+    layout: 'classic' | 'hero' | 'banner' | 'cutout' | 'shape';
+    titleStyle: 'text' | 'logo';
+  };
+  typography: {
+    fontFamily: 'sans' | 'display' | 'mono' | 'serif';
+  };
+  buttons: {
+    style: 'rounded-full' | 'rounded-2xl' | 'rounded-lg' | 'rounded-none';
+    shadow: 'none' | 'soft' | 'hard';
+  };
+  colors: {
+    background: string;
+    buttons: string;
+    buttonText: string;
+    pageText: string;
+    title: string;
+  };
 }
 
 interface RatecardProfile {
@@ -58,6 +81,9 @@ interface RatecardProfile {
   // New Customizable Titles
   studioDirectorTitle?: string;
   studioEstdYear?: string;
+
+  // Design Settings
+  designSettings?: DesignSettings;
 }
 
 interface RatecardService {
@@ -182,7 +208,14 @@ const DEFAULT_DB: DatabaseSchema = {
     youtube: "https://youtube.com/@zendharefitra",
     email: "zendha90@gmail.com",
     avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400&h=400",
-    whatsapp: "https://wa.me/628123456789"
+    whatsapp: "https://wa.me/628123456789",
+    designSettings: {
+      theme: 'minimalist',
+      header: { layout: 'classic', titleStyle: 'text' },
+      typography: { fontFamily: 'sans' },
+      buttons: { style: 'rounded-2xl', shadow: 'soft' },
+      colors: { background: '#FFFFFF', buttons: '#1e293b', buttonText: '#FFFFFF', pageText: '#334155', title: '#0f172a' }
+    }
   },
   services: [
     {
@@ -299,6 +332,11 @@ function readDb(): DatabaseSchema {
 
       if (!db.brands || db.brands.length === 0) {
         db.brands = DEFAULT_DB.brands;
+        changed = true;
+      }
+
+      if (db.profile && !db.profile.designSettings) {
+        db.profile.designSettings = DEFAULT_DB.profile.designSettings;
         changed = true;
       }
       
@@ -1212,7 +1250,7 @@ app.put('/api/ratecard/profile', (req, res) => {
   const { 
     name, bio, instagram, tiktok, youtube, email, avatarUrl, whatsapp,
     heroTagline, heroTitle1, heroTitleHighlight, heroDescription, domicile, contactPhone,
-    stats, termsOfService, studioDirectorTitle, studioEstdYear
+    stats, termsOfService, studioDirectorTitle, studioEstdYear, designSettings
   } = req.body;
   const db = readDb();
   
@@ -1234,7 +1272,8 @@ app.put('/api/ratecard/profile', (req, res) => {
     stats: stats !== undefined ? stats : db.profile.stats,
     termsOfService: termsOfService !== undefined ? termsOfService : db.profile.termsOfService,
     studioDirectorTitle: studioDirectorTitle !== undefined ? studioDirectorTitle : db.profile.studioDirectorTitle,
-    studioEstdYear: studioEstdYear !== undefined ? studioEstdYear : db.profile.studioEstdYear
+    studioEstdYear: studioEstdYear !== undefined ? studioEstdYear : db.profile.studioEstdYear,
+    designSettings: designSettings !== undefined ? designSettings : db.profile.designSettings
   };
   
   writeDb(db);

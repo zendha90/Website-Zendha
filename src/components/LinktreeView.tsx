@@ -97,8 +97,33 @@ export default function LinktreeView({
     return <Globe className="w-4 h-4 text-slate-500" />;
   };
 
+  // Helper to get font class
+  const getFontClass = () => {
+    const font = profile.designSettings?.typography?.fontFamily || 'sans';
+    switch (font) {
+      case 'display': return 'font-display';
+      case 'serif': return 'font-serif';
+      case 'mono': return 'font-mono';
+      default: return 'font-sans';
+    }
+  };
+
+  const getButtonRoundedClass = () => {
+    const style = profile.designSettings?.buttons?.style || 'rounded-2xl';
+    return style; // These are Tailwind rounded classes directly
+  };
+
+  const getButtonShadowClass = () => {
+    const shadow = profile.designSettings?.buttons?.shadow || 'soft';
+    switch (shadow) {
+      case 'none': return 'shadow-none';
+      case 'hard': return 'shadow-xl border-2';
+      default: return 'shadow-md';
+    }
+  };
+
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 relative" style={{
+    <div className={`w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 relative ${getFontClass()}`} style={{
       backgroundColor: profile.designSettings?.colors.background || undefined,
       color: profile.designSettings?.colors.pageText || undefined
     }}>
@@ -107,35 +132,60 @@ export default function LinktreeView({
       <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-full max-w-7xl h-[400px] bg-indigo-50/20 rounded-full blur-[140px] pointer-events-none -z-10" />
 
       {/* Header Profile Landing Section */}
-      <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 mb-6 border-b pb-5" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }} id="landing-profile-header">
+      <div 
+        className={`flex flex-col mb-6 pb-5 border-b ${
+          profile.designSettings?.header.layout === 'hero' ? 'items-center text-center' : 'md:flex-row items-center md:items-start justify-between text-center sm:text-left'
+        }`} 
+        style={{ borderColor: profile.designSettings?.colors.pageText + '20' }} 
+        id="landing-profile-header"
+      >
         
         {/* Profile Avatar and Info */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+        <div className={`flex flex-col gap-6 ${
+          profile.designSettings?.header.layout === 'hero' ? 'items-center' : 'sm:flex-row items-center sm:items-start'
+        }`}>
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className="relative shrink-0"
+            className={`relative shrink-0 group ${
+              profile.designSettings?.header.layout === 'banner' ? 'pt-4' : ''
+            }`}
           >
-            <img 
-              src={profile.avatarUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2"} 
-              alt={profile.name} 
-              className="w-24 h-24 sm:w-28 sm:h-28 rounded-[2rem] object-cover border-4 border-white shadow-xl bg-slate-50"
-              id="avatar-image"
-              referrerPolicy="no-referrer"
-            />
+            {profile.designSettings?.header.layout === 'banner' && (
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-16 rounded-t-3xl -z-10 bg-gradient-to-br from-indigo-500/10 to-transparent" />
+            )}
+            
+            <div className={`relative overflow-hidden border-4 shadow-xl transition-all duration-500 hover:shadow-2xl ${
+               profile.designSettings?.header.layout === 'shape' ? 'rounded-[2.5rem] rotate-6 group-hover:rotate-0' : 
+               profile.designSettings?.header.layout === 'cutout' ? 'rounded-2xl' : 'rounded-full'
+            }`} style={{ borderColor: 'white' }}>
+              <img 
+                src={profile.avatarUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2"} 
+                alt={profile.name} 
+                className={`object-cover bg-slate-50 transition-transform duration-700 group-hover:scale-110 ${
+                  profile.designSettings?.header.layout === 'hero' ? 'w-32 h-32' : 'w-24 h-24 sm:w-28 sm:h-28'
+                }`}
+                id="avatar-image"
+                referrerPolicy="no-referrer"
+              />
+            </div>
             <span className="absolute bottom-1 right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white animate-pulse" />
           </motion.div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-center sm:justify-start gap-2">
+            <div className={`flex items-center gap-2 ${
+              profile.designSettings?.header.layout === 'hero' ? 'justify-center' : 'justify-center sm:justify-start'
+            }`}>
               <motion.h1 
                 initial={{ y: 5, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1, duration: 0.4 }}
-                className="text-2xl sm:text-3xl font-display font-black tracking-tight"
+                className={`${
+                  profile.designSettings?.header.layout === 'hero' ? 'text-4xl' : 'text-2xl sm:text-3xl'
+                } font-black tracking-tight`}
                 id="profile-name"
-                style={{ color: profile.designSettings?.colors.title || undefined }}
+                style={{ color: profile.designSettings?.colors.title || '#0F172A' }}
               >
                 {profile.name}
               </motion.h1>
@@ -146,7 +196,9 @@ export default function LinktreeView({
               initial={{ y: 5, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.4 }}
-              className="text-sm max-w-xl leading-relaxed"
+              className={`text-sm leading-relaxed ${
+                profile.designSettings?.header.layout === 'hero' ? 'max-w-2xl mx-auto' : 'max-w-xl'
+              }`}
               id="profile-bio"
               style={{ color: profile.designSettings?.colors.pageText || undefined }}
             >
@@ -158,7 +210,9 @@ export default function LinktreeView({
               initial={{ y: 5, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.4 }}
-              className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 pt-2"
+              className={`flex flex-wrap items-center gap-2.5 pt-2 ${
+                profile.designSettings?.header.layout === 'hero' ? 'justify-center' : 'justify-center sm:justify-start'
+              }`}
               id="social-icons-bar"
             >
               {profile.whatsapp && (
@@ -229,10 +283,10 @@ export default function LinktreeView({
       {/* Main Section Content Header */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-4" id="landing-main-bar">
         <div>
-          <span className="text-[10px] font-mono font-extrabold text-indigo-600 uppercase tracking-widest inline-flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-indigo-400 animate-pulse" /> Barang yang aku pakai di rumah
+          <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest inline-flex items-center gap-1" style={{ color: profile.designSettings?.colors.buttons }}>
+            <Sparkles className="w-3 h-3 animate-pulse" /> Barang yang aku pakai di rumah
           </span>
-          <h2 className="text-xl font-display font-black text-slate-800 tracking-tight mt-1">
+          <h2 className="text-xl font-black tracking-tight mt-1" style={{ color: profile.designSettings?.colors.title }}>
             Rekomendasi pilihan
           </h2>
         </div>
@@ -272,17 +326,22 @@ export default function LinktreeView({
               const activeIndex = activeLinks.findIndex(l => l.id === link.id);
               const sequenceNumber = activeIndex !== -1 ? activeIndex + 1 : idx + 1;
               return (
-                <motion.div
-                  key={link.id}
-                  layout
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: Math.min(idx * 0.05, 0.25), duration: 0.3 }}
-                  className="bg-white border border-slate-200/60 rounded-3xl shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-350 cursor-pointer overflow-hidden group flex flex-col relative"
-                  onClick={() => handleLinkNavigate(link)}
-                  id={`link-card-${link.id}`}
-                >
+                  <motion.div
+                    key={link.id}
+                    layout
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: Math.min(idx * 0.05, 0.25), duration: 0.3 }}
+                    className={`border transition-all duration-350 cursor-pointer overflow-hidden group flex flex-col relative ${getButtonRoundedClass()} ${getButtonShadowClass()}`}
+                    onClick={() => handleLinkNavigate(link)}
+                    id={`link-card-${link.id}`}
+                    style={{ 
+                      backgroundColor: profile.designSettings?.colors.background === '#FFFFFF' ? '#FFFFFF' : profile.designSettings?.colors.background + '20',
+                      backdropFilter: 'blur(10px)',
+                      borderColor: profile.designSettings?.colors.pageText + '20'
+                    }}
+                  >
                   
                   {/* Aspect Ratio 1:1 Image Box (Strictly enforced 1:1 aspect ratio as requested) */}
                   <div className="w-full aspect-square overflow-hidden relative bg-slate-50 border-b border-slate-100 flex items-center justify-center">
@@ -325,11 +384,11 @@ export default function LinktreeView({
                         {link.category}
                       </span>
 
-                      <h3 className="font-display font-bold text-slate-800 text-sm mt-2 leading-snug group-hover:text-indigo-600 transition-colors line-clamp-2">
+                      <h3 className="font-bold text-sm mt-2 leading-snug transition-colors line-clamp-2" style={{ color: profile.designSettings?.colors.title }}>
                         {link.title}
                       </h3>
                       {link.description && (
-                        <p className="text-[11px] text-slate-400 mt-1.5 line-clamp-2 leading-normal">
+                        <p className="text-[11px] mt-1.5 line-clamp-2 leading-normal opacity-80" style={{ color: profile.designSettings?.colors.pageText }}>
                           {link.description}
                         </p>
                       )}
@@ -338,7 +397,7 @@ export default function LinktreeView({
                     {/* Highly Polished Beli Sekarang CTA Button */}
                     <div className="mt-5 pt-3 border-t" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
                       <div 
-                        className="w-full py-2.5 px-4 text-white rounded-xl text-xs font-bold font-sans tracking-wide flex items-center justify-center gap-1.5 transition-all hover:opacity-90 active:scale-[0.98] shadow-sm cursor-pointer"
+                        className={`w-full py-2.5 px-4 text-white text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer ${getButtonRoundedClass()}`}
                         style={{
                           backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
                           color: profile.designSettings?.colors.buttonText || '#ffffff'
@@ -348,7 +407,7 @@ export default function LinktreeView({
                           handleLinkNavigate(link);
                         }}
                       >
-                        <span>Beli Sekarang</span>
+                        <span>{link.buttonLabel || "Beli Sekarang"}</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
