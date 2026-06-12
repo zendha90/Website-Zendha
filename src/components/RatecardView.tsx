@@ -779,15 +779,25 @@ export default function RatecardView({
             
             <div className="space-y-4 max-w-3xl mx-auto">
               <span className="text-xs font-mono tracking-[0.3em] font-extrabold text-[#8B82F6] bg-white/5 py-1.5 px-4 rounded-full border border-white/5 inline-block">
-                SECURE COLLABORATION
+                {profile.contactBadge || "SECURE COLLABORATION"}
               </span>
               <h2 className="text-4xl sm:text-6xl font-sans font-black text-white leading-[1.05] tracking-tight">
-                LET'S WORK TOGETHER <br />
-                AND CREATE <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8B82F6] to-[#D580FF]">SOMETHING GREAT</span>
+                {profile.contactTitle !== undefined && profile.contactTitle !== "" ? (
+                  <>
+                    {profile.contactTitle}{" "}
+                  </>
+                ) : (
+                  <>
+                    LET'S WORK TOGETHER <br />
+                    AND CREATE <br />
+                  </>
+                )}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8B82F6] to-[#D580FF]">
+                  {profile.contactTitleHighlight || "SOMETHING GREAT"}
+                </span>
               </h2>
               <p className="text-slate-400 text-sm sm:text-base max-w-lg mx-auto font-light font-sans pt-2">
-                Have a customized target or specific scope of work? Connect with design studio lead, {profile.name || "creative director"}.
+                {profile.contactDescription || `Have a customized target or specific scope of work? Connect with design studio lead, ${profile.name || "creative director"}.`}
               </p>
             </div>
 

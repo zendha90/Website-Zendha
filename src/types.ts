@@ -55,6 +55,10 @@ export interface RatecardProfile {
   heroDescription?: string;
   domicile?: string;
   contactPhone?: string;
+  contactBadge?: string;
+  contactTitle?: string;
+  contactTitleHighlight?: string;
+  contactDescription?: string;
   stats?: Array<{ value: string; label: string; desc: string }>;
   statsBadge?: string;
   statsTitle?: string;

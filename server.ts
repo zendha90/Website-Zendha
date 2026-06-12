@@ -80,6 +80,35 @@ interface RatecardProfile {
   domicile?: string;
   contactPhone?: string;
   stats?: Array<{ value: string; label: string; desc: string }>;
+  statsBadge?: string;
+  statsTitle?: string;
+  statsDescription?: string;
+  
+  // Projects Section
+  projectsBadge?: string;
+  projectsTitle?: string;
+  projectsDescription?: string;
+
+  // Pricing Section
+  pricingBadge?: string;
+  pricingTitle?: string;
+  pricingDescription?: string;
+
+  // Brands Section
+  brandsBadge?: string;
+  brandsTitle?: string;
+
+  // Terms Section
+  termsBadge?: string;
+  termsTitle?: string;
+  termsDescription?: string;
+
+  // Contact Section
+  contactBadge?: string;
+  contactTitle?: string;
+  contactTitleHighlight?: string;
+  contactDescription?: string;
+
   termsOfService?: string[];
   
   // New Customizable Titles
@@ -1326,7 +1355,13 @@ app.put('/api/ratecard/profile', (req, res) => {
   const { 
     name, bio, instagram, tiktok, youtube, email, avatarUrl, whatsapp,
     heroTagline, heroTitle1, heroTitleHighlight, heroDescription, domicile, contactPhone,
-    stats, termsOfService, studioDirectorTitle, studioEstdYear, designSettings
+    stats, termsOfService, studioDirectorTitle, studioEstdYear, designSettings,
+    statsBadge, statsTitle, statsDescription,
+    projectsBadge, projectsTitle, projectsDescription,
+    pricingBadge, pricingTitle, pricingDescription,
+    brandsBadge, brandsTitle,
+    termsBadge, termsTitle, termsDescription,
+    contactBadge, contactTitle, contactTitleHighlight, contactDescription
   } = req.body;
   const db = readDb();
   
@@ -1349,7 +1384,25 @@ app.put('/api/ratecard/profile', (req, res) => {
     termsOfService: termsOfService !== undefined ? termsOfService : db.profile.termsOfService,
     studioDirectorTitle: studioDirectorTitle !== undefined ? studioDirectorTitle : db.profile.studioDirectorTitle,
     studioEstdYear: studioEstdYear !== undefined ? studioEstdYear : db.profile.studioEstdYear,
-    designSettings: designSettings !== undefined ? designSettings : db.profile.designSettings
+    designSettings: designSettings !== undefined ? designSettings : db.profile.designSettings,
+    statsBadge: statsBadge !== undefined ? statsBadge : db.profile.statsBadge,
+    statsTitle: statsTitle !== undefined ? statsTitle : db.profile.statsTitle,
+    statsDescription: statsDescription !== undefined ? statsDescription : db.profile.statsDescription,
+    projectsBadge: projectsBadge !== undefined ? projectsBadge : db.profile.projectsBadge,
+    projectsTitle: projectsTitle !== undefined ? projectsTitle : db.profile.projectsTitle,
+    projectsDescription: projectsDescription !== undefined ? projectsDescription : db.profile.projectsDescription,
+    pricingBadge: pricingBadge !== undefined ? pricingBadge : db.profile.pricingBadge,
+    pricingTitle: pricingTitle !== undefined ? pricingTitle : db.profile.pricingTitle,
+    pricingDescription: pricingDescription !== undefined ? pricingDescription : db.profile.pricingDescription,
+    brandsBadge: brandsBadge !== undefined ? brandsBadge : db.profile.brandsBadge,
+    brandsTitle: brandsTitle !== undefined ? brandsTitle : db.profile.brandsTitle,
+    termsBadge: termsBadge !== undefined ? termsBadge : db.profile.termsBadge,
+    termsTitle: termsTitle !== undefined ? termsTitle : db.profile.termsTitle,
+    termsDescription: termsDescription !== undefined ? termsDescription : db.profile.termsDescription,
+    contactBadge: contactBadge !== undefined ? contactBadge : db.profile.contactBadge,
+    contactTitle: contactTitle !== undefined ? contactTitle : db.profile.contactTitle,
+    contactTitleHighlight: contactTitleHighlight !== undefined ? contactTitleHighlight : db.profile.contactTitleHighlight,
+    contactDescription: contactDescription !== undefined ? contactDescription : db.profile.contactDescription
   };
   
   writeDb(db);

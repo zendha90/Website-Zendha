@@ -1463,16 +1463,6 @@ export default function AdminPanel({
                 className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans leading-relaxed"
               />
             </div>
-
-            <div className="flex justify-end mt-4">
-              <button
-                type="button"
-                onClick={() => saveProfile()}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-bold shadow-xs transition-all cursor-pointer font-sans flex items-center gap-1.5"
-              >
-                <Save className="w-3 h-3" /> Simpan Hero Config
-              </button>
-            </div>
           </div>
 
           {/* NEW: Domicile & Contact Section */}
@@ -1731,6 +1721,55 @@ export default function AdminPanel({
                   value={profileForm.brandsTitle || ''}
                   placeholder="e.g. Featured Brands We Worked With"
                   onChange={(e) => setProfileForm({...profileForm, brandsTitle: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* NEW: Contact/Collaboration Section Header Config */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
+            <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Share2 className="w-3.5 h-3.5 text-indigo-500" /> Header Seksi Kolaborasi &amp; Kontak
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Kontak</label>
+                <input 
+                  type="text" 
+                  value={profileForm.contactBadge || ''}
+                  placeholder="e.g. SECURE COLLABORATION"
+                  onChange={(e) => setProfileForm({...profileForm, contactBadge: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Kontak</label>
+                <input 
+                  type="text" 
+                  value={profileForm.contactTitle || ''}
+                  placeholder="e.g. LET'S WORK TOGETHER"
+                  onChange={(e) => setProfileForm({...profileForm, contactTitle: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Teks Sorotan (Gradient)</label>
+                <input 
+                  type="text" 
+                  value={profileForm.contactTitleHighlight || ''}
+                  placeholder="e.g. SOMETHING GREAT"
+                  onChange={(e) => setProfileForm({...profileForm, contactTitleHighlight: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek</label>
+                <input 
+                  type="text" 
+                  value={profileForm.contactDescription || ''}
+                  placeholder="e.g. Have a customized target..."
+                  onChange={(e) => setProfileForm({...profileForm, contactDescription: e.target.value})}
                   className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
                 />
               </div>
