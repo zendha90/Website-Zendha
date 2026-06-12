@@ -335,9 +335,29 @@ function readDb(): DatabaseSchema {
         changed = true;
       }
 
-      if (db.profile && !db.profile.designSettings) {
-        db.profile.designSettings = DEFAULT_DB.profile.designSettings;
-        changed = true;
+      if (db.profile) {
+        if (!db.profile.designSettings) {
+          db.profile.designSettings = DEFAULT_DB.profile.designSettings;
+          changed = true;
+        } else {
+          // Ensure sub-fields exist for older DB versions
+          if (!db.profile.designSettings.header) {
+            db.profile.designSettings.header = DEFAULT_DB.profile.designSettings!.header;
+            changed = true;
+          }
+          if (!db.profile.designSettings.typography) {
+            db.profile.designSettings.typography = DEFAULT_DB.profile.designSettings!.typography;
+            changed = true;
+          }
+          if (!db.profile.designSettings.buttons) {
+            db.profile.designSettings.buttons = DEFAULT_DB.profile.designSettings!.buttons;
+            changed = true;
+          }
+          if (!db.profile.designSettings.colors) {
+            db.profile.designSettings.colors = DEFAULT_DB.profile.designSettings!.colors;
+            changed = true;
+          }
+        }
       }
       
       // Auto-populate realistic click logs if missing or empty
@@ -1169,7 +1189,7 @@ app.post('/api/links/:id/click', (req, res) => {
 app.post('/api/links', (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
   
-  const { title, url, category, description, imageUrl, isActive, priority } = req.body;
+  const { title, url, category, description, buttonLabel, imageUrl, isActive, priority } = req.body;
   if (!title || !url) {
     return res.status(400).json({ success: false, message: 'Title dan URL wajib diisi' });
   }
@@ -1181,6 +1201,7 @@ app.post('/api/links', (req, res) => {
     url,
     category: category || 'General',
     description: description || '',
+    buttonLabel: buttonLabel || '',
     imageUrl: imageUrl || '',
     clicks: 0,
     isActive: isActive !== false,
@@ -1200,7 +1221,7 @@ app.put('/api/links/:id', (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
   
   const { id } = req.params;
-  const { title, url, category, description, imageUrl, isActive, priority } = req.body;
+  const { title, url, category, description, buttonLabel, imageUrl, isActive, priority } = req.body;
   
   const db = readDb();
   const index = db.links.findIndex(l => l.id === id);
@@ -1214,6 +1235,7 @@ app.put('/api/links/:id', (req, res) => {
     url: url !== undefined ? url : db.links[index].url,
     category: category !== undefined ? category : db.links[index].category,
     description: description !== undefined ? description : db.links[index].description,
+    buttonLabel: buttonLabel !== undefined ? buttonLabel : db.links[index].buttonLabel,
     imageUrl: imageUrl !== undefined ? imageUrl : db.links[index].imageUrl,
     isActive: isActive !== undefined ? isActive : db.links[index].isActive,
     priority: priority !== undefined ? Number(priority) : db.links[index].priority

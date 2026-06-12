@@ -210,7 +210,13 @@ export default function DesignSettingsForm({ profile, onSave }: { profile: Ratec
             design.typography?.fontFamily === 'serif' ? 'font-serif' : 
             design.typography?.fontFamily === 'mono' ? 'font-mono' : 'font-sans'
           }`}
-          style={{ backgroundColor: design.colors.background }}
+          style={{ 
+            backgroundColor: design.colors.background,
+            fontFamily: 
+              design.typography?.fontFamily === 'display' ? '"Space Grotesk", sans-serif' : 
+              design.typography?.fontFamily === 'serif' ? '"Playfair Display", serif' : 
+              design.typography?.fontFamily === 'mono' ? '"JetBrains Mono", monospace' : '"Inter", sans-serif'
+          }}
         >
           {/* Mock Banner Layout Visual */}
           {design.header.layout === 'banner' && (

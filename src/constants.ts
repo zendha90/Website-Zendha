@@ -10,7 +10,7 @@ export const PREDEFINED_THEMES: { [key: string]: Omit<DesignSettings, 'theme'> }
   darkMode: {
     header: { layout: 'classic', titleStyle: 'text' },
     typography: { fontFamily: 'display' },
-    buttons: { style: 'rounded-xl', shadow: 'hard' },
+    buttons: { style: 'rounded-2xl', shadow: 'hard' },
     colors: { background: '#0f172a', buttons: '#6366f1', buttonText: '#FFFFFF', pageText: '#cbd5e1', title: '#FFFFFF' }
   },
   forestZen: {

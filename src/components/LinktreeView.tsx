@@ -117,7 +117,7 @@ export default function LinktreeView({
     const shadow = profile.designSettings?.buttons?.shadow || 'soft';
     switch (shadow) {
       case 'none': return 'shadow-none';
-      case 'hard': return 'shadow-xl border-2';
+      case 'hard': return 'shadow-[4px_4px_0px_rgba(15,23,42,0.1)] border-2 border-slate-900/5';
       default: return 'shadow-md';
     }
   };
@@ -125,7 +125,11 @@ export default function LinktreeView({
   return (
     <div className={`w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 relative ${getFontClass()}`} style={{
       backgroundColor: profile.designSettings?.colors.background || undefined,
-      color: profile.designSettings?.colors.pageText || undefined
+      color: profile.designSettings?.colors.pageText || undefined,
+      fontFamily: 
+        profile.designSettings?.typography?.fontFamily === 'display' ? '"Space Grotesk", sans-serif' : 
+        profile.designSettings?.typography?.fontFamily === 'serif' ? '"Playfair Display", serif' : 
+        profile.designSettings?.typography?.fontFamily === 'mono' ? '"JetBrains Mono", monospace' : '"Inter", sans-serif'
     }}>
       
       {/* Decorative radial gradients - update color to match */}
@@ -133,8 +137,12 @@ export default function LinktreeView({
 
       {/* Header Profile Landing Section */}
       <div 
-        className={`flex flex-col mb-6 pb-5 border-b ${
-          profile.designSettings?.header.layout === 'hero' ? 'items-center text-center' : 'md:flex-row items-center md:items-start justify-between text-center sm:text-left'
+        className={`flex flex-col mb-10 pb-8 border-b transition-all duration-500 ${
+          profile.designSettings?.header.layout === 'hero' ? 'items-center text-center' : 
+          profile.designSettings?.header.layout === 'classic' ? 'md:flex-row items-center md:items-start justify-between text-center sm:text-left' :
+          profile.designSettings?.header.layout === 'banner' ? 'items-center text-center' :
+          profile.designSettings?.header.layout === 'cutout' ? 'items-center text-center' :
+          'items-center text-center' // shape
         }`} 
         style={{ borderColor: profile.designSettings?.colors.pageText + '20' }} 
         id="landing-profile-header"
@@ -142,18 +150,18 @@ export default function LinktreeView({
         
         {/* Profile Avatar and Info */}
         <div className={`flex flex-col gap-6 ${
-          profile.designSettings?.header.layout === 'hero' ? 'items-center' : 'sm:flex-row items-center sm:items-start'
+          profile.designSettings?.header.layout === 'classic' ? 'sm:flex-row items-center sm:items-start' : 'items-center'
         }`}>
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.4 }}
             className={`relative shrink-0 group ${
-              profile.designSettings?.header.layout === 'banner' ? 'pt-4' : ''
+              profile.designSettings?.header.layout === 'banner' ? 'pt-8' : ''
             }`}
           >
             {profile.designSettings?.header.layout === 'banner' && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-16 rounded-t-3xl -z-10 bg-gradient-to-br from-indigo-500/10 to-transparent" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300%] h-24 rounded-t-3xl -z-10" style={{ backgroundColor: profile.designSettings?.colors.buttons + '15' }} />
             )}
             
             <div className={`relative overflow-hidden border-4 shadow-xl transition-all duration-500 hover:shadow-2xl ${
@@ -164,7 +172,7 @@ export default function LinktreeView({
                 src={profile.avatarUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2"} 
                 alt={profile.name} 
                 className={`object-cover bg-slate-50 transition-transform duration-700 group-hover:scale-110 ${
-                  profile.designSettings?.header.layout === 'hero' ? 'w-32 h-32' : 'w-24 h-24 sm:w-28 sm:h-28'
+                  profile.designSettings?.header.layout === 'classic' ? 'w-24 h-24 sm:w-28 sm:h-28' : 'w-32 h-32'
                 }`}
                 id="avatar-image"
                 referrerPolicy="no-referrer"
@@ -173,16 +181,16 @@ export default function LinktreeView({
             <span className="absolute bottom-1 right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white animate-pulse" />
           </motion.div>
 
-          <div className="space-y-2">
+          <div className={`space-y-2 ${profile.designSettings?.header.layout === 'classic' ? 'text-left' : 'text-center'}`}>
             <div className={`flex items-center gap-2 ${
-              profile.designSettings?.header.layout === 'hero' ? 'justify-center' : 'justify-center sm:justify-start'
+              profile.designSettings?.header.layout === 'classic' ? 'justify-start' : 'justify-center'
             }`}>
               <motion.h1 
                 initial={{ y: 5, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1, duration: 0.4 }}
                 className={`${
-                  profile.designSettings?.header.layout === 'hero' ? 'text-4xl' : 'text-2xl sm:text-3xl'
+                  profile.designSettings?.header.layout === 'classic' ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl'
                 } font-black tracking-tight`}
                 id="profile-name"
                 style={{ color: profile.designSettings?.colors.title || '#0F172A' }}
@@ -197,7 +205,7 @@ export default function LinktreeView({
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.4 }}
               className={`text-sm leading-relaxed ${
-                profile.designSettings?.header.layout === 'hero' ? 'max-w-2xl mx-auto' : 'max-w-xl'
+                profile.designSettings?.header.layout === 'classic' ? 'max-w-xl' : 'max-w-2xl mx-auto'
               }`}
               id="profile-bio"
               style={{ color: profile.designSettings?.colors.pageText || undefined }}

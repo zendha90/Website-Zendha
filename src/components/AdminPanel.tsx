@@ -1208,7 +1208,7 @@ export default function AdminPanel({
                   <input 
                     type="text" 
                     placeholder="e.g. Cek di Shopee, Lihat Produk, Selengkapnya..."
-                    value={editingLink.buttonLabel || ''}
+                    value={editingLink.buttonLabel ?? ''}
                     onChange={(e) => setEditingLink({...editingLink, buttonLabel: e.target.value})}
                     className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400 font-sans"
                   />
