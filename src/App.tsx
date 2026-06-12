@@ -119,17 +119,27 @@ export default function App() {
     );
   }
 
-  const appBgColor = currentView === 'ratecard' 
-    ? '#0B0B0F' 
-    : currentView === 'admin'
-      ? '#f8fafc' // Admin page background isolates from theme custom design colors
-      : data?.profile.designSettings?.colors.background || '#f8fafc';
+  const getAppBgStyle = () => {
+    if (currentView === 'ratecard') {
+      return { backgroundColor: '#0B0B0F' };
+    }
+    if (currentView === 'admin') {
+      return { backgroundColor: '#f8fafc' };
+    }
+    const ds = data?.profile?.designSettings;
+    if (ds?.backgroundType === 'gradient') {
+      return {
+        background: `linear-gradient(135deg, ${ds.colors.background} 0%, ${ds.colors.backgroundGradientSecond || '#F1F5F9'} 100%)`
+      };
+    }
+    return { backgroundColor: ds?.colors.background || '#f8fafc' };
+  };
 
   return (
     <div 
-      className={`min-h-screen w-full relative transition-colors duration-500 selection:bg-indigo-500 selection:text-white ${currentView === 'ratecard' ? '' : 'pb-20'}`} 
+      className={`min-h-screen w-full relative transition-all duration-500 selection:bg-indigo-500 selection:text-white ${currentView === 'ratecard' ? '' : 'pb-20'}`} 
       id="main-application-frame"
-      style={{ backgroundColor: appBgColor }}
+      style={getAppBgStyle()}
     >
       {/* Visual background lights for top-tier aesthetics */}
       {currentView !== 'ratecard' && (

@@ -30,7 +30,12 @@ export interface DesignSettings {
     buttonText: string;
     pageText: string;
     title: string;
+    backgroundGradientSecond?: string;
   };
+  layoutStyle?: 'grid' | 'list';
+  backgroundType?: 'solid' | 'gradient' | 'glass';
+  cardOpacity?: number;
+  hoverAnimation?: 'scale' | 'lift' | 'tilt' | 'none';
 }
 
 export interface RatecardProfile {

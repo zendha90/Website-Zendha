@@ -931,9 +931,6 @@ export default function AdminPanel({
           </div>
           <div>
             <h1 className="text-lg md:text-xl font-display font-bold">Halo Admin Zendha! 👋</h1>
-            <p className="text-[10px] sm:text-xs text-slate-400 font-mono uppercase tracking-widest mt-1">
-              Admin Dashboard v1.2.0 | Control Center
-            </p>
           </div>
         </div>
         <div className="flex gap-2.5">

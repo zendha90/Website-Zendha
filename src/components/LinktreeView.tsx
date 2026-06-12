@@ -113,6 +113,30 @@ export default function LinktreeView({
     return style; // These are Tailwind rounded classes directly
   };
 
+  const getCardHoverStyle = () => {
+    const hoverVal = profile.designSettings?.hoverAnimation || 'lift';
+    switch (hoverVal) {
+      case 'none': return {};
+      case 'scale': return { scale: 1.025 };
+      default: return { y: -5, scale: 1.01 };
+    }
+  };
+
+  const getCardBgColor = () => {
+    const opacityVal = profile.designSettings?.cardOpacity ?? 100;
+    const isLightBg = !profile.designSettings?.colors.background || profile.designSettings?.colors.background.toLowerCase() === '#ffffff';
+    
+    if (opacityVal < 100) {
+      return isLightBg 
+        ? `rgba(255, 255, 255, ${opacityVal / 100})` 
+        : `rgba(15, 23, 42, ${opacityVal / 100})`;
+    }
+    
+    return profile.designSettings?.colors.background === '#FFFFFF' 
+      ? '#FFFFFF' 
+      : profile.designSettings?.colors.background + '20';
+  };
+
   const getButtonShadowClass = () => {
     const shadow = profile.designSettings?.buttons?.shadow || 'soft';
     switch (shadow) {
@@ -324,125 +348,209 @@ export default function LinktreeView({
         </div>
       </div>
 
-      {/* Landing Page Curated Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="links-grid">
-        <AnimatePresence mode="popLayout">
-          {filteredLinks.length > 0 ? (
-            filteredLinks.map((link, idx) => {
-              const isExpanded = expandedLinkId === link.id;
-              // Retrieve the permanent index of the product inside all active links
-              const activeIndex = activeLinks.findIndex(l => l.id === link.id);
-              const sequenceNumber = activeIndex !== -1 ? activeIndex + 1 : idx + 1;
-              return (
+      {/* Landing Page Curated Product Display */}
+      <AnimatePresence mode="popLayout">
+        {filteredLinks.length > 0 ? (
+          profile.designSettings?.layoutStyle === 'list' ? (
+            /* CLASSIC STACKED LIST LAYOUT MODE */
+            <div className="flex flex-col gap-3.5 w-full" id="links-list">
+              {filteredLinks.map((link, idx) => {
+                const activeIndex = activeLinks.findIndex(l => l.id === link.id);
+                const sequenceNumber = activeIndex !== -1 ? activeIndex + 1 : idx + 1;
+                return (
                   <motion.div
                     key={link.id}
                     layout
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
+                    whileHover={getCardHoverStyle()}
+                    transition={{ delay: Math.min(idx * 0.04, 0.2), duration: 0.3 }}
+                    className={`border p-3.5 flex items-center justify-between gap-4 transition-all duration-350 cursor-pointer overflow-hidden group select-none ${getButtonRoundedClass()} ${getButtonShadowClass()}`}
+                    onClick={() => handleLinkNavigate(link)}
+                    id={`link-list-item-${link.id}`}
+                    style={{ 
+                      backgroundColor: getCardBgColor(),
+                      backdropFilter: (profile.designSettings?.cardOpacity ?? 100) < 100 ? 'blur(12px)' : undefined,
+                      borderColor: profile.designSettings?.colors.pageText + '20'
+                    }}
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      {/* Sequential tag badge */}
+                      <span className="text-[10px] text-slate-400 font-mono font-black w-4 text-right select-none shrink-0">
+                        {sequenceNumber}
+                      </span>
+
+                      {/* Micro-image preview */}
+                      <div className="w-14 h-14 shrink-0 rounded-xl overflow-hidden relative bg-slate-50 border border-slate-100 flex items-center justify-center">
+                        {link.imageUrl ? (
+                          <img 
+                            src={link.imageUrl} 
+                            alt={link.title}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-indigo-50/40 to-slate-100/40 flex items-center justify-center">
+                            {getCategoryIcon(link.category)}
+                          </div>
+                        )}
+                        
+                        {topClickedIds.includes(link.id) && link.clicks > 0 && (
+                          <div className="absolute top-0.5 right-0.5 bg-orange-500 text-white p-0.5 rounded-full shadow-xs">
+                            <Flame className="w-2.5 h-2.5 animate-pulse" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Descriptive metadata text */}
+                      <div className="min-w-0 flex-1">
+                        <span className="inline-flex items-center gap-1 text-[8px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                          {getCategoryIcon(link.category)}
+                          {link.category}
+                        </span>
+                        <h3 className="font-extrabold text-xs sm:text-sm truncate mt-0.5" style={{ color: profile.designSettings?.colors.title }}>
+                          {link.title}
+                        </h3>
+                        {link.description && (
+                          <p className="text-[10px] truncate opacity-70 mt-0.5 leading-normal max-w-lg" style={{ color: profile.designSettings?.colors.pageText }}>
+                            {link.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Standard Action Arrow Pill */}
+                    <div 
+                      className={`py-2 px-4 text-[10px] font-black tracking-wide flex items-center justify-center gap-1 shadow-xs shrink-0 transition-transform ${getButtonRoundedClass() === 'rounded-none' ? 'rounded-none' : 'rounded-full'}`}
+                      style={{
+                        backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
+                        color: profile.designSettings?.colors.buttonText || '#ffffff'
+                      }}
+                    >
+                      <span className="truncate max-w-[85px]">{link.buttonLabel ? link.buttonLabel : "Beli"}</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : (
+            /* COLLAPSIBLE BENTO DECORATIVE GRID LAYOUT MODE */
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full" id="links-grid">
+              {filteredLinks.map((link, idx) => {
+                const activeIndex = activeLinks.findIndex(l => l.id === link.id);
+                const sequenceNumber = activeIndex !== -1 ? activeIndex + 1 : idx + 1;
+                return (
+                  <motion.div
+                    key={link.id}
+                    layout
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    whileHover={getCardHoverStyle()}
                     transition={{ delay: Math.min(idx * 0.05, 0.25), duration: 0.3 }}
                     className={`border transition-all duration-350 cursor-pointer overflow-hidden group flex flex-col relative ${getButtonRoundedClass()} ${getButtonShadowClass()}`}
                     onClick={() => handleLinkNavigate(link)}
                     id={`link-card-${link.id}`}
                     style={{ 
-                      backgroundColor: profile.designSettings?.colors.background === '#FFFFFF' ? '#FFFFFF' : profile.designSettings?.colors.background + '20',
-                      backdropFilter: 'blur(10px)',
+                      backgroundColor: getCardBgColor(),
+                      backdropFilter: (profile.designSettings?.cardOpacity ?? 100) < 100 ? 'blur(12px)' : undefined,
                       borderColor: profile.designSettings?.colors.pageText + '20'
                     }}
                   >
-                  
-                  {/* Aspect Ratio 1:1 Image Box (Strictly enforced 1:1 aspect ratio as requested) */}
-                  <div className="w-full aspect-square overflow-hidden relative bg-slate-50 border-b border-slate-100 flex items-center justify-center">
-                    {link.imageUrl ? (
-                      <img 
-                        src={link.imageUrl} 
-                        alt={link.title}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      // Gorgeous Minimalist Aesthetic Placeholder to maintain strict 1:1 grid layout
-                      <div className="w-full h-full bg-gradient-to-br from-indigo-50/40 to-slate-100/40 flex flex-col items-center justify-center p-6 text-center select-none">
-                        <span className="w-10 h-10 rounded-2rem bg-white border border-slate-150 flex items-center justify-center shadow-xs text-slate-400 group-hover:bg-indigo-50 transition-colors">
-                          {getCategoryIcon(link.category)}
-                        </span>
-                        <span className="text-[10px] uppercase tracking-widest font-mono font-bold text-slate-400 mt-3 block">{link.category}</span>
-                      </div>
-                    )}
                     
-                    {/* Floating Sequential Aesthetic ID Tag */}
-                    <span className="absolute top-3 left-3 text-[11px] text-slate-500 font-sans font-extrabold bg-white/90 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-100 shadow-sm transition-colors group-hover:bg-indigo-650 group-hover:text-white group-hover:border-indigo-650">
-                      {sequenceNumber}
-                    </span>
-
-                    {/* Indicator for High-Clicks Products (Auto-calculated 3 highest) */}
-                    {topClickedIds.includes(link.id) && link.clicks > 0 && (
-                      <span className="absolute top-3 right-3 text-[9px] text-white font-mono font-bold flex items-center gap-1.5 bg-slate-900/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/5 shadow-md">
-                        <Flame className="w-3 h-3 text-orange-400 animate-pulse" /> TERPOPULER
+                    {/* Aspect Ratio 1:1 Image Box */}
+                    <div className="w-full aspect-square overflow-hidden relative bg-slate-50 border-b border-slate-100 flex items-center justify-center">
+                      {link.imageUrl ? (
+                        <img 
+                          src={link.imageUrl} 
+                          alt={link.title}
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-indigo-50/40 to-slate-100/40 flex flex-col items-center justify-center p-6 text-center select-none">
+                          <span className="w-10 h-10 rounded-2rem bg-white border border-slate-150 flex items-center justify-center shadow-xs text-slate-400 group-hover:bg-indigo-50 transition-colors">
+                            {getCategoryIcon(link.category)}
+                          </span>
+                          <span className="text-[10px] uppercase tracking-widest font-mono font-bold text-slate-400 mt-3 block">{link.category}</span>
+                        </div>
+                      )}
+                      
+                      {/* Floating Sequential ID Tag */}
+                      <span className="absolute top-3 left-3 text-[11px] text-slate-500 font-sans font-extrabold bg-white/95 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-100 shadow-xs">
+                        {sequenceNumber}
                       </span>
-                    )}
-                  </div>
 
-                  {/* Card Descriptive Details */}
-                  <div className="p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                      {/* Category Label with Icon representation */}
-                      <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                        {getCategoryIcon(link.category)}
-                        {link.category}
-                      </span>
-
-                      <h3 className="font-bold text-sm mt-2 leading-snug transition-colors line-clamp-2" style={{ color: profile.designSettings?.colors.title }}>
-                        {link.title}
-                      </h3>
-                      {link.description && (
-                        <p className="text-[11px] mt-1.5 line-clamp-2 leading-normal opacity-80" style={{ color: profile.designSettings?.colors.pageText }}>
-                          {link.description}
-                        </p>
+                      {/* Indicator for High-Clicks Products */}
+                      {topClickedIds.includes(link.id) && link.clicks > 0 && (
+                        <span className="absolute top-3 right-3 text-[9px] text-white font-mono font-bold flex items-center gap-1.5 bg-slate-900/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/5 shadow-md">
+                          <Flame className="w-3 h-3 text-orange-400 animate-pulse" /> TERPOPULER
+                        </span>
                       )}
                     </div>
 
-                    {/* Highly Polished CTA Button (Strictly using Database Values) */}
-                    <div className="mt-5 pt-3 border-t" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
-                      <div 
-                        className={`w-full py-2.5 px-4 text-white text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer ${getButtonRoundedClass()}`}
-                        style={{
-                          backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
-                          color: profile.designSettings?.colors.buttonText || '#ffffff'
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleLinkNavigate(link);
-                        }}
-                      >
-                        <span className="truncate">{link.buttonLabel ? link.buttonLabel : "Beli Sekarang"}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform shrink-0" />
+                    {/* Card Descriptive Details */}
+                    <div className="p-5 flex-1 flex flex-col justify-between">
+                      <div>
+                        <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                          {getCategoryIcon(link.category)}
+                          {link.category}
+                        </span>
+
+                        <h3 className="font-bold text-sm mt-2 leading-snug transition-colors line-clamp-2" style={{ color: profile.designSettings?.colors.title }}>
+                          {link.title}
+                        </h3>
+                        {link.description && (
+                          <p className="text-[11px] mt-1.5 line-clamp-2 leading-normal opacity-80" style={{ color: profile.designSettings?.colors.pageText }}>
+                            {link.description}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Highly Polished CTA Button */}
+                      <div className="mt-5 pt-3 border-t" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
+                        <div 
+                          className={`w-full py-2.5 px-4 text-white text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer ${getButtonRoundedClass()}`}
+                          style={{
+                            backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
+                            color: profile.designSettings?.colors.buttonText || '#ffffff'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLinkNavigate(link);
+                          }}
+                        >
+                          <span className="truncate">{link.buttonLabel ? link.buttonLabel : "Beli Sekarang"}</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform shrink-0" />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                </motion.div>
-              );
-            })
-          ) : (
-            <motion.div 
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="py-16 text-center bg-white border border-slate-200/50 rounded-3xl shadow-xs text-slate-400 col-span-full"
-              id="empty-state-search"
+                  </motion.div>
+                );
+              })}
+            </div>
+          )
+        ) : (
+          <motion.div 
+            layout
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="py-16 text-center bg-white border border-slate-200/50 rounded-3xl shadow-xs text-slate-400 w-full"
+            id="empty-state-search"
+          >
+            <p className="text-sm font-medium">Tidak ditemukan perlengkapan yang cocok dengan keyword Anda.</p>
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="mt-3 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-xl text-xs transition-colors"
             >
-              <p className="text-sm font-medium">Tidak ditemukan perlengkapan yang cocok dengan keyword Anda.</p>
-              <button 
-                onClick={() => setSearchQuery('')}
-                className="mt-3 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-xl text-xs transition-colors"
-              >
-                Reset Pencarian
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+              Reset Pencarian
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Aesthetic Footer Block */}
       <div className="text-center mt-16 text-[11px] text-slate-400 font-mono space-y-2 pb-8">
