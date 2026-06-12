@@ -40,7 +40,19 @@ import {
   Upload,
   Github,
   Palette,
-  History
+  History,
+  MapPin,
+  Award,
+  ShieldCheck,
+  Share2,
+  FileArchive,
+  UploadCloud,
+  Settings2,
+  Target,
+  BarChart3,
+  LineChart,
+  Image,
+  Cloud
 } from 'lucide-react';
 import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog } from '../types';
 import DesignSettingsForm from './DesignSettingsForm';
@@ -73,7 +85,7 @@ export default function AdminPanel({
   const [token, setToken] = useState<string | null>(null);
 
   // Active Admin Tabs
-  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github' | 'analytics' | 'design'>('links');
+  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github' | 'analytics' | 'design' | 'ratecard'>('links');
 
   // Analytics View States
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState<'today' | 'yesterday' | '7days' | '30days'>('yesterday');
@@ -958,71 +970,117 @@ export default function AdminPanel({
           <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-8">
             
             {/* Linktree Section */}
-            <div className="space-y-2">
-              <span className="text-[10px] font-mono font-bold tracking-wider text-slate-400 uppercase block pl-2">LINKTREE</span>
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono font-bold tracking-[0.2em] text-slate-400 uppercase block pl-3 mb-1">GENERAL CONTROL</span>
               <button 
                 onClick={() => { setActiveTab('links'); setEditingLink(null); }} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'links' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'links' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
-                <LinkIcon className="w-4 h-4" /> Affiliate Links
+                <div className="flex items-center gap-3">
+                  <LinkIcon className={`w-4 h-4 ${activeTab === 'links' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Linktree Links
+                </div>
+                {activeTab === 'links' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
               <button 
                 onClick={() => { setActiveTab('analytics'); }} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'analytics' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'analytics' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
-                <TrendingUp className="w-4 h-4" /> Performa
+                <div className="flex items-center gap-3">
+                  <TrendingUp className={`w-4 h-4 ${activeTab === 'analytics' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Analytics Performa
+                </div>
+                {activeTab === 'analytics' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
               <button 
                 onClick={() => { setActiveTab('design'); }} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'design' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'design' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
-                <Palette className="w-4 h-4" /> Design
+                <div className="flex items-center gap-3">
+                  <Palette className={`w-4 h-4 ${activeTab === 'design' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Design Theme
+                </div>
+                {activeTab === 'design' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
             </div>
 
             {/* Ratecard Section */}
-            <div className="space-y-2">
-              <span className="text-[10px] font-mono font-bold tracking-wider text-slate-400 uppercase block pl-2">RATECARD</span>
+            <div className="space-y-1.5 pt-2">
+              <span className="text-[10px] font-mono font-bold tracking-[0.2em] text-slate-400 uppercase block pl-3 mb-1">RATECARD ASSETS</span>
+              <button 
+                onClick={() => { setActiveTab('ratecard'); }} 
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'ratecard' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <Sparkles className={`w-4 h-4 ${activeTab === 'ratecard' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Header & Hero
+                </div>
+                {activeTab === 'ratecard' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+              </button>
               <button 
                 onClick={() => { setActiveTab('services'); setEditingService(null); }} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'services' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'services' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
-                <Briefcase className="w-4 h-4" /> Services
+                <div className="flex items-center gap-3">
+                  <Briefcase className={`w-4 h-4 ${activeTab === 'services' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Services Pricing
+                </div>
+                {activeTab === 'services' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
               <button 
                 onClick={() => { setActiveTab('projects'); setEditingProject(null); }} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'projects' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'projects' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
-                <Video className="w-4 h-4" /> Portfolio Videos
+                <div className="flex items-center gap-3">
+                  <Video className={`w-4 h-4 ${activeTab === 'projects' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Portfolio Videos
+                </div>
+                {activeTab === 'projects' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
               <button 
                 onClick={() => { setActiveTab('brands'); setEditingBrand(null); }} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'brands' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'brands' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
-                <Tag className="w-4 h-4" /> Brands
+                <div className="flex items-center gap-3">
+                  <Tag className={`w-4 h-4 ${activeTab === 'brands' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Brand Partners
+                </div>
+                {activeTab === 'brands' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
             </div>
 
             {/* Sistem Section */}
-            <div className="space-y-2">
-              <span className="text-[10px] font-mono font-bold tracking-wider text-slate-400 uppercase block pl-2">SISTEM</span>
+            <div className="space-y-1.5 pt-2">
+              <span className="text-[10px] font-mono font-bold tracking-[0.2em] text-slate-400 uppercase block pl-3 mb-1">SYSTEM CONTROLS</span>
               <button 
                 onClick={() => { setActiveTab('profile'); }} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'profile' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'profile' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
-                <User className="w-4 h-4" /> Profil
+                <div className="flex items-center gap-3">
+                  <User className={`w-4 h-4 ${activeTab === 'profile' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Profil Akun
+                </div>
+                {activeTab === 'profile' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
               <button 
                 onClick={() => { setActiveTab('backup'); }} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'backup' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'backup' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
-                <Database className="w-4 h-4" /> Backup & Restore
+                <div className="flex items-center gap-3">
+                  <Database className={`w-4 h-4 ${activeTab === 'backup' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Backup & Restore
+                </div>
+                {activeTab === 'backup' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
               <button 
                 onClick={() => { setActiveTab('history' as any); }} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === ('history' as any) ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === ('history' as any) ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
-                <History className="w-4 h-4" /> System Logs
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <History className={`w-4 h-4 shrink-0 ${activeTab === ('history' as any) ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  <span className="truncate">System Logs</span>
+                </div>
+                {activeTab === ('history' as any) && <div className="w-1.5 h-1.5 rounded-full bg-indigo-200 animate-pulse ml-2 shrink-0" />}
               </button>
             </div>
           </div>
@@ -1124,7 +1182,8 @@ export default function AdminPanel({
           {/* Collapsible Add/Edit Form Box */}
           {editingLink && (
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-inner" id="link-form-container">
-              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">
+              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <PlusCircle className="w-3.5 h-3.5 text-indigo-500" />
                 {isAddingLink ? 'TAMBAH LINK BARU' : `EDIT LINK: ${editingLink.title}`}
               </h3>
               
@@ -1351,7 +1410,402 @@ export default function AdminPanel({
 
 
       {/* ======================================================== */}
-      {/* 2. MANAGE RATEBOARD SERVERS VIEW TAB */}
+      {/* 2. MANAGE RATEBOARD RATECARD CONFIG TAB */}
+      {/* ======================================================== */}
+      {activeTab === 'ratecard' && (
+        <div className="space-y-6" id="tab-content-ratecard-hero">
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
+            <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-500" /> Header &amp; Hero Ratecard
+            </h3>
+            <p className="text-xs text-slate-400 mb-4">Sesuaikan teks headline utama yang muncul pada bagian paling atas halaman Ratecard Anda.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Tagline Atas Badge</label>
+                <input 
+                  type="text" 
+                  value={profileForm.heroTagline || ''}
+                  placeholder="e.g. STYLISH SPACE & HOME UPGRADES CREATOR"
+                  onChange={(e) => setProfileForm({...profileForm, heroTagline: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Headline Utama (Bagian 1)</label>
+                <input 
+                  type="text" 
+                  value={profileForm.heroTitle1 || ''}
+                  placeholder="e.g. We Design Digital"
+                  onChange={(e) => setProfileForm({...profileForm, heroTitle1: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Headline Bagian Sorot (Gradient)</label>
+                <input 
+                  type="text" 
+                  value={profileForm.heroTitleHighlight || ''}
+                  placeholder="e.g. Experiences"
+                  onChange={(e) => setProfileForm({...profileForm, heroTitleHighlight: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Subheadline Pendahuluan Ratecard</label>
+              <textarea 
+                value={profileForm.heroDescription || ''}
+                rows={3}
+                placeholder="Masukkan kalimat perkenalan aesthetic ratecard Anda..."
+                onChange={(e) => setProfileForm({...profileForm, heroDescription: e.target.value})}
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans leading-relaxed"
+              />
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                onClick={() => saveProfile()}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-bold shadow-xs transition-all cursor-pointer font-sans flex items-center gap-1.5"
+              >
+                <Save className="w-3 h-3" /> Simpan Hero Config
+              </button>
+            </div>
+          </div>
+
+          {/* NEW: Domicile & Contact Section */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
+            <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <MapPin className="w-3.5 h-3.5 text-indigo-500" /> Lokasi Domisili &amp; Telepon Teks
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Domisili / Studio Location</label>
+                <input 
+                  type="text" 
+                  value={profileForm.domicile || ''}
+                  placeholder="e.g. Tangerang, Indonesia"
+                  onChange={(e) => setProfileForm({...profileForm, domicile: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Teks Kontak Telepon / WA WA</label>
+                <input 
+                  type="text" 
+                  value={profileForm.contactPhone || ''}
+                  placeholder="e.g. +62-816-273-270"
+                  onChange={(e) => setProfileForm({...profileForm, contactPhone: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans font-mono"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* NEW: Gelar & Tahun Studio Customize Tab */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
+            <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Award className="w-3.5 h-3.5 text-indigo-500" /> Gelar Kreator &amp; Tahun Berdiri
+            </h3>
+            <p className="text-xs text-slate-400 mb-4">Sesuaikan gelar utama (misal STUDIO DIRECTOR) dan tahun berdiri (misal ESTD 2026) yang tampil di samping foto profil Anda.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Gelar Utama (Director Title)</label>
+                <input 
+                  type="text" 
+                  value={profileForm.studioDirectorTitle || ''}
+                  placeholder="e.g. STUDIO DIRECTOR"
+                  onChange={(e) => setProfileForm({...profileForm, studioDirectorTitle: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-mono font-bold text-[#8B82F6] uppercase mb-1">Tahun Berdiri (Estd Year / Text)</label>
+                <input 
+                  type="text" 
+                  value={profileForm.studioEstdYear || ''}
+                  placeholder="e.g. 2026"
+                  onChange={(e) => setProfileForm({...profileForm, studioEstdYear: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans font-mono font-semibold text-slate-800"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* NEW: Interactive Stats Editor Curation */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
+            <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-1">
+              <TrendingUp className="w-3.5 h-3.5 text-indigo-500" /> Statistik &amp; Metrik Audiens Ratecard
+            </h3>
+            <p className="text-xs text-slate-400 mb-6">Sesuaikan 5 kartu metrik statistik hasil jangkauan audiens organik yang tampil pada halaman Ratecard Anda.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pb-6 border-b border-slate-50">
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Stats</label>
+                <input 
+                  type="text" 
+                  value={profileForm.statsBadge || ''}
+                  placeholder="e.g. ORGANIC REACH METRICS"
+                  onChange={(e) => setProfileForm({...profileForm, statsBadge: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Stats</label>
+                <input 
+                  type="text" 
+                  value={profileForm.statsTitle || ''}
+                  placeholder="e.g. Verified Audience Traction"
+                  onChange={(e) => setProfileForm({...profileForm, statsTitle: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek Stats</label>
+                <input 
+                  type="text" 
+                  value={profileForm.statsDescription || ''}
+                  placeholder="e.g. Real-time Instagram Insight data..."
+                  onChange={(e) => setProfileForm({...profileForm, statsDescription: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {[0, 1, 2, 3, 4].map((index) => {
+                const currentStats = profileForm.stats || [];
+                const statObj = currentStats[index] || { value: '', label: '', desc: '' };
+                
+                const updateStatField = (field: 'value' | 'label' | 'desc', val: string) => {
+                  const newStats = [...currentStats];
+                  while (newStats.length <= index) {
+                    newStats.push({ value: '', label: '', desc: '' });
+                  }
+                  newStats[index] = { ...newStats[index], [field]: val };
+                  setProfileForm({ ...profileForm, stats: newStats });
+                };
+                
+                return (
+                  <div key={index} className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-2">
+                    <span className="text-[10px] font-mono font-extrabold text-indigo-600 block">CARD METRIC {index + 1}</span>
+                    
+                    <div>
+                      <label className="block text-[9px] font-mono font-semibold text-slate-400 uppercase">Nilai (e.g. 60 K)</label>
+                      <input 
+                        type="text"
+                        value={statObj.value}
+                        placeholder="e.g. 60 K"
+                        onChange={(e) => updateStatField('value', e.target.value)}
+                        className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-[10px] bg-white outline-none focus:border-indigo-400 font-sans font-bold"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-[9px] font-mono font-semibold text-slate-400 uppercase">Label Kartu</label>
+                      <input 
+                        type="text"
+                        value={statObj.label}
+                        placeholder="e.g. Followers"
+                        onChange={(e) => updateStatField('label', e.target.value)}
+                        className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-[10px] bg-white outline-none focus:border-indigo-400 font-sans"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-[9px] font-mono font-semibold text-slate-400 uppercase">Deskripsi</label>
+                      <textarea 
+                        value={statObj.desc}
+                        rows={2}
+                        placeholder="Deskripsi ringkas..."
+                        onChange={(e) => updateStatField('desc', e.target.value)}
+                        className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-[10px] bg-white outline-none focus:border-indigo-400 font-sans leading-tight resize-none"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* NEW: Projects Section Header Config */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
+            <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <LineChart className="w-3.5 h-3.5 text-indigo-500" /> Header Seksi Video Project
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Project</label>
+                <input 
+                  type="text" 
+                  value={profileForm.projectsBadge || ''}
+                  placeholder="e.g. CASE STUDIES"
+                  onChange={(e) => setProfileForm({...profileForm, projectsBadge: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Project</label>
+                <input 
+                  type="text" 
+                  value={profileForm.projectsTitle || ''}
+                  placeholder="e.g. Our Recent Projects"
+                  onChange={(e) => setProfileForm({...profileForm, projectsTitle: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek Project</label>
+                <input 
+                  type="text" 
+                  value={profileForm.projectsDescription || ''}
+                  placeholder="e.g. Highly interactive design updates..."
+                  onChange={(e) => setProfileForm({...profileForm, projectsDescription: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* NEW: Pricing Section Header Config */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
+            <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <BarChart3 className="w-3.5 h-3.5 text-indigo-500" /> Header Seksi Rate Card
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Pricing</label>
+                <input 
+                  type="text" 
+                  value={profileForm.pricingBadge || ''}
+                  placeholder="e.g. TRANSPARENT COLLABORATION RATES"
+                  onChange={(e) => setProfileForm({...profileForm, pricingBadge: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Pricing</label>
+                <input 
+                  type="text" 
+                  value={profileForm.pricingTitle || ''}
+                  placeholder="e.g. Placements Rate Card"
+                  onChange={(e) => setProfileForm({...profileForm, pricingTitle: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek Pricing</label>
+                <input 
+                  type="text" 
+                  value={profileForm.pricingDescription || ''}
+                  placeholder="e.g. Extremely clear and clean pricing..."
+                  onChange={(e) => setProfileForm({...profileForm, pricingDescription: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* NEW: Brands Section Header Config */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
+            <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Award className="w-3.5 h-3.5 text-indigo-500" /> Header Seksi Brand Collaborations
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Brands</label>
+                <input 
+                  type="text" 
+                  value={profileForm.brandsBadge || ''}
+                  placeholder="e.g. INDUSTRY COLLABORATIONS"
+                  onChange={(e) => setProfileForm({...profileForm, brandsBadge: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Brands</label>
+                <input 
+                  type="text" 
+                  value={profileForm.brandsTitle || ''}
+                  placeholder="e.g. Featured Brands We Worked With"
+                  onChange={(e) => setProfileForm({...profileForm, brandsTitle: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* NEW: Terms of Service Multi-line editor */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
+            <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-500" /> Syarat &amp; Ketentuan (Satu baris per Syarat)
+            </h3>
+            <p className="text-xs text-slate-400 mb-6">Ubah daftar S&amp;K untuk brand partner. Setiap baris baru otomatis akan menjadi bullet point checklist di halaman Ratecard.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pb-6 border-b border-slate-50">
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas S&K</label>
+                <input 
+                  type="text" 
+                  value={profileForm.termsBadge || ''}
+                  placeholder="e.g. TERMS OF SERVICES"
+                  onChange={(e) => setProfileForm({...profileForm, termsBadge: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama S&K</label>
+                <input 
+                  type="text" 
+                  value={profileForm.termsTitle || ''}
+                  placeholder="e.g. Syarat & Ketentuan"
+                  onChange={(e) => setProfileForm({...profileForm, termsTitle: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+              <div className="col-span-1">
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek S&K</label>
+                <input 
+                  type="text" 
+                  value={profileForm.termsDescription || ''}
+                  placeholder="e.g. Prosedur operasional standard..."
+                  onChange={(e) => setProfileForm({...profileForm, termsDescription: e.target.value})}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                />
+              </div>
+            </div>
+
+            <div>
+              <textarea 
+                value={(profileForm.termsOfService || []).join('\n')}
+                rows={8}
+                onChange={(e) => {
+                  const arr = e.target.value.split('\n');
+                  setProfileForm({...profileForm, termsOfService: arr});
+                }}
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans leading-relaxed"
+                placeholder="Masukkan syarat & ketentuan Anda... Tekan ENTER untuk menambah baris baru."
+              />
+              <p className="text-[10px] text-slate-400 mt-1">Setiap baris akan ditampilkan sebagai checklist di halaman Ratecard.</p>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4 pb-6">
+            <button
+              type="button"
+              onClick={() => saveProfile()}
+              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer font-sans flex items-center gap-1.5"
+            >
+              <Save className="w-4 h-4" /> Simpan Konfigurasi Ratecard
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* 3. MANAGE RATEBOARD SERVICES VIEW TAB */}
       {/* ======================================================== */}
       {activeTab === 'services' && (
         <div className="space-y-6" id="tab-content-services">
@@ -1375,7 +1829,8 @@ export default function AdminPanel({
           {/* Collapsible Add/Edit Service form */}
           {editingService && (
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-inner" id="service-form-container">
-              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">
+              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <PlusCircle className="w-3.5 h-3.5 text-indigo-500" />
                 {isAddingService ? 'TAMBAH SERVICE BARU' : `EDIT SERVICE RATE: ${editingService.title}`}
               </h3>
               
@@ -1684,198 +2139,10 @@ export default function AdminPanel({
               <p className="text-[10px] text-slate-400 mt-1">Gunakan link gambar eksternal atau klik "Unggah File" untuk meng-host gambar langsung di server Anda.</p>
             </div>
 
-            {/* NEW: Ratecard Hero Customizations Section */}
             <div className="border-t border-slate-100 pt-5 mt-6">
-              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-500" /> Header &amp; Hero Ratecard
+              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Share2 className="w-3.5 h-3.5 text-indigo-500" /> Link Sosial Media
               </h3>
-              <p className="text-xs text-slate-400 mb-4">Sesuaikan teks headline utama yang muncul pada bagian paling atas halaman Ratecard Anda.</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="col-span-1">
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Tagline Atas Badge</label>
-                  <input 
-                    type="text" 
-                    value={profileForm.heroTagline || ''}
-                    placeholder="e.g. STYLISH SPACE & HOME UPGRADES CREATOR"
-                    onChange={(e) => setProfileForm({...profileForm, heroTagline: e.target.value})}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Headline Utama (Bagian 1)</label>
-                  <input 
-                    type="text" 
-                    value={profileForm.heroTitle1 || ''}
-                    placeholder="e.g. We Design Digital"
-                    onChange={(e) => setProfileForm({...profileForm, heroTitle1: e.target.value})}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Headline Bagian Sorot (Gradient)</label>
-                  <input 
-                    type="text" 
-                    value={profileForm.heroTitleHighlight || ''}
-                    placeholder="e.g. Experiences"
-                    onChange={(e) => setProfileForm({...profileForm, heroTitleHighlight: e.target.value})}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Subheadline Pendahuluan Ratecard</label>
-                <textarea 
-                  value={profileForm.heroDescription || ''}
-                  rows={3}
-                  placeholder="Masukkan kalimat perkenalan aesthetic ratecard Anda..."
-                  onChange={(e) => setProfileForm({...profileForm, heroDescription: e.target.value})}
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans leading-relaxed"
-                />
-              </div>
-            </div>
-
-            {/* NEW: Domicile & Contact Section */}
-            <div className="border-t border-slate-100 pt-5 mt-6">
-              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">Lokasi Domisili &amp; Telepon Teks</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Domisili / Studio Location</label>
-                  <input 
-                    type="text" 
-                    value={profileForm.domicile || ''}
-                    placeholder="e.g. Tangerang, Indonesia"
-                    onChange={(e) => setProfileForm({...profileForm, domicile: e.target.value})}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Teks Kontak Telepon / WA WA</label>
-                  <input 
-                    type="text" 
-                    value={profileForm.contactPhone || ''}
-                    placeholder="e.g. +62-816-273-270"
-                    onChange={(e) => setProfileForm({...profileForm, contactPhone: e.target.value})}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* NEW: Gelar & Tahun Studio Customize Tab */}
-            <div className="border-t border-slate-100 pt-5 mt-6">
-              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">Gelar Kreator &amp; Tahun Berdiri</h3>
-              <p className="text-xs text-slate-400 mb-4">Sesuaikan gelar utama (misal STUDIO DIRECTOR) dan tahun berdiri (misal ESTD 2026) yang tampil di samping foto profil Anda.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Gelar Utama (Director Title)</label>
-                  <input 
-                    type="text" 
-                    value={profileForm.studioDirectorTitle || ''}
-                    placeholder="e.g. STUDIO DIRECTOR"
-                    onChange={(e) => setProfileForm({...profileForm, studioDirectorTitle: e.target.value})}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-[#8B82F6] uppercase mb-1">Tahun Berdiri (Estd Year / Text)</label>
-                  <input 
-                    type="text" 
-                    value={profileForm.studioEstdYear || ''}
-                    placeholder="e.g. 2026"
-                    onChange={(e) => setProfileForm({...profileForm, studioEstdYear: e.target.value})}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans font-mono font-semibold text-slate-800"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* NEW: Interactive Stats Editor Curation */}
-            <div className="border-t border-slate-100 pt-5 mt-6">
-              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-1">
-                <TrendingUp className="w-3.5 h-3.5 text-indigo-500" /> Statistik &amp; Metrik Audiens Ratecard
-              </h3>
-              <p className="text-xs text-slate-400 mb-4">Sesuaikan 5 kartu metrik statistik hasil jangkauan audiens organik yang tampil pada halaman Ratecard Anda.</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                {[0, 1, 2, 3, 4].map((index) => {
-                  const currentStats = profileForm.stats || [];
-                  const statObj = currentStats[index] || { value: '', label: '', desc: '' };
-                  
-                  const updateStatField = (field: 'value' | 'label' | 'desc', val: string) => {
-                    const newStats = [...currentStats];
-                    while (newStats.length <= index) {
-                      newStats.push({ value: '', label: '', desc: '' });
-                    }
-                    newStats[index] = { ...newStats[index], [field]: val };
-                    setProfileForm({ ...profileForm, stats: newStats });
-                  };
-                  
-                  return (
-                    <div key={index} className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-2">
-                      <span className="text-[10px] font-mono font-extrabold text-indigo-600 block">CARD METRIC {index + 1}</span>
-                      
-                      <div>
-                        <label className="block text-[9px] font-mono font-semibold text-slate-400 uppercase">Nilai (e.g. 60 K)</label>
-                        <input 
-                          type="text"
-                          value={statObj.value}
-                          placeholder="e.g. 60 K"
-                          onChange={(e) => updateStatField('value', e.target.value)}
-                          className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-[10px] bg-white outline-none focus:border-indigo-400 font-sans font-bold"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-[9px] font-mono font-semibold text-slate-400 uppercase">Label Kartu</label>
-                        <input 
-                          type="text"
-                          value={statObj.label}
-                          placeholder="e.g. Followers"
-                          onChange={(e) => updateStatField('label', e.target.value)}
-                          className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-[10px] bg-white outline-none focus:border-indigo-400 font-sans"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-[9px] font-mono font-semibold text-slate-400 uppercase">Deskripsi</label>
-                        <textarea 
-                          value={statObj.desc}
-                          rows={2}
-                          placeholder="Deskripsi ringkas..."
-                          onChange={(e) => updateStatField('desc', e.target.value)}
-                          className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-[10px] bg-white outline-none focus:border-indigo-400 font-sans leading-tight resize-none"
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* NEW: Terms of Service Multi-line editor in Profile */}
-            <div className="border-t border-slate-100 pt-5 mt-6">
-              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">Syarat &amp; Ketentuan (Satu baris per Syarat)</h3>
-              <p className="text-xs text-slate-400 mb-4">Ubah daftar S&amp;K untuk brand partner. Setiap baris baru otomatis akan menjadi bullet point checklist di halaman Ratecard.</p>
-              
-              <div>
-                <textarea 
-                  value={(profileForm.termsOfService || []).join('\n')}
-                  rows={8}
-                  onChange={(e) => {
-                    const arr = e.target.value.split('\n');
-                    setProfileForm({...profileForm, termsOfService: arr});
-                  }}
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans leading-relaxed"
-                  placeholder="Masukkan syarat & ketentuan Anda... Tekan ENTER untuk menambah baris baru."
-                />
-                <p className="text-[10px] text-slate-400 mt-1">Ganti teks di atas baris demi baris demi transparansi kampanye kreatif brand partner.</p>
-              </div>
-            </div>
-
-            <div className="border-t border-slate-100 pt-5 mt-6">
-              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">Link Sosial Media</h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">URL Instagram</label>
@@ -1956,7 +2223,8 @@ export default function AdminPanel({
           {/* New/Edit Project Form Overlay */}
           {editingProject && (
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-inner" id="project-form-container">
-              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">
+              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <PlusCircle className="w-3.5 h-3.5 text-indigo-500" />
                 {isAddingProject ? 'TAMBAH VIDEO PROJECT BARU' : `EDIT VIDEO: ${editingProject.title}`}
               </h3>
 
@@ -2342,7 +2610,9 @@ export default function AdminPanel({
                 <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4">
                   <Download className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-display font-bold text-slate-800">Ekspor/Unduh Backup</h3>
+                <h3 className="text-sm font-display font-bold text-slate-800 flex items-center gap-2">
+                  <Download className="w-4 h-4 text-indigo-500" /> Ekspor/Unduh Backup
+                </h3>
                 <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
                   Cadangkan seluruh data yang telah Anda edit ke dalam file komputer lokal Anda. Berkas ini dapat digunakan sewaktu-waktu jika database website terhapus atau dideploy ulang.
                 </p>
@@ -2382,7 +2652,9 @@ export default function AdminPanel({
                 <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 mb-4">
                   <Upload className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-display font-bold text-slate-800">Impor/Pulihkan Backup</h3>
+                <h3 className="text-sm font-display font-bold text-slate-800 flex items-center gap-2">
+                  <Upload className="w-4 h-4 text-indigo-500" /> Impor/Pulihkan Backup
+                </h3>
                 <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
                   Unggah berkas backup `.json` yang telah Anda ekspor sebelumnya untuk memulihkan semua links dan layout ratecard Anda. Tindakan ini akan sepenuhnya MENIMPA database saat ini.
                 </p>
@@ -2445,8 +2717,8 @@ export default function AdminPanel({
           <div className="mt-8 pt-8 border-t border-slate-150 space-y-4">
             <div className="flex items-center gap-2">
               <Database className="w-5 h-5 text-indigo-600" />
-              <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider font-mono">
-                💻 Cadangan Lokal Komputer (Ekspor / Impor Berkas ZIP)
+              <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider font-mono flex items-center gap-2">
+                <Database className="w-3.5 h-3.5 text-indigo-500" /> Cadangan Lokal Komputer (Ekspor / Impor Berkas ZIP)
               </h3>
             </div>
             <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
@@ -2460,7 +2732,9 @@ export default function AdminPanel({
                   <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 mb-4">
                     <Download className="w-5 h-5" />
                   </div>
-                  <h3 className="text-sm font-display font-bold text-slate-800">Unduh Cadangan Lengkap ke Komputer (.zip)</h3>
+                  <h3 className="text-sm font-display font-bold text-slate-800 flex items-center gap-2">
+                    <FileArchive className="w-4 h-4 text-indigo-500" /> Unduh Cadangan Lengkap ke Komputer (.zip)
+                  </h3>
                   <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
                     Mendownload bundel data utuh berisi database serta seluruh berkas gambar yang tersimpan ke dalam komputer Anda dalam satu folder berkas ZIP yang aman dan lengkap.
                   </p>
@@ -2491,7 +2765,9 @@ export default function AdminPanel({
                   <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
                     <Upload className="w-5 h-5" />
                   </div>
-                  <h3 className="text-sm font-display font-bold text-slate-800">Unggah &amp; Pulihkan Cadangan ZIP dari Komputer</h3>
+                  <h3 className="text-sm font-display font-bold text-slate-800 flex items-center gap-2">
+                    <UploadCloud className="w-4 h-4 text-indigo-500" /> Unggah &amp; Pulihkan Cadangan ZIP dari Komputer
+                  </h3>
                   <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
                     Pilih file ZIP cadangan dari komputer Anda untuk memulihkan seluruh database dan meregenerasi file gambar-gambar di server Anda secara instan.
                   </p>
@@ -2548,7 +2824,9 @@ export default function AdminPanel({
           <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
                <div>
-                 <h3 className="text-xl font-display font-bold text-slate-800">Pengaturan Tampilan</h3>
+                 <h3 className="text-xl font-display font-bold text-slate-800 flex items-center gap-2">
+                   <Settings2 className="w-6 h-6 text-indigo-500" /> Pengaturan Tampilan
+                 </h3>
                  <p className="text-xs text-slate-400">Sesuaikan warna dan tema Linktree Anda secara real-time.</p>
                </div>
             </div>
@@ -2604,7 +2882,9 @@ export default function AdminPanel({
               
               <div className="flex items-center justify-between p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
                 <div>
-                  <h3 className="text-xs font-bold font-mono text-slate-600 uppercase">Status Fitur</h3>
+                  <h3 className="text-xs font-bold font-mono text-slate-600 uppercase flex items-center gap-2">
+                    <Target className="w-3.5 h-3.5 text-indigo-500" /> Status Fitur
+                  </h3>
                   <p className="text-xs text-slate-400 mt-1">Aktifkan untuk mulai mengupload gambar ke GitHub secara langsung</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -2950,28 +3230,6 @@ export default function AdminPanel({
       return (
         <div className="space-y-6" id="tab-content-analytics">
           
-          <div className="bg-white border border-slate-100 rounded-3xl p-5 md:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div onClick={() => setActiveTab('links')} className="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition-colors cursor-pointer border border-slate-100">
-                <ArrowLeft className="w-4 h-4" />
-              </div>
-              <div>
-                <h2 className="text-base font-display font-medium text-slate-800 flex items-center gap-2">
-                  📊 Laporan Performa Toko (Clicks Metric)
-                </h2>
-                <p className="text-xs text-slate-400 font-sans mt-0.5">
-                  Laporan analisis performa konversi klik Linktree Affiliate ala Shopee
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-indigo-600">
-              <span className="px-2.5 py-1 bg-indigo-50 border border-indigo-100 rounded-full flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
-                <Sliders className="w-3 h-3 text-indigo-600" /> Realtime Analytics Live
-              </span>
-            </div>
-          </div>
-
           <div className="border-b border-slate-100 bg-white rounded-3xl p-3 md:p-4 shadow-3xs flex flex-wrap gap-2 text-xs font-sans">
             <button
               type="button"
@@ -3052,7 +3310,9 @@ export default function AdminPanel({
           <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-1.5">
-                <h3 className="text-sm font-display font-medium text-slate-800">Metrik Utama</h3>
+                <h3 className="text-sm font-display font-medium text-slate-800 flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-indigo-500" /> Metrik Utama
+                </h3>
                 <div className="group relative">
                   <span className="text-slate-400 cursor-help text-xs font-serif italic border border-slate-250 rounded-full w-4 h-4 inline-flex items-center justify-center">?</span>
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2.5 bg-slate-900 text-white rounded-lg text-[9px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity leading-normal z-50 shadow-sm font-sans">
@@ -3104,7 +3364,9 @@ export default function AdminPanel({
           <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-sm font-display font-medium text-slate-800">Grafik Klik</h3>
+                <h3 className="text-sm font-display font-medium text-slate-800 flex items-center gap-2">
+                  <LineChart className="w-4 h-4 text-indigo-500" /> Grafik Klik
+                </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">Grafik dinamik logaritmik konversi klik per waktu</p>
               </div>
               <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
@@ -3153,7 +3415,9 @@ export default function AdminPanel({
           <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-display font-medium text-slate-800">Performa Produk</h3>
+                <h3 className="text-sm font-display font-medium text-slate-800 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-indigo-500" /> Performa Produk
+                </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">Urutan performa produk linktree berdasarkan total klik dalam rentang waktu terfilter</p>
               </div>
             </div>
@@ -3251,17 +3515,18 @@ export default function AdminPanel({
           </div>
 
           <div className="space-y-4">
-            {/* Latest Update v1.3.0 */}
+            {/* Latest Update v1.4.0 */}
             <div className="bg-white border-2 border-indigo-100 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50 rounded-full translate-x-24 -translate-y-24 -z-10" />
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                    <span className="font-mono font-black text-sm text-white">1.3</span>
+                  <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 shrink-0">
+                    <span className="font-mono font-black text-sm text-white">1.4</span>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-display font-bold text-slate-800">Version 1.3.0 (Latest Release)</h3>
-                     <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Released: 12 June 2026</p>
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-display font-bold text-slate-800 truncate">Version 1.4.0 (Enhanced Creator Edition)</h3>
+                    <p className="text-[10px] font-mono text-slate-400 mt-0.5 truncate">LATEST STABLE BUILD • REFINED WORKSPACE</p>
+                     <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest truncate">Released: 12 June 2026</p>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-bold rounded-full font-mono border border-emerald-100 uppercase animate-pulse">Running Now</span>
@@ -3282,19 +3547,25 @@ export default function AdminPanel({
                     <PlusCircle className="w-3 h-3 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Pembersihan Visual Minimalis</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Menghilangkan teks redundan versi sistem dan footer admin agar visual halaman utama terlihat lebih clean dan fokus.</p>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Pembersihan Visual UI Admin</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Merapikan sidebar menu, memperbaiki layout yang tumpang tindih, dan menyederhanakan navigasi antar modul.</p>
                   </div>
                 </li>
-                <li className="flex gap-3">
-                  <div className="shrink-0 w-5 h-5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
-                    <Palette className="w-3 h-3 text-slate-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Default Template Database Baru</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Konfigurasi profile, terms of service, dan data links bawaan yang siap pakai untuk kustomisasi instan.</p>
-                  </div>
-                </li>
+              </ul>
+            </div>
+
+            {/* Previous v1.3.0 */}
+            <div className="bg-slate-50 border border-slate-250 rounded-2xl p-5 opacity-90">
+              <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-200">
+                <div className="flex items-center gap-3">
+                  <span className="px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-mono font-bold rounded">v1.3.0</span>
+                  <p className="text-xs font-display font-medium text-slate-600 italic">Advanced Ratecard Customization</p>
+                </div>
+              </div>
+              <ul className="space-y-2 text-[10px] text-slate-500">
+                <li>• Kustomisasi penuh Header Seksi (Badge, Judul, & Deskripsi) untuk Projects, Pricing, Brands, dan Terms.</li>
+                <li>• Penyesuaian real-time untuk Metrik Audiens (Stats section) langsung dari Admin Panel.</li>
+                <li>• Multi-line editor untuk Syarat & Ketentuan dengan preview bullet-point otomatis.</li>
               </ul>
             </div>
 

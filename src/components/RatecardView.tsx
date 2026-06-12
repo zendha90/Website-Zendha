@@ -485,11 +485,15 @@ export default function RatecardView({
         <section className="space-y-10" id="stats-section">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.04] pb-6">
             <div>
-              <span className="text-xs font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block">ORGANIC REACH METRICS</span>
-              <h2 className="text-3xl sm:text-5xl font-sans font-black text-white tracking-tight mt-1">Verified Audience Traction</h2>
+              <span className="text-xs font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block">
+                {profile.statsBadge || "ORGANIC REACH METRICS"}
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-sans font-black text-white tracking-tight mt-1">
+                {profile.statsTitle || "Verified Audience Traction"}
+              </h2>
             </div>
             <p className="text-slate-400 text-sm max-w-sm">
-              Real-time Instagram Insight data with higher conversion &amp; deep engagement than industry baseline standards.
+              {profile.statsDescription || "Real-time Instagram Insight data with higher conversion & deep engagement than industry baseline standards."}
             </p>
           </div>
 
@@ -535,11 +539,15 @@ export default function RatecardView({
         <section className="space-y-10" id="projects-section">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.04] pb-6">
             <div>
-              <span className="text-xs font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block">CASE STUDIES</span>
-              <h2 className="text-3xl sm:text-5xl font-sans font-black text-white tracking-tight mt-1">Our Recent Projects (Viral Videos)</h2>
+              <span className="text-xs font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block">
+                {profile.projectsBadge || "CASE STUDIES"}
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-sans font-black text-white tracking-tight mt-1">
+                {profile.projectsTitle || "Our Recent Projects (Viral Videos)"}
+              </h2>
             </div>
             <p className="text-slate-400 text-sm max-w-sm">
-              Highly interactive design updates that caught viral attraction. Click any card to experience the live interactive link.
+              {profile.projectsDescription || "Highly interactive design updates that caught viral attraction. Click any card to experience the live interactive link."}
             </p>
           </div>
 
@@ -605,11 +613,15 @@ export default function RatecardView({
         <section className="space-y-10 scroll-mt-24" id="pricing-section">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.04] pb-6">
             <div>
-              <span className="text-xs font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block">TRANSPARENT COLLABORATION RATES</span>
-              <h2 className="text-3xl sm:text-5xl font-sans font-black text-white tracking-tight mt-1">Placements Rate Card</h2>
+              <span className="text-xs font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block">
+                {profile.pricingBadge || "TRANSPARENT COLLABORATION RATES"}
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-sans font-black text-white tracking-tight mt-1">
+                {profile.pricingTitle || "Placements Rate Card"}
+              </h2>
             </div>
             <p className="text-slate-400 text-sm max-w-sm">
-              Extremely clear and clean pricing plans tailored for verified creative projects. No hidden costs. 
+              {profile.pricingDescription || "Extremely clear and clean pricing plans tailored for verified creative projects. No hidden costs."}
             </p>
           </div>
 
@@ -711,8 +723,12 @@ export default function RatecardView({
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#8B82F6]/5 rounded-full blur-3xl pointer-events-none" />
           
           <div className="text-center space-y-2">
-            <span className="text-xs font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block">INDUSTRY COLLABORATIONS</span>
-            <h3 className="text-2xl sm:text-3xl font-sans font-black text-white">Featured Brands We Worked With</h3>
+            <span className="text-xs font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block">
+              {profile.brandsBadge || "INDUSTRY COLLABORATIONS"}
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-sans font-black text-white">
+              {profile.brandsTitle || "Featured Brands We Worked With"}
+            </h3>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6">
@@ -727,11 +743,15 @@ export default function RatecardView({
         <section className="space-y-10" id="terms-section">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.04] pb-6">
             <div>
-              <span className="text-xs font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block">TERMS OF SERVICES</span>
-              <h2 className="text-3xl sm:text-5xl font-sans font-black text-white tracking-tight mt-1">Syarat &amp; Ketentuan</h2>
+              <span className="text-xs font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block">
+                {profile.termsBadge || "TERMS OF SERVICES"}
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-sans font-black text-white tracking-tight mt-1">
+                {profile.termsTitle || "Syarat & Ketentuan"}
+              </h2>
             </div>
             <p className="text-slate-400 text-sm max-w-sm">
-              Prosedur operasional standard yang adil, transparan, dan profesional untuk menjamin kelancaran kontrak konten.
+              {profile.termsDescription || "Prosedur operasional standard yang adil, transparan, dan profesional untuk menjamin kelancaran kontrak konten."}
             </p>
           </div>
 

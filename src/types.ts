@@ -56,6 +56,29 @@ export interface RatecardProfile {
   domicile?: string;
   contactPhone?: string;
   stats?: Array<{ value: string; label: string; desc: string }>;
+  statsBadge?: string;
+  statsTitle?: string;
+  statsDescription?: string;
+  
+  // Projects Section
+  projectsBadge?: string;
+  projectsTitle?: string;
+  projectsDescription?: string;
+
+  // Pricing Section
+  pricingBadge?: string;
+  pricingTitle?: string;
+  pricingDescription?: string;
+
+  // Brands Section
+  brandsBadge?: string;
+  brandsTitle?: string;
+
+  // Terms Section
+  termsBadge?: string;
+  termsTitle?: string;
+  termsDescription?: string;
+
   termsOfService?: string[];
   
   // New Customizable Titles
