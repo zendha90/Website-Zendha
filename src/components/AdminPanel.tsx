@@ -2527,8 +2527,25 @@ export default function AdminPanel({
       )}
 
       {activeTab === 'design' && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-8" id="design-tab-content">
-          <DesignSettingsForm profile={profileForm} onSave={(newProfile) => { setProfileForm(newProfile); saveProfile(undefined, newProfile); }} />
+        <div className="space-y-6" id="design-tab-content">
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+               <div>
+                 <h3 className="text-xl font-display font-bold text-slate-800">Pengaturan Tampilan</h3>
+                 <p className="text-xs text-slate-400">Sesuaikan warna dan tema Linktree Anda secara real-time.</p>
+               </div>
+               <button 
+                 onClick={onNavigateBack}
+                 className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
+               >
+                 <Eye className="w-4 h-4" /> Lihat Linktree
+               </button>
+            </div>
+            <DesignSettingsForm profile={profileForm} onSave={(newProfile) => { 
+                setProfileForm(newProfile); 
+                saveProfile(undefined, newProfile); 
+            }} />
+          </div>
         </div>
       )}
 
