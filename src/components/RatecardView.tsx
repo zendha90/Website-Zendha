@@ -131,7 +131,7 @@ const renderDefaultSvg = (name: string) => {
   return <span className="text-xs font-bold text-slate-300 group-hover:text-white uppercase tracking-widest text-center px-1 truncate">{name}</span>;
 }
 
-const BrandLogoList = ({ brands = [], onImageLoad }: { brands?: RatecardBrand[]; onImageLoad?: () => void }) => {
+const BrandLogoList = ({ brands = [] }: { brands?: RatecardBrand[] }) => {
   const activeBrands = (brands || [])
     .filter(b => b.isActive !== false)
     .sort((a, b) => (a.priority || 0) - (b.priority || 0));
@@ -149,8 +149,6 @@ const BrandLogoList = ({ brands = [], onImageLoad }: { brands?: RatecardBrand[];
               src={brand.logoUrl} 
               alt={brand.name} 
               referrerPolicy="no-referrer"
-              onLoad={onImageLoad}
-              onError={onImageLoad}
               loading="lazy"
               className="max-h-full max-w-full object-contain opacity-80 hover:opacity-100 transition-opacity" 
             />
@@ -172,49 +170,33 @@ export default function RatecardView({
   onNavigateToAdmin
 }: RatecardViewProps) {
   
-  // Track image load counts and progress
-  const activeBrandsWithImg = (brands || []).filter(b => b.isActive !== false && b.logoUrl);
-  const totalExpectedImages = 1 + (projects?.length || 0) + activeBrandsWithImg.length;
-  
-  const [imagesLoadedCount, setImagesLoadedCount] = React.useState(0);
+  // Track loading status
   const [isPageLoaded, setIsPageLoaded] = React.useState(false);
-  const [isUserScrolling, setIsUserScrolling] = React.useState(false);
 
-  const handleImageLoad = () => {
-    setImagesLoadedCount(prev => {
-      const newVal = prev + 1;
-      if (newVal >= totalExpectedImages) {
-        setIsPageLoaded(true);
-      }
-      return newVal;
-    });
-  };
-
-  // Safe loading backup timeout (to prevent infinite spinners on slower speeds)
+  // Safe loading logic using 'load' event and a safety timeout
   React.useEffect(() => {
+    const handleLoad = () => {
+      setIsPageLoaded(true);
+    };
+
+    // If document is already loaded
+    if (document.readyState === 'complete') {
+      setIsPageLoaded(true);
+    } else {
+      window.addEventListener('load', handleLoad);
+    }
+
+    // Safe loading backup timeout (to prevent infinite spinners)
     const timer = setTimeout(() => {
       setIsPageLoaded(true);
-    }, 2000); // 2 seconds safety curtain
-    return () => clearTimeout(timer);
-  }, []);
+    }, 2500); // 2.5 seconds safety curtain
 
-  // Track scroll activity to show subtle bottom notification if NOT fully loaded
-  React.useEffect(() => {
-    let scrollTimeout: NodeJS.Timeout;
-    const handleScroll = () => {
-      setIsUserScrolling(true);
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        setIsUserScrolling(false);
-      }, 1000);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
+      window.removeEventListener('load', handleLoad);
+      clearTimeout(timer);
     };
   }, []);
+
 
   const stats = profile.stats && profile.stats.length > 0 ? profile.stats : [
     { value: "60 K", label: "Instagram Followers", desc: "Highly engaged home & setup niche" },
@@ -244,7 +226,7 @@ export default function RatecardView({
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#0B0B0F] text-[#F3F4F6] font-sans antialiased selection:bg-[#8B82F6] selection:text-black relative overflow-x-hidden">
+    <div className="w-full min-h-screen bg-[#0B0B0F] text-[#F3F4F6] font-sans antialiased selection:bg-[#8B82F6] selection:text-black relative overflow-x-hidden touch-action-pan-y">
       
       {/* Dynamic Absolute Abstract Glowing Orbs (Premium Awwwards visual style) */}
       <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] max-w-[840px] bg-gradient-to-br from-[#8B82F6]/15 to-[#7C3AED]/5 rounded-full blur-[140px] pointer-events-none" />
@@ -337,8 +319,6 @@ export default function RatecardView({
                 <img 
                   src={profile.avatarUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2"} 
                   alt={profile.name} 
-                  onLoad={handleImageLoad}
-                  onError={handleImageLoad}
                   loading="lazy"
                   className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
                   referrerPolicy="no-referrer"
@@ -514,8 +494,6 @@ export default function RatecardView({
                     <img 
                       src={project.imageUrl || "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&q=80&w=400"} 
                       alt={project.title} 
-                      onLoad={handleImageLoad}
-                      onError={handleImageLoad}
                       loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100"
                       referrerPolicy="no-referrer"
@@ -675,7 +653,7 @@ export default function RatecardView({
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6">
-            <BrandLogoList brands={brands} onImageLoad={handleImageLoad} />
+            <BrandLogoList brands={brands} />
           </div>
           
           <p className="text-[10px] font-mono text-slate-500 text-center uppercase tracking-[0.25em] pt-4">AND MORE THAN 50+ HOME DECOR &amp; TECH PARTNERS</p>
@@ -810,45 +788,11 @@ export default function RatecardView({
                 ZENDHA REFITRA
               </h1>
               
-              <div className="flex justify-center">
+              
+              <div className="flex justify-center pt-8">
                 <Loader2 className="w-8 h-8 text-[#8B82F6] animate-spin" />
               </div>
-
-              {/* Progress Track */}
-              <div className="w-48 h-[3px] bg-white/[0.05] rounded-full overflow-hidden mx-auto">
-                <motion.div 
-                  className="h-full bg-gradient-to-r from-[#8B82F6] to-[#D580FF]"
-                  initial={{ width: '0%' }}
-                  animate={{ width: `${Math.min(100, totalExpectedImages > 0 ? (imagesLoadedCount / totalExpectedImages) * 100 : 0)}%` }}
-                  transition={{ duration: 0.2 }}
-                />
-              </div>
-
-              <div className="flex items-center justify-between font-mono text-[10px] text-slate-500 w-48 mx-auto">
-                <span>CURATING CONTENT</span>
-                <span>{Math.round(Math.min(100, totalExpectedImages > 0 ? (imagesLoadedCount / totalExpectedImages) * 100 : 0))}%</span>
-              </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Floating HUD loader if scrolling before loaded */}
-      <AnimatePresence>
-        {isUserScrolling && !isPageLoaded && (
-          <motion.div
-            key="hud-scroller"
-            initial={{ opacity: 0, y: 50, x: "-50%", scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
-            exit={{ opacity: 0, y: 50, x: "-50%", scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#121218]/90 backdrop-blur-xl border border-[#8B82F6]/30 px-5 py-3 rounded-full shadow-[0_10px_30px_rgba(139,130,246,0.25)] flex items-center gap-2.5 font-mono text-[11px] text-slate-200"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8B82F6] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#8B82F6]"></span>
-            </span>
-            <span>Optimizing layout ({imagesLoadedCount}/{totalExpectedImages})...</span>
           </motion.div>
         )}
       </AnimatePresence>

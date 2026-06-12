@@ -105,6 +105,14 @@ interface DatabaseSchema {
   projects: RatecardProject[];
   brands?: RatecardBrand[];
   clickLogs?: ClickLog[];
+  githubSettings?: {
+    enabled: boolean;
+    token: string;
+    owner: string;
+    repo: string;
+    branch: string;
+    path: string;
+  };
 }
 
 // Default Data Seed

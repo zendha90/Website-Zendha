@@ -163,7 +163,7 @@ export default function AdminPanel({
 
   const handleExportToGithub = async () => {
     setIsExportingGithub(true);
-    setGithubSyncStatus({ message: 'Mengekspor seluruh database dan gambar lokal ke repositori GitHub...', type: 'loading' });
+    setGithubSyncStatus({ message: 'Mengekspor seluruh database dan gambar lokal ke server...', type: 'loading' });
     try {
       const resp = await fetch('/api/github/export-all', {
         method: 'POST',
@@ -205,7 +205,7 @@ export default function AdminPanel({
       return;
     }
     setIsImportingGithub(true);
-    setGithubSyncStatus({ message: 'Mengunduh data cadangan penuh dan mengunduh ulang gambar dari GitHub...', type: 'loading' });
+    setGithubSyncStatus({ message: 'Mengunduh data cadangan penuh dan mengunduh ulang gambar...', type: 'loading' });
     try {
       const resp = await fetch('/api/github/import-all', {
         method: 'POST',
@@ -234,7 +234,7 @@ export default function AdminPanel({
 
   const handleExportZipToPC = async () => {
     setIsExportingPCZip(true);
-    setGithubSyncStatus({ message: 'Menyiapkan berkas ZIP cadangan (database & seluruh gambar dari GitHub)...', type: 'loading' });
+    setGithubSyncStatus({ message: 'Menyiapkan berkas ZIP cadangan (database & seluruh gambar)...', type: 'loading' });
     try {
       const headers = getAuthHeader();
       const resp = await fetch('/api/github/export-pc-zip', {
@@ -2466,7 +2466,7 @@ export default function AdminPanel({
                   </div>
                   <h3 className="text-sm font-display font-bold text-slate-800">Unggah &amp; Pulihkan Cadangan ZIP dari Komputer</h3>
                   <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
-                    Pilih file ZIP cadangan dari komputer Anda untuk memulihkan seluruh database, meregenerasi file gambar-gambar di server, serta menyinkronkannya kembali secara sinkron ke repository GitHub Anda (jika aktif).
+                    Pilih file ZIP cadangan dari komputer Anda untuk memulihkan seluruh database dan meregenerasi file gambar-gambar di server Anda secara instan.
                   </p>
                 </div>
                 <label className={`w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer font-sans text-center select-none ${
