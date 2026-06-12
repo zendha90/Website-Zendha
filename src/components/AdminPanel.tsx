@@ -38,9 +38,11 @@ import {
   Database,
   Download,
   Upload,
-  Github
+  Github,
+  Palette
 } from 'lucide-react';
 import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog } from '../types';
+import DesignSettingsForm from './DesignSettingsForm';
 
 interface AdminPanelProps {
   onNavigateBack: () => void;
@@ -70,7 +72,7 @@ export default function AdminPanel({
   const [token, setToken] = useState<string | null>(null);
 
   // Active Admin Tabs
-  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github' | 'analytics'>('links');
+  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github' | 'analytics' | 'design'>('links');
 
   // Analytics View States
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState<'today' | 'yesterday' | '7days' | '30days'>('yesterday');
@@ -1007,6 +1009,12 @@ export default function AdminPanel({
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'backup' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
                 <Database className="w-4 h-4" /> Backup & Restore
+              </button>
+              <button 
+                onClick={() => { setActiveTab('design'); }} 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'design' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
+                <Palette className="w-4 h-4" /> Design
               </button>
             </div>
           </div>
@@ -2516,6 +2524,12 @@ export default function AdminPanel({
         </div>
       )}
 
+      {activeTab === 'design' && (
+        <div className="bg-white border border-slate-200 rounded-3xl p-8" id="design-tab-content">
+          <DesignSettingsForm profile={profileForm} onSave={(newProfile) => setProfileForm(newProfile)} />
+        </div>
+      )}
+
       {activeTab === 'github' && (
         <div className="space-y-6" id="tab-content-github">
           
@@ -3194,6 +3208,11 @@ export default function AdminPanel({
       );
     })()}
         </main>
+      </div>
+
+      {/* Footer Administration Panel */}
+      <div className="w-full text-center py-8 text-xs text-slate-400 font-mono mt-8 border-t border-slate-100">
+        <p>Admin Dashboard v1.1.0 | ZenDhA Refitra Personal Workspace</p>
       </div>
     </div>
   );

@@ -10,6 +10,21 @@ export interface AffiliateLink {
   imageUrl?: string;
 }
 
+export interface DesignSettings {
+  theme: string;
+  header: {
+    layout: 'classic' | 'hero' | 'banner' | 'cutout' | 'shape';
+    titleStyle: 'text' | 'logo';
+  };
+  colors: {
+    background: string;
+    buttons: string;
+    buttonText: string;
+    pageText: string;
+    title: string;
+  };
+}
+
 export interface RatecardProfile {
   name: string;
   bio: string;
@@ -33,6 +48,9 @@ export interface RatecardProfile {
   // New Customizable Titles
   studioDirectorTitle?: string;
   studioEstdYear?: string;
+
+  // Design Settings
+  designSettings?: DesignSettings;
 }
 
 export interface RatecardService {

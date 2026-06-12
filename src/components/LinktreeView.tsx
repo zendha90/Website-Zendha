@@ -98,13 +98,16 @@ export default function LinktreeView({
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 relative">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 relative" style={{
+      backgroundColor: profile.designSettings?.colors.background || undefined,
+      color: profile.designSettings?.colors.pageText || undefined
+    }}>
       
-      {/* Decorative radial gradients for the ultimate modern editorial workspace landing page */}
-      <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-full max-w-7xl h-[400px] bg-indigo-50/40 rounded-full blur-[140px] pointer-events-none -z-10" />
+      {/* Decorative radial gradients - update color to match */}
+      <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-full max-w-7xl h-[400px] bg-indigo-50/20 rounded-full blur-[140px] pointer-events-none -z-10" />
 
       {/* Header Profile Landing Section */}
-      <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 mb-6 border-b border-slate-100 pb-5" id="landing-profile-header">
+      <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 mb-6 border-b pb-5" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }} id="landing-profile-header">
         
         {/* Profile Avatar and Info */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
@@ -130,8 +133,9 @@ export default function LinktreeView({
                 initial={{ y: 5, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1, duration: 0.4 }}
-                className="text-2xl sm:text-3xl font-display font-black text-slate-800 tracking-tight"
+                className="text-2xl sm:text-3xl font-display font-black tracking-tight"
                 id="profile-name"
+                style={{ color: profile.designSettings?.colors.title || undefined }}
               >
                 {profile.name}
               </motion.h1>
@@ -142,8 +146,9 @@ export default function LinktreeView({
               initial={{ y: 5, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.4 }}
-              className="text-slate-600 text-sm max-w-xl leading-relaxed"
+              className="text-sm max-w-xl leading-relaxed"
               id="profile-bio"
+              style={{ color: profile.designSettings?.colors.pageText || undefined }}
             >
               {profile.bio}
             </motion.p>
@@ -331,9 +336,13 @@ export default function LinktreeView({
                     </div>
 
                     {/* Highly Polished Beli Sekarang CTA Button */}
-                    <div className="mt-5 pt-3 border-t border-slate-100">
+                    <div className="mt-5 pt-3 border-t" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
                       <div 
-                        className="w-full py-2.5 px-4 bg-slate-900 text-white rounded-xl text-xs font-bold font-sans tracking-wide flex items-center justify-center gap-1.5 transition-all group-hover:bg-indigo-600 hover:!bg-indigo-700 active:scale-[0.98] shadow-sm cursor-pointer"
+                        className="w-full py-2.5 px-4 text-white rounded-xl text-xs font-bold font-sans tracking-wide flex items-center justify-center gap-1.5 transition-all hover:opacity-90 active:scale-[0.98] shadow-sm cursor-pointer"
+                        style={{
+                          backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
+                          color: profile.designSettings?.colors.buttonText || '#ffffff'
+                        }}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleLinkNavigate(link);
