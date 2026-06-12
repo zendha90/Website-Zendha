@@ -121,7 +121,9 @@ export default function App() {
 
   const appBgColor = currentView === 'ratecard' 
     ? '#0B0B0F' 
-    : data?.profile.designSettings?.colors.background || '#f8fafc';
+    : currentView === 'admin'
+      ? '#f8fafc' // Admin page background isolates from theme custom design colors
+      : data?.profile.designSettings?.colors.background || '#f8fafc';
 
   return (
     <div 
