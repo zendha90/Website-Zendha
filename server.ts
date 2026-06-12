@@ -340,6 +340,21 @@ function readDb(): DatabaseSchema {
       }
 
       if (db.profile) {
+        if (db.profile.name === "Zendha Refitra") {
+          db.profile.name = "Aesthetic Creator";
+          db.profile.bio = DEFAULT_DB.profile.bio;
+          db.profile.instagram = DEFAULT_DB.profile.instagram;
+          db.profile.tiktok = DEFAULT_DB.profile.tiktok;
+          db.profile.youtube = DEFAULT_DB.profile.youtube;
+          db.profile.email = DEFAULT_DB.profile.email;
+          db.profile.contactPhone = DEFAULT_DB.profile.contactPhone || "+62-8123-456-789";
+          db.profile.whatsapp = DEFAULT_DB.profile.whatsapp;
+          if (db.profile.heroDescription && db.profile.heroDescription.includes("Zendha")) {
+            db.profile.heroDescription = DEFAULT_DB.profile.heroDescription;
+          }
+          changed = true;
+        }
+
         if (!db.profile.designSettings) {
           db.profile.designSettings = { ...DEFAULT_DB.profile.designSettings! };
           changed = true;
@@ -363,6 +378,33 @@ function readDb(): DatabaseSchema {
             });
           }
         }
+      }
+      
+      // Auto-migrate any old links to avoid any left-over reference
+      if (db.links && Array.isArray(db.links)) {
+        db.links.forEach((link: any) => {
+          if (link.url && (link.url.includes("zendha") || link.url.includes("zendharefitra"))) {
+            link.url = link.url.replace(/zendharefitra/g, "yourusername")
+                               .replace(/zendharef_/g, "yourusername")
+                               .replace(/zendha90/g, "creator");
+            changed = true;
+          }
+          if (link.title && link.title.includes("Zendha")) {
+            link.title = link.title.replace(/Zendha Refitra/g, "Creator").replace(/Zendha/g, "Creator");
+            changed = true;
+          }
+        });
+      }
+
+      // Auto-migrate termsOfService references if any
+      if (db.profile && db.profile.termsOfService && Array.isArray(db.profile.termsOfService)) {
+        db.profile.termsOfService = db.profile.termsOfService.map((term: string) => {
+          if (term.includes("zendharefitra")) {
+            changed = true;
+            return term.replace(/zendharefitra/g, "creator");
+          }
+          return term;
+        });
       }
       
       // Auto-populate realistic click logs if missing or empty
