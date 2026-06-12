@@ -9,6 +9,10 @@ const PORT = 3000;
 
 // Pathing for local file persistence
 const DATA_DIR = process.env.DATA_PATH ? process.env.DATA_PATH : path.join(process.cwd(), 'data');
+console.log('--- SYSTEM STARTUP ---');
+console.log('Environment:', process.env.NODE_ENV || 'development');
+console.log('Data Directory Path:', DATA_DIR);
+console.log('-----------------------');
 const DATA_FILE = path.join(DATA_DIR, 'db.json');
 
 // Ensure data directory exists

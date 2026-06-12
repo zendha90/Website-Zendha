@@ -402,7 +402,7 @@ export default function LinktreeView({
                       )}
                     </div>
 
-                    {/* Highly Polished Beli Sekarang CTA Button */}
+                    {/* Highly Polished CTA Button (Strictly using Database Values) */}
                     <div className="mt-5 pt-3 border-t" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
                       <div 
                         className={`w-full py-2.5 px-4 text-white text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm cursor-pointer ${getButtonRoundedClass()}`}
@@ -415,8 +415,8 @@ export default function LinktreeView({
                           handleLinkNavigate(link);
                         }}
                       >
-                        <span>{link.buttonLabel || "Beli Sekarang"}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        <span className="truncate">{link.buttonLabel ? link.buttonLabel : "Beli Sekarang"}</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform shrink-0" />
                       </div>
                     </div>
                   </div>
@@ -445,9 +445,13 @@ export default function LinktreeView({
       </div>
 
       {/* Aesthetic Footer Block */}
-      <div className="text-center mt-16 text-[11px] text-slate-400 font-mono space-y-2">
+      <div className="text-center mt-16 text-[11px] text-slate-400 font-mono space-y-2 pb-8">
         <p>© 2026 zendharefitra.com. All intellectual rights reserved.</p>
-        <p className="text-slate-350">Aesthetic workspace gear &amp; layout curations.</p>
+        <div className="flex items-center justify-center gap-2 text-[9px] text-slate-350">
+          <span>Aesthetic workspace gear & layout curations.</span>
+          <span className="w-1 h-1 rounded-full bg-slate-200" />
+          <span className="font-bold text-indigo-400/60 uppercase tracking-tighter">System Version 1.2.0</span>
+        </div>
       </div>
     </div>
   );
