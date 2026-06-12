@@ -17,6 +17,8 @@ import {
   Monitor,
   Loader2
 } from 'lucide-react';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import { RatecardProfile, RatecardService, RatecardProject, RatecardBrand } from '../types';
 
 interface RatecardViewProps {
@@ -39,6 +41,57 @@ const WhatsAppIcon = ({ className = "w-5 h-5", ...props }: { className?: string 
     <path d="M12 .02c-6.627 0-12 5.373-12 12 0 2.112.546 4.16 1.585 5.978L.055 24l6.18-1.62c1.763.96 3.75 1.48 5.768 1.48C18.63 23.86 24 18.487 24 11.86c0-3.21-1.248-6.22-3.511-8.487C18.22 1.348 15.21.02 12 .02zm5.978 17.202c-.25 1.406-1.218 2.062-2.187 2.375-1.094.344-2.594.188-4.469-.594-2.094-.875-3.719-2.312-4.938-3.937-1.125-1.469-1.937-3.281-2.094-4.844-.094-.968.219-1.844.938-2.5.281-.25.594-.281.875-.281H7c.219 0 .406.094.5.344.25.625.875 2.156 1 2.375.094.219.094.438-.031.656-.125.188-.25.375-.375.531-.125.156-.25.313-.094.563.313.531.688 1.031 1.125 1.469.563.563 1.156.938 1.719 1.25.25.156.406.125.563-.063.156-.188.688-.781.875-1.062.188-.281.375-.219.625-.125.25.094 1.563.75 1.844.906.281.156.469.25.531.375.063.125.063.781-.188 1.438z" />
   </svg>
 );
+
+// Super cohesive dark mode skeleton matching the premium creative design aesthetic of zendharefitra.com
+const RatecardSkeleton = () => {
+  return (
+    <SkeletonTheme baseColor="#111115" highlightColor="#1A1A24">
+      <div className="w-full max-w-7xl mx-auto py-10 space-y-24 animate-pulse">
+        {/* Hero Section Skeleton */}
+        <div className="pt-8 pb-16 flex flex-col items-center text-center space-y-6">
+          <div className="flex justify-center">
+            <Skeleton width={260} height={24} className="rounded-full" />
+          </div>
+          <div className="flex justify-center">
+            <Skeleton width={420} height={52} className="rounded-xl" />
+          </div>
+          <div className="flex justify-center max-w-lg mx-auto w-full px-4">
+            <div className="w-full space-y-2 mt-2">
+              <Skeleton width="100%" height={16} className="rounded" />
+              <Skeleton width="80%" height={16} className="rounded mx-auto" />
+            </div>
+          </div>
+          
+          {/* Avatar Area Mock */}
+          <div className="w-56 h-56 rounded-full overflow-hidden border border-white/[0.04] mx-auto mt-8 flex items-center justify-center bg-[#111115]">
+            <Skeleton circle height="100%" width="100%" />
+          </div>
+
+          <div className="flex gap-4 justify-center pt-6 max-w-sm mx-auto w-full px-4">
+            <Skeleton width={120} height={36} className="rounded-full" />
+            <Skeleton width={120} height={36} className="rounded-full" />
+          </div>
+        </div>
+
+        {/* Stats Section Skeletons */}
+        <div className="space-y-6">
+          <div className="flex justify-center">
+            <Skeleton width={200} height={20} className="rounded-full" />
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-[#111115]/50 border border-white/[0.03] p-6 rounded-3xl space-y-3">
+                <Skeleton width={70} height={36} className="rounded-lg" />
+                <Skeleton width={110} height={18} className="rounded" />
+                <Skeleton width="100%" height={12} className="rounded" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </SkeletonTheme>
+  );
+};
 
 const renderDefaultSvg = (name: string) => {
   const normalized = name.toLowerCase().trim();
@@ -173,30 +226,27 @@ export default function RatecardView({
   // Track loading status
   const [isPageLoaded, setIsPageLoaded] = React.useState(false);
 
-  // Safe loading logic using 'load' event and a safety timeout
+  // Smooth loading behavior with scroll-locking and asset transition delay
   React.useEffect(() => {
-    const handleLoad = () => {
-      setIsPageLoaded(true);
-    };
-
-    // If document is already loaded
-    if (document.readyState === 'complete') {
-      setIsPageLoaded(true);
+    // Scroll-lock to prevent "stuck / jerky scrolling" on mobile before elements render
+    if (!isPageLoaded) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
     } else {
-      window.addEventListener('load', handleLoad);
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
     }
 
-    // Safe loading backup timeout (to prevent infinite spinners)
     const timer = setTimeout(() => {
       setIsPageLoaded(true);
-    }, 2500); // 2.5 seconds safety curtain
+    }, 1500); // 1.5 seconds layout preparation window
 
     return () => {
-      window.removeEventListener('load', handleLoad);
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
       clearTimeout(timer);
     };
-  }, []);
-
+  }, [isPageLoaded]);
 
   const stats = profile.stats && profile.stats.length > 0 ? profile.stats : [
     { value: "60 K", label: "Instagram Followers", desc: "Highly engaged home & setup niche" },
@@ -226,15 +276,18 @@ export default function RatecardView({
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#0B0B0F] text-[#F3F4F6] font-sans antialiased selection:bg-[#8B82F6] selection:text-black relative overflow-x-hidden touch-action-pan-y">
+    <div className="w-full min-h-screen bg-[#0B0B0F] text-[#F3F4F6] font-sans antialiased selection:bg-[#8B82F6] selection:text-black relative overflow-x-hidden touch-action-pan-y flex flex-col">
       
-      {/* Dynamic Absolute Abstract Glowing Orbs (Premium Awwwards visual style) */}
-      <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] max-w-[840px] bg-gradient-to-br from-[#8B82F6]/15 to-[#7C3AED]/5 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-[40%] left-[-15%] w-[50vw] h-[50vw] max-w-[700px] bg-gradient-to-tr from-[#9333EA]/10 to-[#8B82F6]/5 rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[55vw] h-[55vw] max-w-[800px] bg-gradient-to-tr from-[#7C3AED]/12 to-transparent rounded-full blur-[130px] pointer-events-none" />
+      {/* Background Decor Wrapper to prevent any absolute overflow or empty space */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Dynamic Absolute Abstract Glowing Orbs (Premium Awwwards visual style) */}
+        <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] max-w-[840px] bg-gradient-to-br from-[#8B82F6]/15 to-[#7C3AED]/5 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-[40%] left-[-15%] w-[50vw] h-[50vw] max-w-[700px] bg-gradient-to-tr from-[#9333EA]/10 to-[#8B82F6]/5 rounded-full blur-[160px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[55vw] h-[55vw] max-w-[800px] bg-gradient-to-tr from-[#7C3AED]/12 to-transparent rounded-full blur-[130px] pointer-events-none" />
 
-      {/* Ambient Grid Overlay Accent for high-end studio feel */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+        {/* Ambient Grid Overlay Accent for high-end studio feel */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+      </div>
 
       {/* Top Header Premium Bar */}
       <div className="w-full relative z-25">
@@ -251,17 +304,27 @@ export default function RatecardView({
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-[10px] font-mono tracking-[0.25em] text-[#8B82F6] font-bold uppercase py-1 px-3 rounded-full bg-[#8B82F6]/10 border border-[#8B82F6]/15">
-              CREATIVE PORTFOLIO
-            </span>
+            {!isPageLoaded ? (
+              <span className="text-[10px] font-mono tracking-[0.25em] text-amber-400 font-bold uppercase py-1 px-3 rounded-full bg-amber-500/10 border border-amber-500/20 animate-pulse flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping animate-duration-1000" />
+                <span>PREPARING ASSETS</span>
+              </span>
+            ) : (
+              <span className="text-[10px] font-mono tracking-[0.25em] text-[#8B82F6] font-bold uppercase py-1 px-3 rounded-full bg-[#8B82F6]/10 border border-[#8B82F6]/15 animate-fade-in">
+                CREATIVE PORTFOLIO
+              </span>
+            )}
           </div>
         </div>
       </div>
 
       {/* Main Luxury Sandbox Container */}
-      <div className="w-full max-w-7xl mx-auto px-6 sm:px-8 py-10 relative z-20 space-y-24">
-        
-        {/* ================= HERO SECTION ================= */}
+      <div className="w-full max-w-7xl mx-auto px-6 sm:px-8 py-10 relative z-20 space-y-24 flex-grow">
+        {!isPageLoaded ? (
+          <RatecardSkeleton />
+        ) : (
+          <>
+            {/* ================= HERO SECTION ================= */}
         <section className="pt-8 pb-16 md:pt-12 md:pb-20 flex flex-col justify-center text-center relative" id="agency-hero">
           <div className="space-y-6 max-w-4xl mx-auto">
             {/* Minimal Tagline Badge */}
@@ -751,11 +814,13 @@ export default function RatecardView({
             </div>
           </div>
         </section>
+          </>
+        )}
 
       </div>
 
       {/* Styled Minimal Footer */}
-      <footer className="w-full border-t border-white/[0.04] mt-24 py-12 relative z-25 bg-[#08080B]">
+      <footer className="w-full border-t border-white/[0.04] py-12 relative z-25 bg-[#08080B]">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-slate-500 font-mono">
           <p>© 2026 zendharefitra.com. All trademark and intellectual properties reserved.</p>
           <div className="flex items-center gap-6">
@@ -763,39 +828,6 @@ export default function RatecardView({
           </div>
         </div>
       </footer>
-
-      {/* Dynamic Full Screen Loading Curtain */}
-      <AnimatePresence>
-        {!isPageLoaded && (
-          <motion.div
-            key="curtain-loader"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="fixed inset-0 bg-[#0B0B0F] z-[9999] flex flex-col items-center justify-center p-6"
-          >
-            {/* Background glowing orb */}
-            <div className="absolute w-[80vw] h-[80vw] sm:w-[40vw] sm:h-[40vw] max-w-[500px] bg-[#8B82F6]/10 rounded-full blur-[100px] pointer-events-none" />
-            
-            <div className="text-center space-y-6 max-w-xs relative z-10">
-              {/* Small top badge */}
-              <span className="text-[10px] font-mono tracking-[0.3em] text-[#8B82F6] font-extrabold uppercase block animate-pulse">
-                CREATIVE PORTFOLIO
-              </span>
-              
-              {/* Main Title */}
-              <h1 className="text-2xl font-sans font-black text-white tracking-widest uppercase">
-                ZENDHA REFITRA
-              </h1>
-              
-              
-              <div className="flex justify-center pt-8">
-                <Loader2 className="w-8 h-8 text-[#8B82F6] animate-spin" />
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
     </div>
   );
