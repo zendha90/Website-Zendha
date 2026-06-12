@@ -525,12 +525,14 @@ export default function AdminPanel({
 
   // ================= PROFILE OPERATIONS =================
 
-  const saveProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const saveProfile = async (e?: React.FormEvent, profileToSave?: RatecardProfile) => {
+    if (e) e.preventDefault();
+    const targetProfile = profileToSave || profileForm;
+
     try {
       const sanitizedProfile = {
-        ...profileForm,
-        termsOfService: (profileForm.termsOfService || [])
+        ...targetProfile,
+        termsOfService: (targetProfile.termsOfService || [])
           .map(t => t.trim())
           .filter(t => t.length > 0)
       };
@@ -955,9 +957,9 @@ export default function AdminPanel({
         <aside className="w-full md:w-72 shrink-0 space-y-6">
           <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-8">
             
-            {/* Manajemen Section */}
+            {/* Linktree Section */}
             <div className="space-y-2">
-              <span className="text-[10px] font-mono font-bold tracking-wider text-slate-400 uppercase block pl-2">MANAJEMEN</span>
+              <span className="text-[10px] font-mono font-bold tracking-wider text-slate-400 uppercase block pl-2">LINKTREE</span>
               <button 
                 onClick={() => { setActiveTab('links'); setEditingLink(null); }} 
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'links' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
@@ -969,6 +971,12 @@ export default function AdminPanel({
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'analytics' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
                 <TrendingUp className="w-4 h-4" /> Performa
+              </button>
+              <button 
+                onClick={() => { setActiveTab('design'); }} 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'design' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
+                <Palette className="w-4 h-4" /> Design
               </button>
             </div>
 
@@ -1009,12 +1017,6 @@ export default function AdminPanel({
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'backup' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
               >
                 <Database className="w-4 h-4" /> Backup & Restore
-              </button>
-              <button 
-                onClick={() => { setActiveTab('design'); }} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'design' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
-              >
-                <Palette className="w-4 h-4" /> Design
               </button>
             </div>
           </div>
@@ -2526,7 +2528,7 @@ export default function AdminPanel({
 
       {activeTab === 'design' && (
         <div className="bg-white border border-slate-200 rounded-3xl p-8" id="design-tab-content">
-          <DesignSettingsForm profile={profileForm} onSave={(newProfile) => setProfileForm(newProfile)} />
+          <DesignSettingsForm profile={profileForm} onSave={(newProfile) => { setProfileForm(newProfile); saveProfile(undefined, newProfile); }} />
         </div>
       )}
 
