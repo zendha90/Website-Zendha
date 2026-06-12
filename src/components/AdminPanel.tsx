@@ -951,44 +951,64 @@ export default function AdminPanel({
         
         {/* Sidebar Navigation */}
         <aside className="w-full md:w-72 shrink-0 space-y-6">
-          <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs space-y-6">
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-8">
             
             {/* Manajemen Section */}
             <div className="space-y-2">
-              <span className="text-[10px] font-mono font-extrabold tracking-wider text-slate-400 uppercase block pl-2">MANAJEMEN</span>
-              <button onClick={() => { setActiveTab('links'); setEditingLink(null); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'links' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+              <span className="text-[10px] font-mono font-bold tracking-wider text-slate-400 uppercase block pl-2">MANAJEMEN</span>
+              <button 
+                onClick={() => { setActiveTab('links'); setEditingLink(null); }} 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'links' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
                 <LinkIcon className="w-4 h-4" /> Affiliate Links
               </button>
-              <button onClick={() => { setActiveTab('analytics'); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'analytics' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+              <button 
+                onClick={() => { setActiveTab('analytics'); }} 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'analytics' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
                 <TrendingUp className="w-4 h-4" /> Performa
               </button>
             </div>
 
             {/* Ratecard Section */}
             <div className="space-y-2">
-              <span className="text-[10px] font-mono font-extrabold tracking-wider text-slate-400 uppercase block pl-2">RATECARD</span>
-              <button onClick={() => { setActiveTab('services'); setEditingService(null); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'services' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+              <span className="text-[10px] font-mono font-bold tracking-wider text-slate-400 uppercase block pl-2">RATECARD</span>
+              <button 
+                onClick={() => { setActiveTab('services'); setEditingService(null); }} 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'services' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
                 <Briefcase className="w-4 h-4" /> Services
               </button>
-              <button onClick={() => { setActiveTab('projects'); setEditingProject(null); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'projects' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+              <button 
+                onClick={() => { setActiveTab('projects'); setEditingProject(null); }} 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'projects' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
                 <Video className="w-4 h-4" /> Portfolio Videos
               </button>
-              <button onClick={() => { setActiveTab('brands'); setEditingBrand(null); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'brands' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+              <button 
+                onClick={() => { setActiveTab('brands'); setEditingBrand(null); }} 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'brands' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
                 <Tag className="w-4 h-4" /> Brands
               </button>
             </div>
 
             {/* Sistem Section */}
             <div className="space-y-2">
-              <span className="text-[10px] font-mono font-extrabold tracking-wider text-slate-400 uppercase block pl-2">SISTEM</span>
-              <button onClick={() => { setActiveTab('profile'); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'profile' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
-                <User className="w-4 h-4" /> Profile Main
+              <span className="text-[10px] font-mono font-bold tracking-wider text-slate-400 uppercase block pl-2">SISTEM</span>
+              <button 
+                onClick={() => { setActiveTab('profile'); }} 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'profile' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
+                <User className="w-4 h-4" /> Profil
               </button>
-              <button onClick={() => { setActiveTab('backup'); }} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold ${activeTab === 'backup' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+              <button 
+                onClick={() => { setActiveTab('backup'); }} 
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${activeTab === 'backup' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
                 <Database className="w-4 h-4" /> Backup & Restore
               </button>
             </div>
-            
           </div>
         </aside>
 
@@ -1004,16 +1024,16 @@ export default function AdminPanel({
             {/* Visual Link Analytical Widgets (High-fidelity CRM design) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4" id="links-stats-bento">
               {/* Total Clicks Widget */}
-              <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-xs flex items-center justify-between col-span-1">
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex items-center justify-between col-span-1">
                 <div>
                   <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">TOTAL CLICKS METRIC</span>
-                  <span className="text-3xl font-display font-black text-slate-800 tracking-tight block mt-1">
+                  <span className="text-4xl font-display font-black text-slate-900 tracking-tight block mt-2">
                     {totalClicks}
                   </span>
-                  <span className="text-[11px] text-slate-400 mt-1 block">Akumulasi klik sepanjang waktu</span>
+                  <span className="text-xs text-slate-500 mt-2 block">Akumulasi sepanjang waktu</span>
                 </div>
-                <div className="p-3 bg-indigo-50 rounded-2xl text-indigo-600 shrink-0">
-                  <TrendingUp className="w-6 h-6 animate-pulse" />
+                <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600 shrink-0">
+                  <TrendingUp className="w-6 h-6" />
                 </div>
               </div>
 

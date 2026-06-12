@@ -14,7 +14,8 @@ import {
   HelpCircle,
   MessagesSquare,
   Globe,
-  Monitor
+  Monitor,
+  Loader2
 } from 'lucide-react';
 import { RatecardProfile, RatecardService, RatecardProject, RatecardBrand } from '../types';
 
@@ -150,6 +151,7 @@ const BrandLogoList = ({ brands = [], onImageLoad }: { brands?: RatecardBrand[];
               referrerPolicy="no-referrer"
               onLoad={onImageLoad}
               onError={onImageLoad}
+              loading="lazy"
               className="max-h-full max-w-full object-contain opacity-80 hover:opacity-100 transition-opacity" 
             />
           ) : (
@@ -337,6 +339,7 @@ export default function RatecardView({
                   alt={profile.name} 
                   onLoad={handleImageLoad}
                   onError={handleImageLoad}
+                  loading="lazy"
                   className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
@@ -513,6 +516,7 @@ export default function RatecardView({
                       alt={project.title} 
                       onLoad={handleImageLoad}
                       onError={handleImageLoad}
+                      loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100"
                       referrerPolicy="no-referrer"
                     />
@@ -806,6 +810,10 @@ export default function RatecardView({
                 ZENDHA REFITRA
               </h1>
               
+              <div className="flex justify-center">
+                <Loader2 className="w-8 h-8 text-[#8B82F6] animate-spin" />
+              </div>
+
               {/* Progress Track */}
               <div className="w-48 h-[3px] bg-white/[0.05] rounded-full overflow-hidden mx-auto">
                 <motion.div 
