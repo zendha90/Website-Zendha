@@ -3268,83 +3268,6 @@ export default function AdminPanel({
 
       return (
         <div className="space-y-6" id="tab-content-analytics">
-          
-          <div className="border-b border-slate-100 bg-white rounded-3xl p-3 md:p-4 shadow-3xs flex flex-wrap gap-2 text-xs font-sans">
-            <button
-              type="button"
-              onClick={() => setAnalyticsSource('all')}
-              className={`px-4 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none ${
-                analyticsSource === 'all' ? 'bg-indigo-600 text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
-              }`}
-            >
-              Semua
-            </button>
-            <button
-              type="button"
-              onClick={() => setAnalyticsSource('shopee')}
-              className={`px-4 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none ${
-                analyticsSource === 'shopee' ? 'bg-indigo-600 text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
-              }`}
-            >
-              Tautan Shopee
-            </button>
-            <button
-              type="button"
-              onClick={() => setAnalyticsSource('medsos')}
-              className={`px-4 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none ${
-                analyticsSource === 'medsos' ? 'bg-indigo-600 text-white font-extrabold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
-              }`}
-            >
-              Media Sosial &amp; Lainnya
-            </button>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setAnalyticsTimeRange('today')}
-              className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all cursor-pointer select-none ${
-                analyticsTimeRange === 'today'
-                  ? 'bg-indigo-50/50 border-indigo-600 text-indigo-600 shadow-2xs font-extrabold'
-                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-              }`}
-            >
-              Hari Ini
-            </button>
-            <button
-              type="button"
-              onClick={() => setAnalyticsTimeRange('yesterday')}
-              className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all cursor-pointer select-none ${
-                analyticsTimeRange === 'yesterday'
-                  ? 'bg-indigo-50/50 border-indigo-600 text-indigo-600 shadow-2xs font-extrabold'
-                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-              }`}
-            >
-              Kemarin
-            </button>
-            <button
-              type="button"
-              onClick={() => setAnalyticsTimeRange('7days')}
-              className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all cursor-pointer select-none ${
-                analyticsTimeRange === '7days'
-                  ? 'bg-orange-50/50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
-                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-              }`}
-            >
-              7 Hari Terakhir
-            </button>
-            <button
-              type="button"
-              onClick={() => setAnalyticsTimeRange('30days')}
-              className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all cursor-pointer select-none ${
-                analyticsTimeRange === '30days'
-                  ? 'bg-orange-50/50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
-                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-              }`}
-            >
-              30 Hari Terakhir
-            </button>
-          </div>
 
           <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -3448,6 +3371,86 @@ export default function AdminPanel({
                   />
                 </AreaChart>
               </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Filter letak di atas Performa Produk */}
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-slate-50 border border-slate-150 p-4 rounded-3xl mt-2">
+            <div className="flex flex-wrap gap-1.5 text-xs font-sans">
+              <button
+                type="button"
+                onClick={() => setAnalyticsSource('all')}
+                className={`px-3.5 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none text-[11px] ${
+                  analyticsSource === 'all' ? 'bg-indigo-600 text-white font-extrabold shadow-sm' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-100 hover:text-slate-800'
+                }`}
+              >
+                Semua Kategori
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalyticsSource('shopee')}
+                className={`px-3.5 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none text-[11px] ${
+                  analyticsSource === 'shopee' ? 'bg-indigo-600 text-white font-extrabold shadow-sm' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-100 hover:text-slate-800'
+                }`}
+              >
+                Tautan Shopee
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalyticsSource('medsos')}
+                className={`px-3.5 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none text-[11px] ${
+                  analyticsSource === 'medsos' ? 'bg-indigo-600 text-white font-extrabold shadow-sm' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-100 hover:text-slate-800'
+                }`}
+              >
+                Sosial &amp; Lainnya
+              </button>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5 self-stretch sm:self-auto justify-end">
+              <button
+                type="button"
+                onClick={() => setAnalyticsTimeRange('today')}
+                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
+                  analyticsTimeRange === 'today'
+                    ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-2xs font-extrabold'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                Hari Ini
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalyticsTimeRange('yesterday')}
+                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
+                  analyticsTimeRange === 'yesterday'
+                    ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-2xs font-extrabold'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                Kemarin
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalyticsTimeRange('7days')}
+                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
+                  analyticsTimeRange === '7days'
+                    ? 'bg-orange-50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                7 Hari
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalyticsTimeRange('30days')}
+                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
+                  analyticsTimeRange === '30days'
+                    ? 'bg-orange-50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                30 Hari
+              </button>
             </div>
           </div>
 
@@ -3559,8 +3562,8 @@ export default function AdminPanel({
               <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50 rounded-full translate-x-24 -translate-y-24 -z-10" />
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 shrink-0">
-                    <span className="font-mono font-black text-sm text-white">1.4</span>
+                  <div className="h-10 px-2.5 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 shrink-0 min-w-10">
+                    <span className="font-mono font-black text-xs text-white">v1.4.0</span>
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-sm font-display font-bold text-slate-800 truncate">Version 1.4.0 (Enhanced Creator Edition)</h3>
@@ -3645,7 +3648,7 @@ export default function AdminPanel({
 
       {/* Footer Administration Panel */}
       <div className="w-full text-center py-8 text-xs text-slate-400 font-mono mt-8 border-t border-slate-100">
-        <p>Admin Dashboard v1.3.0 | Personal Creator Workspace</p>
+        <p>Admin Dashboard v1.4.0 | Personal Creator Workspace</p>
       </div>
     </div>
   );
