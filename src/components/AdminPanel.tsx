@@ -133,7 +133,7 @@ export default function AdminPanel({
 
   // Check storage on mount for active session
   useEffect(() => {
-    const savedToken = localStorage.getItem('zendha_admin_token');
+    const savedToken = localStorage.getItem('creator_admin_token');
     if (savedToken) {
       setToken(savedToken);
       setIsLoggedIn(true);
@@ -260,7 +260,7 @@ export default function AdminPanel({
       a.href = url;
       
       const contentDisposition = resp.headers.get('content-disposition');
-      let filename = `zendha_portfolio_backup_${new Date().toISOString().substring(0, 10)}.zip`;
+      let filename = `creator_portfolio_backup_${new Date().toISOString().substring(0, 10)}.zip`;
       if (contentDisposition) {
         const matches = /filename="([^"]+)"/.exec(contentDisposition);
         if (matches && matches[1]) {
@@ -388,11 +388,11 @@ export default function AdminPanel({
       });
       const data = await response.json();
       if (data.success) {
-        localStorage.setItem('zendha_admin_token', data.token);
+        localStorage.setItem('creator_admin_token', data.token);
         setToken(data.token);
         setIsLoggedIn(true);
         setPassword('');
-        showToast('Login berhasil! Selamat datang Admin Zendha.');
+        showToast('Login berhasil! Selamat datang Admin.');
       } else {
         setLoginError(data.message || 'Password salah!');
       }
@@ -402,7 +402,7 @@ export default function AdminPanel({
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('zendha_admin_token');
+    localStorage.removeItem('creator_admin_token');
     setToken(null);
     setIsLoggedIn(false);
     showToast('Logout berhasil!', 'success');
@@ -412,7 +412,7 @@ export default function AdminPanel({
   const getAuthHeader = () => {
     return {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token || localStorage.getItem('zendha_admin_token')}`
+      'Authorization': `Bearer ${token || localStorage.getItem('creator_admin_token')}`
     };
   };
 
@@ -567,7 +567,7 @@ export default function AdminPanel({
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data.database, null, 2));
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `backup-zendharefitra-${new Date().toISOString().split('T')[0]}.json`);
+        downloadAnchor.setAttribute("download", `backup-creator-portfolio-${new Date().toISOString().split('T')[0]}.json`);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
@@ -869,7 +869,7 @@ export default function AdminPanel({
           <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Lock className="w-8 h-8 text-indigo-600" />
           </div>
-          <h1 className="text-xl font-display font-bold text-slate-800">Panel Admin zendharefitra.com</h1>
+          <h1 className="text-xl font-display font-bold text-slate-800">Panel Admin Hub</h1>
           <p className="text-xs text-slate-400 mt-1 mb-6">Masukkan password admin untuk mengelola isi website Anda.</p>
 
           <form onSubmit={handleLogin} className="space-y-4">
@@ -930,7 +930,7 @@ export default function AdminPanel({
             <Sliders className="w-6 h-6 text-indigo-400" />
           </div>
           <div>
-            <h1 className="text-lg md:text-xl font-display font-bold">Halo Admin Zendha! 👋</h1>
+            <h1 className="text-lg md:text-xl font-display font-bold">Halo Admin! 👋</h1>
           </div>
         </div>
         <div className="flex gap-2.5">
@@ -2363,7 +2363,7 @@ export default function AdminPanel({
                   </div>
                   <div className="py-1.5 flex justify-between font-mono">
                     <span className="text-slate-400">Nama Profil:</span>
-                    <span className="font-bold text-slate-800">{profile?.name || 'Zendha Refitra'}</span>
+                    <span className="font-bold text-slate-800">{profile?.name || 'Your Name'}</span>
                   </div>
                 </div>
               </div>
@@ -2642,7 +2642,7 @@ export default function AdminPanel({
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. zendharefitra"
+                    placeholder="e.g. your-github-username"
                     required={githubSettings.enabled}
                     value={githubSettings.owner}
                     onChange={(e) => setGithubSettings({ ...githubSettings, owner: e.target.value })}
@@ -3251,17 +3251,17 @@ export default function AdminPanel({
           </div>
 
           <div className="space-y-4">
-            {/* Latest Update v1.2.0 */}
+            {/* Latest Update v1.3.0 */}
             <div className="bg-white border-2 border-indigo-100 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50 rounded-full translate-x-24 -translate-y-24 -z-10" />
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                    <span className="font-mono font-black text-sm text-white">1.2</span>
+                    <span className="font-mono font-black text-sm text-white">1.3</span>
                   </div>
                   <div>
-                    <h3 className="text-sm font-display font-bold text-slate-800">Version 1.2.0 (Latest Release)</h3>
-                    <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Released: 12 June 2026</p>
+                    <h3 className="text-sm font-display font-bold text-slate-800">Version 1.3.0 (Latest Release)</h3>
+                     <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Released: 12 June 2026</p>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-bold rounded-full font-mono border border-emerald-100 uppercase animate-pulse">Running Now</span>
@@ -3273,8 +3273,8 @@ export default function AdminPanel({
                     <Sparkles className="w-3 h-3 text-indigo-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Optimasi Sinkronisasi Real-time</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Memperbaiki delay pembaruan desain di Linktree publik & mengoptimalkan persistence pada server CPanel.</p>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Normalisasi Template &amp; White-labeling</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Menghapus referensi nama personal untuk mempermudah creator menggunakan aplikasi ini sebagai template mandiri.</p>
                   </div>
                 </li>
                 <li className="flex gap-3">
@@ -3282,8 +3282,8 @@ export default function AdminPanel({
                     <PlusCircle className="w-3 h-3 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Improved CTA Controls</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Penambahan kolom "Nama Tombol CTA" untuk kustomisasi label klik (e.g. "Beli Sekarang", "Cek Promo").</p>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Pembersihan Visual Minimalis</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Menghilangkan teks redundan versi sistem dan footer admin agar visual halaman utama terlihat lebih clean dan fokus.</p>
                   </div>
                 </li>
                 <li className="flex gap-3">
@@ -3291,24 +3291,39 @@ export default function AdminPanel({
                     <Palette className="w-3 h-3 text-slate-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Design & Typography Polishing</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Fix bug penggantian Typography, Button Shape & Shadow yang tidak terdeteksi pada preview kecil.</p>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Default Template Database Baru</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Konfigurasi profile, terms of service, dan data links bawaan yang siap pakai untuk kustomisasi instan.</p>
                   </div>
                 </li>
               </ul>
             </div>
 
+            {/* Previous v1.2.0 */}
+            <div className="bg-slate-50 border border-slate-250 rounded-2xl p-5 opacity-90">
+              <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-200">
+                <div className="flex items-center gap-3">
+                  <span className="px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] font-mono font-bold rounded">v1.2.0</span>
+                  <p className="text-xs font-display font-medium text-slate-500 italic">Optimasi Real-time &amp; Live Preview</p>
+                </div>
+              </div>
+              <ul className="space-y-2 text-[10px] text-slate-500">
+                <li>• Memperbaiki delay sinkronisasi kustomisasi layout bento grid atau classic list.</li>
+                <li>• Penambahan penyesuaian label tombol CTA (e.g. "Beli Sekarang", "Cek Promo").</li>
+                <li>• Perbaikan feedback visual real-time pada edit typography, button style, &amp; shadows.</li>
+              </ul>
+            </div>
+
             {/* Previous v1.1.0 */}
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 opacity-80">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 opacity-70">
               <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-200/50">
                 <div className="flex items-center gap-3">
                   <span className="px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] font-mono font-bold rounded">v1.1.0</span>
-                  <p className="text-xs font-display font-medium text-slate-500 italic">Stability & Feature Baseline</p>
+                  <p className="text-xs font-display font-medium text-slate-500 italic">Stability &amp; Feature Baseline</p>
                 </div>
               </div>
               <ul className="space-y-2 text-[10px] text-slate-400">
                 <li>• Initial release of Dark Theme support for Ratecard Profile.</li>
-                <li>• Social icons integration (WhatsApp & YouTube redirect).</li>
+                <li>• Social icons integration (WhatsApp &amp; YouTube redirect).</li>
                 <li>• Design Tab Beta (Typography selection - Inter, Space Grotesk).</li>
               </ul>
             </div>
@@ -3320,7 +3335,7 @@ export default function AdminPanel({
 
       {/* Footer Administration Panel */}
       <div className="w-full text-center py-8 text-xs text-slate-400 font-mono mt-8 border-t border-slate-100">
-        <p>Admin Dashboard v1.2.0 | ZenDhA Refitra Personal Workspace</p>
+        <p>Admin Dashboard v1.3.0 | Personal Creator Workspace</p>
       </div>
     </div>
   );

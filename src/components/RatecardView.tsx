@@ -42,7 +42,7 @@ const WhatsAppIcon = ({ className = "w-5 h-5", ...props }: { className?: string 
   </svg>
 );
 
-// Super cohesive dark mode skeleton matching the premium creative design aesthetic of zendharefitra.com
+// Super cohesive dark mode skeleton matching the premium creative design aesthetic
 const RatecardSkeleton = () => {
   return (
     <SkeletonTheme baseColor="#111115" highlightColor="#1A1A24">
@@ -261,7 +261,7 @@ export default function RatecardView({
     "Jika ada brief atau point penting wajib disampaikan sebelum kesepakatan produksi.",
     "Pembayaran 100% di awal sebelum produksi dimulai dan harga di atas belum termasuk pajak.",
     "Client/Brand berhak menerima draf script konten dan diberikan kesempatan revisi maksimal 1x.",
-    "Semua video, ide kreatif, dan style editing disesuaikan dengan style visual aesthetic zendharefitra.",
+    "Semua video, ide kreatif, dan style editing disesuaikan dengan style visual aesthetic creator.",
     "Diberikan kesempatan revisi minor video 1x gratis (hanya untuk editing teks atau voice over).",
     "Negosiasi harga khusus tersedia bagi pengambilan minimal 3 SOW sekaligus.",
     "Berhak melakukan takedown konten apabila melanggar regulasi hukum tanpa refund."
@@ -360,11 +360,11 @@ export default function RatecardView({
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-slate-400 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed font-light font-sans"
             >
-              {profile.heroDescription || "We curate minimalist workstation setups, premium home upgrades, and cinematic tech content that captures millions of eyeballs. Welcome to Zendha Refitra's official workflow, rates, and verified organic stats."}
+              {profile.heroDescription || `We curate minimalist workstation setups, premium home upgrades, and cinematic tech content that captures millions of eyeballs. Welcome to the official workflow, rates, and verified organic stats.`}
             </motion.p>
           </div>
 
-          {/* Luxury Floating UI Feature Preview Card of Zendha's Core Vibe */}
+          {/* Luxury Floating UI Feature Preview Card of Creator's Core Vibe */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -411,14 +411,14 @@ export default function RatecardView({
                 </div>
 
                 <p className="text-slate-400 text-base leading-relaxed font-light">
-                  {profile.bio || "Saya sangat memukai segala tentang peralatan rumah tangga, dekorasi rumah aesthetic, dan minimalis setups. Membagikan pengalaman organik nyata yang mengedukasi dan menginspirasi jutaan audiens di Instagram serta TikTok secara konsisten."}
+                  {profile.bio || "Saya sangat menyukai segala tentang peralatan rumah tangga, dekorasi rumah aesthetic, dan minimalis setups. Membagikan pengalaman organik nyata yang mengedukasi dan menginspirasi jutaan audiens di media sosial secara konsisten."}
                 </p>
 
                 {/* Micro Metrics inline */}
                 <div className="grid grid-cols-2 pt-4 border-t border-white/[0.04] gap-6">
                   <div>
                     <span className="block text-[11px] font-mono uppercase tracking-widest text-[#8B82F6]">CREATOR PROFILE</span>
-                    <span className="block text-white text-md font-sans font-bold mt-1">Zendha Refitra</span>
+                    <span className="block text-white text-md font-sans font-bold mt-1">{profile.name}</span>
                   </div>
                   <div>
                     <span className="block text-[11px] font-mono uppercase tracking-widest text-[#8B82F6]">LATEST GEOGRAPHY</span>
@@ -767,7 +767,7 @@ export default function RatecardView({
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8B82F6] to-[#D580FF]">SOMETHING GREAT</span>
               </h2>
               <p className="text-slate-400 text-sm sm:text-base max-w-lg mx-auto font-light font-sans pt-2">
-                Have a customized target or specific scope of work? Connect with design studio lead, Zendha Refitra.
+                Have a customized target or specific scope of work? Connect with design studio lead, {profile.name || "creative director"}.
               </p>
             </div>
 
@@ -777,8 +777,8 @@ export default function RatecardView({
                 <span className="text-[10px] font-mono font-bold uppercase text-[#8B82F6] block tracking-widest">
                   CONTACT NUMBER / WA
                 </span>
-                <a href={profile.whatsapp || "https://wa.me/62816273270"} target="_blank" rel="noopener noreferrer" className="text-lg font-mono font-bold text-white hover:text-[#8B82F6] block transition-colors">
-                  {profile.contactPhone || "+62-816-273-270"}
+                <a href={profile.whatsapp || "https://wa.me/15550199"} target="_blank" rel="noopener noreferrer" className="text-lg font-mono font-bold text-white hover:text-[#8B82F6] block transition-colors">
+                  {profile.contactPhone || "Configure Phone Number"}
                 </a>
               </div>
               <div className="space-y-1.5">
@@ -786,7 +786,7 @@ export default function RatecardView({
                   DOMICILE &amp; STUDIO LOCATION
                 </span>
                 <p className="text-base text-slate-300 font-sans font-light">
-                  {profile.domicile || "Lavon 2, Sindang Jaya, Kab. Tangerang, Indonesia"}
+                  {profile.domicile || "Configure Location / Domicile"}
                 </p>
               </div>
             </div>
@@ -794,7 +794,7 @@ export default function RatecardView({
             {/* Real CTAs */}
             <div className="flex flex-wrap items-center justify-center gap-4">
               <a 
-                href={`mailto:${profile.email || "zendha90@gmail.com"}?subject=Kolaborasi Brand`}
+                href={`mailto:${profile.email || "creator@example.com"}?subject=Kolaborasi Brand`}
                 className="px-8 py-4 bg-white text-black hover:bg-slate-200 text-xs font-bold font-sans uppercase rounded-full transition-all duration-300 tracking-wider shadow-lg hover:scale-[1.03]"
               >
                 Send Business Email
@@ -822,7 +822,7 @@ export default function RatecardView({
       {/* Styled Minimal Footer */}
       <footer className="w-full border-t border-white/[0.04] py-12 relative z-25 bg-[#08080B]">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-slate-500 font-mono">
-          <p>© 2026 zendharefitra.com. All trademark and intellectual properties reserved.</p>
+          <p>© 2026 {profile.name || "Creator Studio"}. All trademark and intellectual properties reserved.</p>
           <div className="flex items-center gap-6">
             <p className="text-[#8B82F6]/60">Design studio powered by Antigravity</p>
           </div>

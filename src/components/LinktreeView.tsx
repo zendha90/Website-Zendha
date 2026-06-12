@@ -554,12 +554,7 @@ export default function LinktreeView({
 
       {/* Aesthetic Footer Block */}
       <div className="text-center mt-16 text-[11px] text-slate-400 font-mono space-y-2 pb-8">
-        <p>© 2026 zendharefitra.com. All intellectual rights reserved.</p>
-        <div className="flex items-center justify-center gap-2 text-[9px] text-slate-350">
-          <span>Aesthetic workspace gear & layout curations.</span>
-          <span className="w-1 h-1 rounded-full bg-slate-200" />
-          <span className="font-bold text-indigo-400/60 uppercase tracking-tighter">System Version 1.2.0</span>
-        </div>
+        <p>© 2026 {profile?.name || "Creator Templates"}. All intellectual rights reserved.</p>
       </div>
     </div>
   );

@@ -184,7 +184,7 @@ const DEFAULT_DB: DatabaseSchema = {
     {
       id: "link-4",
       title: "Stand Holder Laptop Aluminium Adjustable",
-      url: "https://tiktok.com/@zendharefitra/shop/laptop-stand",
+      url: "https://tiktok.com/@yourusername/shop/laptop-stand",
       category: "TikTok Shop",
       clicks: 65,
       isActive: true,
@@ -194,8 +194,8 @@ const DEFAULT_DB: DatabaseSchema = {
     },
     {
       id: "link-5",
-      title: "Instagram Zendha Refitra - Tips Workspace & Tech",
-      url: "https://instagram.com/zendharef_",
+      title: "Instagram Creator - Tips Workspace & Tech",
+      url: "https://instagram.com/yourusername",
       category: "Social Media",
       clicks: 215,
       isActive: true,
@@ -205,12 +205,12 @@ const DEFAULT_DB: DatabaseSchema = {
     }
   ],
   profile: {
-    name: "Zendha Refitra",
+    name: "Aesthetic Creator",
     bio: "Tech Content Creator & Workspaces Enthusiast. Membagikan inspirasi setup meja kerja minimalis, ulasan gadget fungsional, dan tips produktivitas digital.",
-    instagram: "https://instagram.com/zendharef_",
-    tiktok: "https://tiktok.com/@zendharefitra",
-    youtube: "https://youtube.com/@zendharefitra",
-    email: "zendha90@gmail.com",
+    instagram: "https://instagram.com/yourusername",
+    tiktok: "https://tiktok.com/@yourusername",
+    youtube: "https://youtube.com/@yourusername",
+    email: "creator@example.com",
     avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400&h=400",
     whatsapp: "https://wa.me/628123456789",
     designSettings: {
@@ -577,7 +577,7 @@ app.post('/api/backup/import', (req, res) => {
     }
 
     writeDb(database);
-    res.json({ success: true, message: 'Database zendharefitra berhasil dipulihkan secara penuh!' });
+    res.json({ success: true, message: 'Database template berhasil dipulihkan secara penuh!' });
   } catch (err: any) {
     res.status(500).json({ success: false, message: 'Gagal memulihkan database: ' + err.message });
   }
@@ -1030,7 +1030,7 @@ app.get('/api/github/export-pc-zip', async (req, res) => {
     // 4. Return ZIP file for download
     const zipBuffer = zip.toBuffer();
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `zendha_portfolio_backup_${timestamp}.zip`;
+    const filename = `creator_portfolio_backup_${timestamp}.zip`;
 
     res.setHeader('Content-Type', 'application/zip');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

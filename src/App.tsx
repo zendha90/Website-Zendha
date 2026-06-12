@@ -91,7 +91,7 @@ export default function App() {
 
         <div className="text-center relative z-10" id="loading-spinner">
           <div className="w-14 h-14 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4" />
-          <h2 className="text-sm font-display font-semibold text-slate-700 tracking-wide">zendharefitra.com</h2>
+          <h2 className="text-sm font-display font-semibold text-slate-700 tracking-wide">{data?.profile?.name || "Creator Hub"}</h2>
           <p className="text-xs text-slate-400 mt-1">Memuat database local...</p>
         </div>
       </div>
