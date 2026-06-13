@@ -640,6 +640,10 @@ function isAdmin(req: express.Request): boolean {
 
 // ---------------- API ENDPOINTS ----------------
 
+app.get('/api/system/engine', (req, res) => {
+  res.json({ engine: process.env.DB_TYPE === 'mysql' ? 'mysql' : 'json' });
+});
+
 // Get All Public Data
 app.get('/api/data', (req, res) => {
   const db = readDb();

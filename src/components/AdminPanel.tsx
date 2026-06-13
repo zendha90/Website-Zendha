@@ -96,6 +96,9 @@ export default function AdminPanel({
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState<'today' | 'yesterday' | '7days' | '30days'>('yesterday');
   const [analyticsSource, setAnalyticsSource] = useState<'all' | 'shopee' | 'medsos'>('all');
 
+  // System Engine State
+  const [dbEngine, setDbEngine] = useState<'json' | 'mysql'>('json');
+
   // GitHub integration states
   const [githubSettings, setGithubSettings] = useState({
     enabled: false,
@@ -163,6 +166,18 @@ export default function AdminPanel({
       setProfileForm({ ...profile });
     }
   }, [profile]);
+
+  const fetchSystemEngine = async () => {
+    try {
+      const resp = await fetch('/api/system/engine');
+      if (resp.ok) {
+        const data = await resp.json();
+        setDbEngine(data.engine);
+      }
+    } catch (err) {
+      console.error('Failed to fetch system engine state', err);
+    }
+  };
 
   const fetchGithubSettings = async (currentToken = token) => {
     if (!currentToken) return;
@@ -356,6 +371,7 @@ export default function AdminPanel({
   useEffect(() => {
     if (isLoggedIn && token) {
       fetchGithubSettings(token);
+      fetchSystemEngine();
     }
   }, [isLoggedIn, token]);
 
@@ -975,7 +991,13 @@ export default function AdminPanel({
             <Sliders className="w-6 h-6 text-indigo-400" />
           </div>
           <div>
-            <h1 className="text-lg md:text-xl font-display font-bold">Selamat Datang di Admin Link {profileForm.name || 'Kreator'}! 👋</h1>
+            <div className="flex flex-col md:flex-row md:items-center gap-2 justify-center md:justify-start">
+              <h1 className="text-lg md:text-xl font-display font-bold">Selamat Datang di Admin Link {profileForm.name || 'Kreator'}! 👋</h1>
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border w-max ${dbEngine === 'mysql' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                <Database className="w-3 h-3" />
+                {dbEngine === 'mysql' ? 'MySQL Database' : 'JSON Local Data'}
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex gap-2.5">
