@@ -7,6 +7,7 @@ import AdmZip from 'adm-zip';
 import { setupMysqlTables, loadDbFromMysql, writeDbToMysql, generateSqlDump } from './src/db/mysql';
 
 let cachedDbState: DatabaseSchema | null = null;
+export let ACTIVE_ENGINE: 'json' | 'mysql' = 'json';
 
 const app = express();
 const PORT = 3000;
@@ -641,7 +642,7 @@ function isAdmin(req: express.Request): boolean {
 // ---------------- API ENDPOINTS ----------------
 
 app.get('/api/system/engine', (req, res) => {
-  res.json({ engine: process.env.DB_TYPE === 'mysql' ? 'mysql' : 'json' });
+  res.json({ engine: ACTIVE_ENGINE });
 });
 
 // Get All Public Data
@@ -1802,14 +1803,17 @@ async function startServer() {
       console.log('[Database] Loading state from MySQL...');
       const localFallback = readDb();
       cachedDbState = await loadDbFromMysql(localFallback);
+      ACTIVE_ENGINE = 'mysql';
       console.log('[Database] Successfully initialized with MySQL Cache!');
     } else {
       console.log('[Database] Setup MySQL failed. Falling back to JSON database...');
       cachedDbState = readDb();
+      ACTIVE_ENGINE = 'json';
     }
   } else {
     console.log('[Database] Initializing with standard local JSON database...');
     cachedDbState = readDb();
+    ACTIVE_ENGINE = 'json';
   }
 
   if (process.env.NODE_ENV !== "production") {
