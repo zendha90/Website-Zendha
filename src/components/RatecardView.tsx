@@ -253,7 +253,8 @@ export default function RatecardView({
     { value: "1 M", label: "Monthly Reach", desc: "Consistent organic impressions standard" },
     { value: "76 %", label: "Women Followers", desc: "Premium aesthetic layout interest" },
     { value: "6 %", label: "Engagement Rate", desc: "High conversion compared to global median" },
-    { value: "8 K", label: "Tiktok Followers", desc: "Rapidly growing creative design workspace" }
+    { value: "8 K", label: "Tiktok Followers", desc: "Rapidly growing creative design workspace" },
+    { value: "50 +", label: "Brand Collabs", desc: "Sponsorships & content partnerships" }
   ];
 
   const termsOfService = profile.termsOfService && profile.termsOfService.length > 0 ? profile.termsOfService : [
@@ -498,7 +499,7 @@ export default function RatecardView({
           </div>
 
           {/* Premium Glowing Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-6">
             {stats.map((stat, idx) => {
               const match = stat.value.trim().match(/^([\d.,]+)\s*(.*)$/);
               const numPart = match ? match[1] : stat.value;
@@ -507,26 +508,28 @@ export default function RatecardView({
               return (
                 <div 
                   key={idx}
-                  className="group relative bg-[#0E0E13] border border-white/[0.03] hover:border-[#8B82F6]/25 rounded-[1.8rem] p-7 transition-all duration-300 shadow-xl overflow-hidden flex flex-col justify-between min-h-[190px]"
+                  className="group relative bg-[#0E0E13] border border-white/[0.03] hover:border-[#8B82F6]/25 rounded-2xl sm:rounded-[1.8rem] p-4 sm:p-7 transition-all duration-300 shadow-xl overflow-hidden flex flex-col justify-start min-h-[120px] sm:min-h-[190px]"
                 >
                   {/* Micro Accent Glow on top corner */}
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-tr from-transparent to-[#8B82F6]/5 group-hover:to-[#8B82F6]/12 rounded-full transition-all duration-500 blur-xl pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-tr from-transparent to-[#8B82F6]/5 group-hover:to-[#8B82F6]/12 rounded-full transition-all duration-500 blur-xl pointer-events-none" />
                   
                   {/* Dynamic clean elegant number rendering */}
-                  <div className="flex items-start font-sans font-black tracking-tighter text-[#E6E4D9]">
-                    <span className="text-5xl sm:text-6xl leading-none">{numPart}</span>
+                  <div className="h-10 sm:h-16 flex items-baseline font-sans font-black tracking-tighter text-[#E6E4D9]">
+                    <span className="text-4xl leading-none sm:text-6xl">{numPart}</span>
                     {suffixPart && (
-                      <span className="text-xl sm:text-2xl font-bold text-[#E6E4D9]/80 ml-0.5 leading-none pt-1">
+                      <span className="text-lg sm:text-2xl font-bold text-[#E6E4D9]/80 ml-0.5 leading-none">
                         {suffixPart}
                       </span>
                     )}
                   </div>
                   
-                  <div className="mt-8">
-                    <h4 className="text-base sm:text-[17px] font-bold font-sans text-slate-200 tracking-tight leading-[1.12] group-hover:text-white transition-colors">
+                  <div className="mt-4 sm:mt-6 text-left">
+                    <h4 className="text-[13px] sm:text-[17px] font-bold font-sans text-slate-200 tracking-tight leading-[1.2] group-hover:text-white transition-colors pr-2 sm:pr-0 min-h-[32px] sm:min-h-[42px] flex items-start text-left">
                       {stat.label}
                     </h4>
-                    <p className="text-[11px] text-slate-500 font-sans mt-2 leading-snug group-hover:text-slate-400 transition-colors">{stat.desc}</p>
+                    <p className="text-[9px] sm:text-[11px] text-slate-500 font-sans mt-1.5 sm:mt-2 leading-snug group-hover:text-slate-400 transition-colors hidden sm:block sm:min-h-[34px]">
+                      {stat.desc}
+                    </p>
                   </div>
                 </div>
               );

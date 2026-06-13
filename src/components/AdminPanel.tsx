@@ -55,7 +55,8 @@ import {
   Cloud,
   Calendar,
   Globe,
-  Server
+  Server,
+  Columns
 } from 'lucide-react';
 import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog, VisitLog } from '../types';
 import DesignSettingsForm from './DesignSettingsForm';
@@ -1578,7 +1579,7 @@ export default function AdminPanel({
             <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5 text-indigo-500" /> Statistik &amp; Metrik Audiens Ratecard
             </h3>
-            <p className="text-xs text-slate-400 mb-6">Sesuaikan 5 kartu metrik statistik hasil jangkauan audiens organik yang tampil pada halaman Ratecard Anda.</p>
+            <p className="text-xs text-slate-400 mb-6 font-sans">Sesuaikan hingga 6 kartu metrik statistik hasil jangkauan audiens organik yang tampil pada halaman Ratecard Anda.</p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pb-6 border-b border-slate-50">
               <div className="col-span-1">
@@ -1613,8 +1614,8 @@ export default function AdminPanel({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {[0, 1, 2, 3, 4].map((index) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
+              {[0, 1, 2, 3, 4, 5].map((index) => {
                 const currentStats = profileForm.stats || [];
                 const statObj = currentStats[index] || { value: '', label: '', desc: '' };
                 
@@ -3886,42 +3887,55 @@ DB_NAME=nama_database_anda`}
           </div>
 
           <div className="space-y-4">
-            {/* Latest Update v1.5.0 */}
+            {/* Latest Update v1.6.0 */}
             <div className="bg-white border-2 border-indigo-100 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50 rounded-full translate-x-24 -translate-y-24 -z-10" />
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 px-2.5 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 shrink-0 min-w-10">
-                    <span className="font-mono font-black text-xs text-white">v1.5.0</span>
+                    <span className="font-mono font-black text-xs text-white">v1.6.0</span>
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-display font-bold text-slate-800 truncate">Version 1.5.0 (SEO &amp; Dynamic Tab Edition)</h3>
-                    <p className="text-[10px] font-mono text-slate-400 mt-0.5 truncate">LATEST STABLE BUILD • SEO READY</p>
+                    <h3 className="text-sm font-display font-bold text-slate-800 truncate">Version 1.6.0 (Responsive Mobile Bento &amp; Stats Grid)</h3>
+                    <p className="text-[10px] font-mono text-slate-400 mt-0.5 truncate">LATEST STABLE BUILD • ULTRA RESPONSIVE</p>
                     <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest truncate">Released: 13 June 2026</p>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-bold rounded-full font-mono border border-emerald-100 uppercase animate-pulse">Running Now</span>
               </div>
               
               <ul className="space-y-3">
                 <li className="flex gap-3">
                   <div className="shrink-0 w-5 h-5 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center">
-                    <Globe className="w-3 h-3 text-indigo-600" />
+                    <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Pengaturan SEO (Judul Browser &amp; Favicon)</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Menambahkan fitur ganti judul tab peramban untuk halaman Linktree &amp; Ratecard secara dinamis serta pengunggahan ikon favicon (1:1) lengkap dengan rekomendasi panduan format gambar.</p>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Optimasi Kisi Grid &amp; Simetri Statistik</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Meningkatkan total bawaan metrik audiens menjadi 6 item (menambahkan seksi Kolaborasi Brand) untuk mengisi grid 2-kolom seimbang di mobile. Menyelaraskan perataan teks vertikal (baseline) dan batas tinggi minimum agar tinggi antar-kartu tetap simetris, rapi, dan mudah dibaca.</p>
                   </div>
                 </li>
                 <li className="flex gap-3">
                   <div className="shrink-0 w-5 h-5 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-emerald-600" />
+                    <Columns className="w-3.5 h-3.5 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Selamat Datang Dinamis &amp; Perbaikan Layout</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Memperkenalkan salam pembuka dinamis sesuai nama kreator di dasbor admin serta memperbaiki visual layout seksi teks/angka agar tidak tumpah/keluar dari kotak kontainer.</p>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Bento Grid Linktree 2-Kolom di Mobile</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Mendesain ulang tampilan daftar tautan (Linktree) bermode Bento Grid pada perangkat seluler menjadi 2 kolom. Memperhalus ukuran font, lencana/ikon, padding, dan tombol CTA agar bento tetap compact, padat, indah, dan hemat ruang layar.</p>
                   </div>
                 </li>
+              </ul>
+            </div>
+
+            {/* Previous v1.5.0 */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 opacity-90">
+              <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-200">
+                <div className="flex items-center gap-3">
+                  <span className="px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-mono font-bold rounded">v1.5.0</span>
+                  <p className="text-xs font-display font-medium text-slate-600 italic">SEO &amp; Dynamic Tab Edition</p>
+                </div>
+              </div>
+              <ul className="space-y-2 text-[10px] text-slate-500">
+                <li>• Pengaturan SEO (Judul Browser &amp; Favicon): Kustomisasi judul tab dinamis dan favicon format 1:1 di Linktree &amp; Ratecard.</li>
+                <li>• Salam Pembuka Dinamis: Sambutan pencantuman nama kreator di dasbor dan perapian visual text-overflow.</li>
               </ul>
             </div>
 
@@ -3976,7 +3990,7 @@ DB_NAME=nama_database_anda`}
 
       {/* Footer Administration Panel */}
       <div className="w-full text-center py-8 text-xs text-slate-400 font-mono mt-8 border-t border-slate-100">
-        <p>Admin Dashboard v1.5.0 | Personal Creator Workspace</p>
+        <p>Admin Dashboard v1.6.0 | Personal Creator Workspace</p>
       </div>
     </div>
   );

@@ -452,7 +452,7 @@ export default function LinktreeView({
             </div>
           ) : (
             /* COLLAPSIBLE BENTO DECORATIVE GRID LAYOUT MODE */
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full" id="links-grid">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 w-full" id="links-grid">
               {filteredLinks.map((link, idx) => {
                 const activeIndex = activeLinks.findIndex(l => l.id === link.id);
                 const sequenceNumber = activeIndex !== -1 ? activeIndex + 1 : idx + 1;
@@ -469,9 +469,9 @@ export default function LinktreeView({
                     onClick={() => handleLinkNavigate(link)}
                     id={`link-card-${link.id}`}
                     style={{ 
-                      backgroundColor: getCardBgColor(),
-                      backdropFilter: (profile.designSettings?.cardOpacity ?? 100) < 100 ? 'blur(12px)' : undefined,
-                      borderColor: profile.designSettings?.colors.pageText + '20'
+                       backgroundColor: getCardBgColor(),
+                       backdropFilter: (profile.designSettings?.cardOpacity ?? 100) < 100 ? 'blur(12px)' : undefined,
+                       borderColor: profile.designSettings?.colors.pageText + '20'
                     }}
                   >
                     
@@ -485,49 +485,49 @@ export default function LinktreeView({
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-indigo-50/40 to-slate-100/40 flex flex-col items-center justify-center p-6 text-center select-none">
-                          <span className="w-10 h-10 rounded-2rem bg-white border border-slate-150 flex items-center justify-center shadow-xs text-slate-400 group-hover:bg-indigo-50 transition-colors">
+                        <div className="w-full h-full bg-gradient-to-br from-indigo-50/40 to-slate-100/40 flex flex-col items-center justify-center p-3 sm:p-6 text-center select-none">
+                          <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-2rem bg-white border border-slate-150 flex items-center justify-center shadow-xs text-slate-400 group-hover:bg-indigo-50 transition-colors">
                             {getCategoryIcon(link.category)}
                           </span>
-                          <span className="text-[10px] uppercase tracking-widest font-mono font-bold text-slate-400 mt-3 block">{link.category}</span>
+                          <span className="text-[8px] sm:text-[10px] uppercase tracking-widest font-mono font-bold text-slate-400 mt-2 sm:mt-3 block">{link.category}</span>
                         </div>
                       )}
                       
                       {/* Floating Sequential ID Tag */}
-                      <span className="absolute top-3 left-3 text-[11px] text-slate-500 font-sans font-extrabold bg-white/95 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-100 shadow-xs">
+                      <span className="absolute top-2 left-2 sm:top-3 sm:left-3 text-[9px] sm:text-[11px] text-slate-500 font-sans font-extrabold bg-white/95 backdrop-blur-md px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg border border-slate-100 shadow-xs">
                         {sequenceNumber}
                       </span>
 
                       {/* Indicator for High-Clicks Products */}
                       {topClickedIds.includes(link.id) && link.clicks > 0 && (
-                        <span className="absolute top-3 right-3 text-[9px] text-white font-mono font-bold flex items-center gap-1.5 bg-slate-900/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/5 shadow-md">
-                          <Flame className="w-3 h-3 text-orange-400 animate-pulse" /> TERPOPULER
+                        <span className="absolute top-2 right-2 sm:top-3 sm:right-3 text-[7.5px] sm:text-[9px] text-white font-mono font-bold flex items-center gap-1 bg-slate-900/85 backdrop-blur-md px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg border border-white/5 shadow-md">
+                          <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-orange-400 animate-pulse" /> TERPOPULER
                         </span>
                       )}
                     </div>
 
                     {/* Card Descriptive Details */}
-                    <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
                       <div>
-                        <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                        <span className="inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400">
                           {getCategoryIcon(link.category)}
                           {link.category}
                         </span>
 
-                        <h3 className="font-bold text-sm mt-2 leading-snug transition-colors line-clamp-2" style={{ color: profile.designSettings?.colors.title }}>
+                        <h3 className="font-bold text-xs sm:text-sm mt-1 sm:mt-2 leading-snug transition-colors line-clamp-2" style={{ color: profile.designSettings?.colors.title }}>
                           {link.title}
                         </h3>
                         {link.description && (
-                          <p className="text-[11px] mt-1.5 line-clamp-2 leading-normal opacity-80" style={{ color: profile.designSettings?.colors.pageText }}>
+                          <p className="text-[10px] sm:text-[11px] mt-1 sm:mt-1.5 line-clamp-2 leading-normal opacity-80" style={{ color: profile.designSettings?.colors.pageText }}>
                             {link.description}
                           </p>
                         )}
                       </div>
 
                       {/* Highly Polished CTA Button */}
-                      <div className="mt-5 pt-3 border-t" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
+                      <div className="mt-3 sm:mt-5 pt-2 sm:pt-3 border-t" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
                         <div 
-                          className={`w-full py-2.5 px-4 text-white text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer ${getButtonRoundedClass()}`}
+                          className={`w-full py-2 sm:py-2.5 px-2 sm:px-4 text-white text-[10px] sm:text-xs font-bold tracking-wide flex items-center justify-center gap-1 sm:gap-1.5 transition-all shadow-xs cursor-pointer ${getButtonRoundedClass()}`}
                           style={{
                             backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
                             color: profile.designSettings?.colors.buttonText || '#ffffff'
@@ -538,7 +538,7 @@ export default function LinktreeView({
                           }}
                         >
                           <span className="truncate">{link.buttonLabel ? link.buttonLabel : "Beli Sekarang"}</span>
-                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform shrink-0" />
+                          <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition-transform shrink-0" />
                         </div>
                       </div>
                     </div>
