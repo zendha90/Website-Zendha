@@ -25,11 +25,13 @@ jobs:
           npm install
           npm run build
 
-      - name: Kirim ke cPanel (FTP)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: Kirim ke cPanel (SFTP)
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: ${{ secrets.FTP_SERVER }}
+          port: 45022
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-          server-dir: /public_html/node-app/dist/
+          local_path: './dist/*'
+          remote_path: '/public_html/node-app/dist/'
+          sftp_only: true
