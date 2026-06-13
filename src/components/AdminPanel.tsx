@@ -1472,7 +1472,7 @@ export default function AdminPanel({
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Tagline Atas Badge</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Tagline Atas Badge</label>
                 <input 
                   type="text" 
                   value={profileForm.heroTagline || ''}
@@ -1482,7 +1482,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Headline Utama (Bagian 1)</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Headline Utama (Bagian 1)</label>
                 <input 
                   type="text" 
                   value={profileForm.heroTitle1 || ''}
@@ -1492,7 +1492,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Headline Bagian Sorot (Gradient)</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Headline Bagian Sorot (Gradient)</label>
                 <input 
                   type="text" 
                   value={profileForm.heroTitleHighlight || ''}
@@ -1522,7 +1522,7 @@ export default function AdminPanel({
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Domisili / Studio Location</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Domisili / Studio Location</label>
                 <input 
                   type="text" 
                   value={profileForm.domicile || ''}
@@ -1532,7 +1532,7 @@ export default function AdminPanel({
                 />
               </div>
               <div>
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Teks Kontak Telepon / WA WA</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Teks Kontak Telepon / WA WA</label>
                 <input 
                   type="text" 
                   value={profileForm.contactPhone || ''}
@@ -1552,7 +1552,7 @@ export default function AdminPanel({
             <p className="text-xs text-slate-400 mb-4">Sesuaikan gelar utama (misal STUDIO DIRECTOR) dan tahun berdiri (misal ESTD 2026) yang tampil di samping foto profil Anda.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Gelar Utama (Director Title)</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Gelar Utama (Director Title)</label>
                 <input 
                   type="text" 
                   value={profileForm.studioDirectorTitle || ''}
@@ -1562,7 +1562,7 @@ export default function AdminPanel({
                 />
               </div>
               <div>
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-[#8B82F6] uppercase mb-1">Tahun Berdiri (Estd Year / Text)</label>
+                <label className="block text-[11px] font-mono font-bold text-[#8B82F6] uppercase mb-1">Tahun Berdiri (Estd Year / Text)</label>
                 <input 
                   type="text" 
                   value={profileForm.studioEstdYear || ''}
@@ -1583,7 +1583,7 @@ export default function AdminPanel({
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pb-6 border-b border-slate-50">
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Stats</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Stats</label>
                 <input 
                   type="text" 
                   value={profileForm.statsBadge || ''}
@@ -1593,7 +1593,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Stats</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Stats</label>
                 <input 
                   type="text" 
                   value={profileForm.statsTitle || ''}
@@ -1603,7 +1603,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek Stats</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek Stats</label>
                 <input 
                   type="text" 
                   value={profileForm.statsDescription || ''}
@@ -1677,7 +1677,7 @@ export default function AdminPanel({
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Project</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Project</label>
                 <input 
                   type="text" 
                   value={profileForm.projectsBadge || ''}
@@ -1687,7 +1687,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Project</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Project</label>
                 <input 
                   type="text" 
                   value={profileForm.projectsTitle || ''}
@@ -1697,7 +1697,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek Project</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek Project</label>
                 <input 
                   type="text" 
                   value={profileForm.projectsDescription || ''}
@@ -1716,7 +1716,7 @@ export default function AdminPanel({
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Pricing</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Pricing</label>
                 <input 
                   type="text" 
                   value={profileForm.pricingBadge || ''}
@@ -1726,7 +1726,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Pricing</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Pricing</label>
                 <input 
                   type="text" 
                   value={profileForm.pricingTitle || ''}
@@ -1736,7 +1736,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek Pricing</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pendek Pricing</label>
                 <input 
                   type="text" 
                   value={profileForm.pricingDescription || ''}
@@ -1755,7 +1755,7 @@ export default function AdminPanel({
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Brands</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Badge Atas Brands</label>
                 <input 
                   type="text" 
                   value={profileForm.brandsBadge || ''}
@@ -1765,7 +1765,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="flex md:min-h-[32px] items-end text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Brands</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Utama Brands</label>
                 <input 
                   type="text" 
                   value={profileForm.brandsTitle || ''}
