@@ -89,6 +89,11 @@ export interface RatecardProfile {
   studioDirectorTitle?: string;
   studioEstdYear?: string;
 
+  // Custom SEO / Browser titles & Favicon
+  linktreeTitle?: string;
+  ratecardTitle?: string;
+  faviconUrl?: string;
+
   // Design Settings
   designSettings?: DesignSettings;
 }
@@ -126,6 +131,20 @@ export interface ClickLog {
   id: string;
   linkId: string;
   timestamp: string; // ISO String
+  referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+}
+
+export interface VisitLog {
+  id: string;
+  timestamp: string; // ISO String
+  referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  viewType: 'linktree' | 'ratecard';
 }
 
 export interface AppData {
@@ -135,4 +154,5 @@ export interface AppData {
   projects: RatecardProject[];
   brands?: RatecardBrand[];
   clickLogs?: ClickLog[];
+  visitLogs?: VisitLog[];
 }

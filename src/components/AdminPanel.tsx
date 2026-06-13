@@ -52,9 +52,11 @@ import {
   BarChart3,
   LineChart,
   Image,
-  Cloud
+  Cloud,
+  Calendar,
+  Globe
 } from 'lucide-react';
-import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog } from '../types';
+import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog, VisitLog } from '../types';
 import DesignSettingsForm from './DesignSettingsForm';
 
 interface AdminPanelProps {
@@ -66,6 +68,7 @@ interface AdminPanelProps {
   projects: RatecardProject[];
   brands?: RatecardBrand[];
   clickLogs?: ClickLog[];
+  visitLogs?: VisitLog[];
 }
 
 export default function AdminPanel({
@@ -76,7 +79,8 @@ export default function AdminPanel({
   services,
   projects,
   brands: initialBrands,
-  clickLogs = []
+  clickLogs = [],
+  visitLogs = []
 }: AdminPanelProps) {
   // Authentication states
   const [password, setPassword] = useState('');
@@ -480,7 +484,7 @@ export default function AdminPanel({
 
   const [isUploading, setIsUploading] = useState<{[key: string]: boolean}>({});
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetField: 'avatarUrl' | 'link' | 'project' | 'brand') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetField: 'avatarUrl' | 'faviconUrl' | 'link' | 'project' | 'brand') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -513,6 +517,8 @@ export default function AdminPanel({
           showToast('Gambar berhasil diunggah!');
           if (targetField === 'avatarUrl') {
             setProfileForm(prev => ({ ...prev, avatarUrl: data.url }));
+          } else if (targetField === 'faviconUrl') {
+            setProfileForm(prev => ({ ...prev, faviconUrl: data.url }));
           } else if (targetField === 'link') {
             setEditingLink(prev => ({ ...prev, imageUrl: data.url }));
           } else if (targetField === 'project') {
@@ -942,7 +948,7 @@ export default function AdminPanel({
             <Sliders className="w-6 h-6 text-indigo-400" />
           </div>
           <div>
-            <h1 className="text-lg md:text-xl font-display font-bold">Halo Admin! 👋</h1>
+            <h1 className="text-lg md:text-xl font-display font-bold">Selamat Datang di Admin Link {profileForm.name || 'Kreator'}! 👋</h1>
           </div>
         </div>
         <div className="flex gap-2.5">
@@ -1098,44 +1104,44 @@ export default function AdminPanel({
             {/* Visual Link Analytical Widgets (High-fidelity CRM design) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4" id="links-stats-bento">
               {/* Total Clicks Widget */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex items-center justify-between col-span-1">
-                <div>
-                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">TOTAL CLICKS METRIC</span>
-                  <span className="text-4xl font-display font-black text-slate-900 tracking-tight block mt-2">
+              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs flex items-center justify-between col-span-1 min-w-0">
+                <div className="min-w-0">
+                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">Total Klik Tautan</span>
+                  <span className="text-3xl font-display font-bold text-slate-800 tracking-tight block mt-1.5 truncate">
                     {totalClicks}
                   </span>
-                  <span className="text-xs text-slate-500 mt-2 block">Akumulasi sepanjang waktu</span>
+                  <span className="text-[11px] text-slate-400 mt-1 block font-sans">Semua tautan terakumulasi</span>
                 </div>
-                <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600 shrink-0">
-                  <TrendingUp className="w-6 h-6" />
+                <div className="p-3 bg-indigo-50 border border-indigo-100/50 rounded-2xl text-indigo-600 shrink-0">
+                  <TrendingUp className="w-5 h-5" />
                 </div>
               </div>
 
               {/* Top Performing Item Widget */}
-              <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-xs col-span-1 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">TOP PERFORMING ITEM</span>
+              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs col-span-1 flex items-center justify-between min-w-0">
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">Tautan Terpopuler</span>
                   {topLink ? (
                     <>
-                      <h4 className="text-slate-800 text-xs font-semibold mt-2 line-clamp-1">
+                      <h4 className="text-slate-800 text-[13px] font-bold mt-1.5 font-sans truncate pr-2">
                         {topLink.title}
                       </h4>
-                      <span className="text-xs font-mono font-bold text-emerald-600 block mt-1">
-                        {topLink.clicks || 0} clicks ({totalClicks > 0 ? ((topLink.clicks / totalClicks) * 100).toFixed(1) : 0}%)
+                      <span className="text-[11px] font-mono font-bold text-emerald-600 block mt-1">
+                        {topLink.clicks || 0} klik ({totalClicks > 0 ? ((topLink.clicks / totalClicks) * 100).toFixed(1) : 0}%)
                       </span>
                     </>
                   ) : (
                     <span className="text-xs text-slate-400 block mt-2">Belum ada statistik</span>
                   )}
                 </div>
-                <span className="text-[10px] text-slate-400 font-mono block border-t border-slate-100 pt-2 pb-0.5 mt-2">
-                  Konversi link terpopuler Anda
-                </span>
+                <div className="p-3 bg-emerald-50 border border-emerald-100/50 rounded-2xl text-emerald-600 shrink-0">
+                  <Sparkles className="w-5 h-5" />
+                </div>
               </div>
 
               {/* Platform Clicks distribution */}
-              <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-xs col-span-1 space-y-2">
-                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block mb-1">PLATFORM CLICK SHARE</span>
+              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs col-span-1 min-w-0 flex flex-col justify-center">
+                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block mb-2">Distribusi Platform</span>
                 
                 <div className="space-y-1.5 text-[11px]" id="share-platform-distribution">
                   {Object.entries(platformStats).map(([platform, clicks]) => {
@@ -1146,10 +1152,10 @@ export default function AdminPanel({
                     return (
                       <div key={platform} className="space-y-0.5">
                         <div className="flex justify-between text-[10px] font-medium font-mono text-slate-600">
-                          <span>{platform}</span>
+                          <span className="truncate pr-1">{platform}</span>
                           <span>{clicks} klik ({percentage.toFixed(0)}%)</span>
                         </div>
-                        <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+                        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                           <div 
                             className={`h-full ${barColor} rounded-full transition-all duration-300`}
                             style={{ width: `${percentage}%` }}
@@ -2223,6 +2229,69 @@ export default function AdminPanel({
               </div>
             </div>
 
+            <div className="border-t border-slate-100 pt-5 mt-6">
+              <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Globe className="w-3.5 h-3.5 text-indigo-500" /> SEO &amp; Pengaturan Browser (Judul &amp; Favicon)
+              </h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Browser Halaman Tautan (Linktree)</label>
+                    <input 
+                      type="text" 
+                      placeholder="Contoh: Aesthetic Creator | Affiliate Links & Portfolio"
+                      value={profileForm.linktreeTitle || ''}
+                      onChange={(e) => setProfileForm({...profileForm, linktreeTitle: e.target.value})}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">Ganti judul di tab peramban untuk halaman list linktree utama.</p>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Browser Halaman Ratecard (Portfolio)</label>
+                    <input 
+                      type="text" 
+                      placeholder="Contoh: Aesthetic Creator | Premium Ratecard"
+                      value={profileForm.ratecardTitle || ''}
+                      onChange={(e) => setProfileForm({...profileForm, ratecardTitle: e.target.value})}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-sans"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">Ganti judul di tab peramban untuk halaman ratecard detail.</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Favicon Website (Ikon Browser)</label>
+                  <div className="flex gap-2 items-center">
+                    <input 
+                      type="text" 
+                      placeholder="URL Gambar Favicon (.png atau .ico) atau unggah langsung..."
+                      value={profileForm.faviconUrl || ''}
+                      onChange={(e) => setProfileForm({...profileForm, faviconUrl: e.target.value})}
+                      className="flex-1 px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none transition-colors font-mono"
+                    />
+                    <label className="px-3.5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-xs font-bold cursor-pointer transition-colors shrink-0 text-center select-none">
+                      {isUploading['faviconUrl'] ? 'Uploading...' : 'Unggah File'}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => handleFileUpload(e, 'faviconUrl')} 
+                        className="hidden" 
+                      />
+                    </label>
+                  </div>
+                  <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 mt-2 text-[11px] text-slate-500 leading-relaxed font-sans space-y-1.5 shadow-3xs">
+                    <p className="font-semibold text-slate-700 flex items-center gap-1">
+                      💡 Rekomendasi Format &amp; Rasio Gambar Favicon:
+                    </p>
+                    <ul className="list-disc list-inside space-y-1 pl-1">
+                      <li><strong className="text-indigo-600">Aspek Rasio:</strong> Wajib menggunakan aspek rasio persegi rata <strong className="text-slate-700 font-mono">1:1</strong> (Contoh ukuran piksel ideal: <span className="font-mono text-[10px]">16x16</span>, <span className="font-mono text-[10px]">32x32</span>, <span className="font-mono text-[10px]">48x48</span>, atau <span className="font-mono text-[10px]">192x192</span>).</li>
+                      <li><strong className="text-indigo-600">Ekstensi Format:</strong> Format berkas <strong className="text-slate-700 font-semibold">.png</strong> (Direkomendasikan dengan latar transparan) atau ekstensi ikon Windows standar <strong className="text-slate-700 font-semibold">.ico</strong>. Format SVG dan JPEG juga berfungsi dengan baik di sebagian besar peramban modern.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="flex justify-end pt-6 border-t border-slate-100 mt-6">
               <button
                 type="submit"
@@ -3210,6 +3279,100 @@ export default function AdminPanel({
         ? Math.round((topLinkCount / totalClicks) * 100)
         : 0;
 
+      // Filter and compute total page visits
+      const currentVisits = visitLogs.filter(log => {
+        const logTime = new Date(log.timestamp);
+        return logTime >= currentStart && logTime <= currentEnd;
+      });
+      const prevVisits = visitLogs.filter(log => {
+        const logTime = new Date(log.timestamp);
+        return logTime >= prevStart && logTime <= prevEnd;
+      });
+
+      const totalVisits = currentVisits.length;
+      const prevTotalVisits = prevVisits.length;
+      const visitsPercentChange = prevTotalVisits > 0 
+        ? Math.round(((totalVisits - prevTotalVisits) / prevTotalVisits) * 100)
+        : totalVisits > 0 ? 100 : 0;
+      const visitsTrendSymbol = visitsPercentChange >= 0 ? '+' : '';
+      const visitsTrendColor = visitsPercentChange > 0 
+        ? 'text-emerald-500 font-extrabold' 
+        : visitsPercentChange < 0 
+          ? 'text-rose-500 font-extrabold' 
+          : 'text-slate-400 font-bold';
+
+      // Compute Click-Through Rate (CTR) overall
+      const ctrOverall = totalVisits > 0 ? Math.round((totalClicks / totalVisits) * 100) : 0;
+      const prevCtrOverall = prevTotalVisits > 0 ? Math.round((prevClicks / prevTotalVisits) * 100) : 0;
+      const ctrChange = ctrOverall - prevCtrOverall;
+      const ctrTrendSymbol = ctrChange >= 0 ? '+' : '';
+      const ctrTrendColor = ctrChange > 0 
+        ? 'text-emerald-500 font-extrabold' 
+        : ctrChange < 0 
+          ? 'text-rose-500 font-extrabold' 
+          : 'text-slate-400 font-bold';
+
+      // Compute traffic platforms aggregates
+      const sourceCounts: Record<string, { visits: number; clicks: number }> = {
+        'Instagram': { visits: 0, clicks: 0 },
+        'TikTok': { visits: 0, clicks: 0 },
+        'WhatsApp': { visits: 0, clicks: 0 },
+        'YouTube': { visits: 0, clicks: 0 },
+        'Google / Search': { visits: 0, clicks: 0 },
+        'Direct / None': { visits: 0, clicks: 0 },
+      };
+
+      const mapToFriendlySource = (utmSource?: string, referrer?: string) => {
+        const src = (utmSource || '').toLowerCase();
+        const ref = (referrer || '').toLowerCase();
+        
+        if (src.includes('instagram') || src === 'ig' || ref.includes('instagram.com') || ref.includes('l.instagram.com')) return 'Instagram';
+        if (src.includes('tiktok') || src === 'tt' || ref.includes('tiktok.com')) return 'TikTok';
+        if (src.includes('youtube') || src === 'yt' || ref.includes('youtube.com') || ref.includes('youtu.be')) return 'YouTube';
+        if (src.includes('whatsapp') || src === 'wa' || ref.includes('wa.me') || ref.includes('whatsapp.com')) return 'WhatsApp';
+        if (src.includes('facebook') || src === 'fb' || ref.includes('facebook.com') || ref.includes('l.facebook.com')) return 'Instagram'; // merge FB as Meta/IG
+        if (src.includes('twitter') || src === 'x' || ref.includes('twitter.com') || ref.includes('t.co')) return 'Twitter / X';
+        if (ref.includes('google.com') || ref.includes('bing.com') || ref.includes('yahoo.com') || ref.includes('google')) return 'Google / Search';
+        
+        return 'Direct / None';
+      };
+
+      currentVisits.forEach(v => {
+        const src = mapToFriendlySource(v.utmSource, v.referrer);
+        if (!sourceCounts[src]) sourceCounts[src] = { visits: 0, clicks: 0 };
+        sourceCounts[src].visits++;
+      });
+
+      currentLogs.forEach(c => {
+        const src = mapToFriendlySource(c.utmSource, c.referrer);
+        if (!sourceCounts[src]) sourceCounts[src] = { visits: 0, clicks: 0 };
+        sourceCounts[src].clicks++;
+      });
+
+      const sortedSources = Object.entries(sourceCounts)
+        .map(([name, data]) => ({ name, ...data }))
+        .sort((a, b) => b.visits - a.visits);
+
+      // Compute custom Campaign performance
+      const campaignCounts: Record<string, { visits: number; clicks: number }> = {};
+      currentVisits.forEach(v => {
+        if (v.utmCampaign) {
+          const camp = v.utmCampaign;
+          if (!campaignCounts[camp]) campaignCounts[camp] = { visits: 0, clicks: 0 };
+          campaignCounts[camp].visits++;
+        }
+      });
+      currentLogs.forEach(c => {
+        if (c.utmCampaign) {
+          const camp = c.utmCampaign;
+          if (!campaignCounts[camp]) campaignCounts[camp] = { visits: 0, clicks: 0 };
+          campaignCounts[camp].clicks++;
+        }
+      });
+      const sortedCampaigns = Object.entries(campaignCounts)
+        .map(([name, data]) => ({ name, ...data }))
+        .sort((a, b) => b.visits - a.visits);
+
       let chartData: Array<{ name: string; klik: number }> = [];
       if (analyticsTimeRange === 'today' || analyticsTimeRange === 'yesterday') {
         const hours = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
@@ -3269,6 +3432,59 @@ export default function AdminPanel({
       return (
         <div className="space-y-6" id="tab-content-analytics">
 
+          {/* Filter Rentang Waktu (Global Analytics Timerange) */}
+          <div className="bg-slate-50 border border-slate-100 p-4 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <span className="text-xs font-semibold text-slate-500 font-sans flex items-center gap-1.5 select-none hover:text-slate-700">
+              <Calendar className="w-4 h-4 text-indigo-500" /> Filter Rentang Waktu Laporan:
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5 self-stretch sm:self-auto justify-start sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setAnalyticsTimeRange('today')}
+                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
+                  analyticsTimeRange === 'today'
+                    ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-2xs font-extrabold'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                Hari Ini
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalyticsTimeRange('yesterday')}
+                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
+                  analyticsTimeRange === 'yesterday'
+                    ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-2xs font-extrabold'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                Kemarin
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalyticsTimeRange('7days')}
+                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
+                  analyticsTimeRange === '7days'
+                    ? 'bg-orange-50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                7 Hari
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalyticsTimeRange('30days')}
+                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
+                  analyticsTimeRange === '30days'
+                    ? 'bg-orange-50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                30 Hari
+              </button>
+            </div>
+          </div>
+
           <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-1.5">
@@ -3287,37 +3503,57 @@ export default function AdminPanel({
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-              <div className="border border-indigo-100 bg-indigo-600/3 rounded-2xl p-4 flex flex-col justify-between transition-all hover:bg-indigo-600/5 select-none">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
+              {/* Card 1: Klik Tautan */}
+              <div className="border border-indigo-100 bg-indigo-600/3 rounded-2xl p-4 flex flex-col justify-between transition-all hover:bg-indigo-600/5 select-none min-w-0">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase text-indigo-600 tracking-wider">Klik Tautan</span>
-                  <h4 className="text-2xl font-bold font-sans text-indigo-600 mt-1.5">{totalClicks}</h4>
+                  <span className="text-[10px] font-mono font-bold uppercase text-indigo-600 tracking-wider block">Klik Tautan</span>
+                  <h4 className="text-2xl font-bold font-sans text-indigo-600 mt-1.5 truncate">{totalClicks}</h4>
                 </div>
-                <div className={`text-[10px] sm:text-[9.5px] mt-3 shrink-0 flex items-center gap-1 font-sans ${trendColor}`}>
-                  <span>Pertumbuhan: </span>
-                  <span className="font-extrabold">{trendSymbol}{percentChange}%</span>
-                  <span className="opacity-70">vs lalu</span>
+                <div className={`text-[10px] sm:text-[9.5px] mt-3 shrink-0 flex flex-wrap items-center gap-x-1 gap-y-0.5 font-sans ${trendColor}`}>
+                  <span className="whitespace-nowrap">Kenaikan:</span>
+                  <span className="font-extrabold whitespace-nowrap">{trendSymbol}{percentChange}%</span>
+                  <span className="opacity-70 whitespace-nowrap">vs periode lalu</span>
                 </div>
               </div>
 
-              <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4 flex flex-col justify-between hover:bg-slate-50 select-none">
+              {/* Card 2: Pengunjung */}
+              <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4 flex flex-col justify-between hover:bg-slate-50 select-none min-w-0">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider">Rata-rata Klik / Hari</span>
-                  <h4 className="text-2xl font-bold font-sans text-slate-700 mt-1.5">{avgDailyClicks}</h4>
+                  <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block">Total Pengunjung</span>
+                  <h4 className="text-2xl font-bold font-sans text-slate-700 mt-1.5 truncate">{totalVisits}</h4>
                 </div>
-                <span className="text-[10px] text-slate-400 mt-3 block font-sans">Rasio rata-rata klik harian</span>
+                <div className={`text-[10px] sm:text-[9.5px] mt-3 shrink-0 flex flex-wrap items-center gap-x-1 gap-y-0.5 font-sans ${visitsTrendColor}`}>
+                  <span className="whitespace-nowrap">Tren:</span>
+                  <span className="font-extrabold whitespace-nowrap">{visitsTrendSymbol}{visitsPercentChange}%</span>
+                  <span className="opacity-70 whitespace-nowrap">vs periode lalu</span>
+                </div>
               </div>
 
-              <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4 flex flex-col justify-between hover:bg-slate-50 select-none">
+              {/* Card 3: CTR */}
+              <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4 flex flex-col justify-between hover:bg-slate-50 select-none min-w-0">
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider">Produk Terpopuler</span>
-                  <h4 className="text-xs font-display font-medium text-slate-800 line-clamp-1 mt-2 mb-1">
+                  <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block">Rasio Klik (CTR)</span>
+                  <h4 className="text-2xl font-bold font-sans text-indigo-600 mt-1.5 truncate">{ctrOverall}%</h4>
+                </div>
+                <div className={`text-[10px] sm:text-[9.5px] mt-3 shrink-0 flex flex-wrap items-center gap-x-1 gap-y-0.5 font-sans ${ctrTrendColor}`}>
+                  <span className="whitespace-nowrap">Konversi:</span>
+                  <span className="font-extrabold whitespace-nowrap">{ctrTrendSymbol}{ctrChange}%</span>
+                  <span className="opacity-70 whitespace-nowrap">vs lalu</span>
+                </div>
+              </div>
+
+              {/* Card 4: Produk Terpopuler */}
+              <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-4 flex flex-col justify-between hover:bg-slate-50 select-none min-w-0">
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-wider block">Produk Terpopuler</span>
+                  <h4 className="text-xs font-display font-medium text-slate-800 line-clamp-1 mt-2 mb-1 break-words">
                     {topLink ? topLink.title : 'Tidak ada data'}
                   </h4>
                 </div>
-                <div className="text-[10px] text-slate-400 mt-1 shrink-0 flex items-center justify-between font-sans">
-                  <span>{topLinkCount} klik</span>
-                  {topLink && <span className="font-mono text-emerald-600 font-extrabold">{topLinkContribution}% Share</span>}
+                <div className="text-[10px] text-slate-400 mt-3 shrink-0 flex flex-wrap items-center justify-between gap-x-1 gap-y-0.5 font-sans">
+                  <span className="whitespace-nowrap">{topLinkCount} klik</span>
+                  {topLink && <span className="font-mono text-emerald-600 font-extrabold whitespace-nowrap">{topLinkContribution}% Share</span>}
                 </div>
               </div>
             </div>
@@ -3374,83 +3610,48 @@ export default function AdminPanel({
             </div>
           </div>
 
-          {/* Filter letak di atas Performa Produk */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-slate-50 border border-slate-150 p-4 rounded-3xl mt-2">
-            <div className="flex flex-wrap gap-1.5 text-xs font-sans">
-              <button
-                type="button"
-                onClick={() => setAnalyticsSource('all')}
-                className={`px-3.5 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none text-[11px] ${
-                  analyticsSource === 'all' ? 'bg-indigo-600 text-white font-extrabold shadow-sm' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-100 hover:text-slate-800'
-                }`}
-              >
-                Semua Kategori
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalyticsSource('shopee')}
-                className={`px-3.5 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none text-[11px] ${
-                  analyticsSource === 'shopee' ? 'bg-indigo-600 text-white font-extrabold shadow-sm' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-100 hover:text-slate-800'
-                }`}
-              >
-                Tautan Shopee
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalyticsSource('medsos')}
-                className={`px-3.5 py-2 font-bold cursor-pointer transition-colors rounded-xl select-none text-[11px] ${
-                  analyticsSource === 'medsos' ? 'bg-indigo-600 text-white font-extrabold shadow-sm' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-100 hover:text-slate-800'
-                }`}
-              >
-                Sosial &amp; Lainnya
-              </button>
-            </div>
+          {/* SECTION: TRAFFIC SOURCES */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-sm font-display font-medium text-slate-800 flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-indigo-500" /> Platform Sumber Traffic
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Asal lalu lintas rujukan atau parameter UTM pengunjung</p>
+                </div>
+                <span className="text-[9px] font-mono font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100 uppercase tracking-wide">Asal Pengunjung</span>
+              </div>
 
-            <div className="flex flex-wrap items-center gap-1.5 self-stretch sm:self-auto justify-end">
-              <button
-                type="button"
-                onClick={() => setAnalyticsTimeRange('today')}
-                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
-                  analyticsTimeRange === 'today'
-                    ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-2xs font-extrabold'
-                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                Hari Ini
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalyticsTimeRange('yesterday')}
-                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
-                  analyticsTimeRange === 'yesterday'
-                    ? 'bg-indigo-50 border-indigo-600 text-indigo-600 shadow-2xs font-extrabold'
-                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                Kemarin
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalyticsTimeRange('7days')}
-                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
-                  analyticsTimeRange === '7days'
-                    ? 'bg-orange-50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
-                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                7 Hari
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalyticsTimeRange('30days')}
-                className={`px-3.5 py-2 text-[10px] font-semibold rounded-xl border transition-all cursor-pointer select-none ${
-                  analyticsTimeRange === '30days'
-                    ? 'bg-orange-50 border-[#ee4d2d] text-[#ee4d2d] shadow-2xs font-extrabold'
-                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-                }`}
-              >
-                30 Hari
-              </button>
+              <div className="space-y-3.5 mt-4">
+                {sortedSources.map((source) => {
+                  const maxVisits = Math.max(...sortedSources.map(s => s.visits), 1);
+                  const percentBar = Math.round((source.visits / maxVisits) * 100);
+                  const sharePercent = totalVisits > 0 ? Math.round((source.visits / totalVisits) * 100) : 0;
+                  
+                  return (
+                    <div key={source.name} className="space-y-1 font-sans">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-semibold text-slate-700">{source.name}</span>
+                        <div className="flex items-center gap-1.5 text-slate-500 font-mono text-[11px]">
+                          <span className="font-bold text-slate-800">{source.visits}</span>
+                          <span className="text-slate-400 text-[10px]">pengunjung</span>
+                          <span className="text-slate-300">|</span>
+                          <span className="font-bold text-indigo-600">{source.clicks}</span>
+                          <span className="text-slate-400 text-[10px]">klik</span>
+                          <span className="text-indigo-600 font-bold ml-1">({sharePercent}%)</span>
+                        </div>
+                      </div>
+                      <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-indigo-600 h-full rounded-full transition-all duration-500" 
+                          style={{ width: `${percentBar}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -3557,18 +3758,18 @@ export default function AdminPanel({
           </div>
 
           <div className="space-y-4">
-            {/* Latest Update v1.4.0 */}
+            {/* Latest Update v1.5.0 */}
             <div className="bg-white border-2 border-indigo-100 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50 rounded-full translate-x-24 -translate-y-24 -z-10" />
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 px-2.5 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 shrink-0 min-w-10">
-                    <span className="font-mono font-black text-xs text-white">v1.4.0</span>
+                    <span className="font-mono font-black text-xs text-white">v1.5.0</span>
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-display font-bold text-slate-800 truncate">Version 1.4.0 (Enhanced Creator Edition)</h3>
-                    <p className="text-[10px] font-mono text-slate-400 mt-0.5 truncate">LATEST STABLE BUILD • REFINED WORKSPACE</p>
-                     <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest truncate">Released: 12 June 2026</p>
+                    <h3 className="text-sm font-display font-bold text-slate-800 truncate">Version 1.5.0 (SEO &amp; Dynamic Tab Edition)</h3>
+                    <p className="text-[10px] font-mono text-slate-400 mt-0.5 truncate">LATEST STABLE BUILD • SEO READY</p>
+                    <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest truncate">Released: 13 June 2026</p>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-bold rounded-full font-mono border border-emerald-100 uppercase animate-pulse">Running Now</span>
@@ -3577,67 +3778,66 @@ export default function AdminPanel({
               <ul className="space-y-3">
                 <li className="flex gap-3">
                   <div className="shrink-0 w-5 h-5 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-indigo-600" />
+                    <Globe className="w-3 h-3 text-indigo-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Normalisasi Template &amp; White-labeling</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Menghapus referensi nama personal untuk mempermudah creator menggunakan aplikasi ini sebagai template mandiri.</p>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Pengaturan SEO (Judul Browser &amp; Favicon)</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Menambahkan fitur ganti judul tab peramban untuk halaman Linktree &amp; Ratecard secara dinamis serta pengunggahan ikon favicon (1:1) lengkap dengan rekomendasi panduan format gambar.</p>
                   </div>
                 </li>
                 <li className="flex gap-3">
                   <div className="shrink-0 w-5 h-5 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                    <PlusCircle className="w-3 h-3 text-emerald-600" />
+                    <Sparkles className="w-3 h-3 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Pembersihan Visual UI Admin</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Merapikan sidebar menu, memperbaiki layout yang tumpang tindih, dan menyederhanakan navigasi antar modul.</p>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Selamat Datang Dinamis &amp; Perbaikan Layout</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Memperkenalkan salam pembuka dinamis sesuai nama kreator di dasbor admin serta memperbaiki visual layout seksi teks/angka agar tidak tumpah/keluar dari kotak kontainer.</p>
                   </div>
                 </li>
               </ul>
             </div>
 
-            {/* Previous v1.3.0 */}
-            <div className="bg-slate-50 border border-slate-250 rounded-2xl p-5 opacity-90">
+            {/* Previous v1.4.0 */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 opacity-90">
               <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-200">
                 <div className="flex items-center gap-3">
-                  <span className="px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-mono font-bold rounded">v1.3.0</span>
-                  <p className="text-xs font-display font-medium text-slate-600 italic">Advanced Ratecard Customization</p>
+                  <span className="px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-mono font-bold rounded">v1.4.0</span>
+                  <p className="text-xs font-display font-medium text-slate-600 italic">Enhanced Creator Edition</p>
                 </div>
               </div>
               <ul className="space-y-2 text-[10px] text-slate-500">
-                <li>• Kustomisasi penuh Header Seksi (Badge, Judul, & Deskripsi) untuk Projects, Pricing, Brands, dan Terms.</li>
+                <li>• Normalisasi Template: Penggantian referensi nama pribadi dengan placeholder generic (e.g. Aesthetic Creator atau Kreator) untuk kebutuhan template white-label.</li>
+                <li>• Pembersihan Visual UI: Penyelarasan baris grid, penyesuaian navigasi, filter link, dan pembersihan komponen yang tidak digunakan.</li>
+              </ul>
+            </div>
+
+            {/* Previous v1.3.0 */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 opacity-80">
+              <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-200">
+                <div className="flex items-center gap-3">
+                  <span className="px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] font-mono font-bold rounded">v1.3.0</span>
+                  <p className="text-xs font-display font-medium text-slate-500 italic">Advanced Ratecard Customization</p>
+                </div>
+              </div>
+              <ul className="space-y-2 text-[10px] text-slate-400">
+                <li>• Kustomisasi penuh Header Seksi (Badge, Judul, &amp; Deskripsi) untuk Projects, Pricing, Brands, dan Terms.</li>
                 <li>• Penyesuaian real-time untuk Metrik Audiens (Stats section) langsung dari Admin Panel.</li>
-                <li>• Multi-line editor untuk Syarat & Ketentuan dengan preview bullet-point otomatis.</li>
+                <li>• Multi-line editor untuk Syarat &amp; Ketentuan dengan preview bullet-point otomatis.</li>
               </ul>
             </div>
 
             {/* Previous v1.2.0 */}
-            <div className="bg-slate-50 border border-slate-250 rounded-2xl p-5 opacity-90">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 opacity-70">
               <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-200">
                 <div className="flex items-center gap-3">
                   <span className="px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] font-mono font-bold rounded">v1.2.0</span>
                   <p className="text-xs font-display font-medium text-slate-500 italic">Optimasi Real-time &amp; Live Preview</p>
                 </div>
               </div>
-              <ul className="space-y-2 text-[10px] text-slate-500">
+              <ul className="space-y-2 text-[10px] text-slate-400">
                 <li>• Memperbaiki delay sinkronisasi kustomisasi layout bento grid atau classic list.</li>
                 <li>• Penambahan penyesuaian label tombol CTA (e.g. "Beli Sekarang", "Cek Promo").</li>
                 <li>• Perbaikan feedback visual real-time pada edit typography, button style, &amp; shadows.</li>
-              </ul>
-            </div>
-
-            {/* Previous v1.1.0 */}
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 opacity-70">
-              <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-200/50">
-                <div className="flex items-center gap-3">
-                  <span className="px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] font-mono font-bold rounded">v1.1.0</span>
-                  <p className="text-xs font-display font-medium text-slate-500 italic">Stability &amp; Feature Baseline</p>
-                </div>
-              </div>
-              <ul className="space-y-2 text-[10px] text-slate-400">
-                <li>• Initial release of Dark Theme support for Ratecard Profile.</li>
-                <li>• Social icons integration (WhatsApp &amp; YouTube redirect).</li>
-                <li>• Design Tab Beta (Typography selection - Inter, Space Grotesk).</li>
               </ul>
             </div>
           </div>
@@ -3648,7 +3848,7 @@ export default function AdminPanel({
 
       {/* Footer Administration Panel */}
       <div className="w-full text-center py-8 text-xs text-slate-400 font-mono mt-8 border-t border-slate-100">
-        <p>Admin Dashboard v1.4.0 | Personal Creator Workspace</p>
+        <p>Admin Dashboard v1.5.0 | Personal Creator Workspace</p>
       </div>
     </div>
   );

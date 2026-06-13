@@ -45,6 +45,47 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Track traffic query parameters & referrer
+  const [trafficContext] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      utmSource: params.get('utm_source') || '',
+      utmMedium: params.get('utm_medium') || '',
+      utmCampaign: params.get('utm_campaign') || '',
+      referrer: document.referrer || '',
+    };
+  });
+
+  // Register general page visit once per session
+  useEffect(() => {
+    if (currentView === 'admin') return;
+
+    const sessionKey = `visited_session_${currentView}`;
+    if (!sessionStorage.getItem(sessionKey)) {
+      sessionStorage.setItem(sessionKey, 'true');
+      
+      const registerVisit = async () => {
+        try {
+          await fetch('/api/visits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              referrer: trafficContext.referrer,
+              utmSource: trafficContext.utmSource,
+              utmMedium: trafficContext.utmMedium,
+              utmCampaign: trafficContext.utmCampaign,
+              viewType: currentView === 'ratecard' ? 'ratecard' : 'linktree'
+            })
+          });
+        } catch (err) {
+          console.error('Failed to log visit analytics', err);
+        }
+      };
+      
+      registerVisit();
+    }
+  }, [currentView, trafficContext]);
+
   // Fetch all initial linktree and ratecard content
   const loadData = async () => {
     try {
@@ -66,25 +107,51 @@ export default function App() {
     loadData();
   }, []);
 
-  // Sync document title to match Creator's Name dynamically
+  // Sync document title and favicon dynamically
   useEffect(() => {
     if (currentView === 'admin') {
       document.title = 'Admin Dashboard | Creator Workspace';
-    } else if (data?.profile?.name) {
+    } else if (data?.profile) {
       if (currentView === 'ratecard') {
-        document.title = `${data.profile.name} | Premium Ratecard`;
+        document.title = data.profile.ratecardTitle || `${data.profile.name} | Premium Ratecard`;
       } else {
-        document.title = `${data.profile.name} | Affiliate Links & Portfolio`;
+        document.title = data.profile.linktreeTitle || `${data.profile.name} | Affiliate Links & Portfolio`;
       }
     } else {
       document.title = 'Creator Linktree & Premium Ratecard';
     }
-  }, [currentView, data?.profile?.name]);
+  }, [currentView, data?.profile?.name, data?.profile?.ratecardTitle, data?.profile?.linktreeTitle]);
+
+  useEffect(() => {
+    const faviconUrl = data?.profile?.faviconUrl;
+    if (faviconUrl) {
+      const links = document.querySelectorAll("link[rel*='icon']");
+      if (links.length > 0) {
+        links.forEach((link: any) => {
+          link.href = faviconUrl;
+        });
+      } else {
+        const link = document.createElement('link');
+        link.rel = 'icon';
+        link.href = faviconUrl;
+        document.head.appendChild(link);
+      }
+    }
+  }, [data?.profile?.faviconUrl]);
 
   // Increment click counts in the background
   const registerClick = async (linkId: string) => {
     try {
-      await fetch(`/api/links/${linkId}/click`, { method: 'POST' });
+      await fetch(`/api/links/${linkId}/click`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          referrer: trafficContext.referrer,
+          utmSource: trafficContext.utmSource,
+          utmMedium: trafficContext.utmMedium,
+          utmCampaign: trafficContext.utmCampaign
+        })
+      });
       // Optimistic update local metrics
       if (data) {
         const updatedLinks = data.links.map(l => 
@@ -223,6 +290,7 @@ export default function App() {
                 projects={data.projects}
                 brands={data.brands}
                 clickLogs={data.clickLogs}
+                visitLogs={data.visitLogs}
               />
             </motion.div>
           )}

@@ -38,6 +38,20 @@ interface ClickLog {
   id: string;
   linkId: string;
   timestamp: string; // ISO String
+  referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+}
+
+interface VisitLog {
+  id: string;
+  timestamp: string; // ISO String
+  referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  viewType: 'linktree' | 'ratecard';
 }
 
 interface DesignSettings {
@@ -115,6 +129,11 @@ interface RatecardProfile {
   studioDirectorTitle?: string;
   studioEstdYear?: string;
 
+  // Custom SEO / Browser titles & Favicon
+  linktreeTitle?: string;
+  ratecardTitle?: string;
+  faviconUrl?: string;
+
   // Design Settings
   designSettings?: DesignSettings;
 }
@@ -164,6 +183,7 @@ interface DatabaseSchema {
   projects: RatecardProject[];
   brands?: RatecardBrand[];
   clickLogs?: ClickLog[];
+  visitLogs?: VisitLog[];
   githubSettings?: {
     enabled: boolean;
     token: string;
@@ -442,6 +462,15 @@ function readDb(): DatabaseSchema {
         const linksList = db.links || [];
         if (linksList.length > 0) {
           const now = new Date();
+          const clickSources = [
+            { utmSource: 'instagram', referrer: 'https://l.instagram.com/' },
+            { utmSource: 'tiktok', referrer: 'https://tiktok.com/' },
+            { utmSource: 'youtube', referrer: 'https://youtube.com/' },
+            { utmSource: 'whatsapp', referrer: 'https://wa.me/' },
+            { utmSource: '', referrer: 'https://google.com/' },
+            { utmSource: '', referrer: '' }
+          ];
+
           // Generate logs for the last 30 days
           for (let i = 30; i >= 0; i--) {
             const date = new Date();
@@ -473,10 +502,21 @@ function readDb(): DatabaseSchema {
                 const clickTime = new Date(date);
                 clickTime.setHours(hour, min, sec, 0);
                 
+                // Assign traffic source weights
+                const srcRand = Math.random();
+                let srcObj = clickSources[5]; // Direct
+                if (srcRand < 0.40) srcObj = clickSources[0]; // Instagram
+                else if (srcRand < 0.65) srcObj = clickSources[1]; // TikTok
+                else if (srcRand < 0.75) srcObj = clickSources[2]; // YouTube
+                else if (srcRand < 0.85) srcObj = clickSources[3]; // WhatsApp
+                else if (srcRand < 0.95) srcObj = clickSources[4]; // Google search
+
                 db.clickLogs.push({
                   id: `click-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
                   linkId: selectedLink.id,
-                  timestamp: clickTime.toISOString()
+                  timestamp: clickTime.toISOString(),
+                  referrer: srcObj.referrer || undefined,
+                  utmSource: srcObj.utmSource || undefined
                 });
               }
             }
@@ -485,6 +525,53 @@ function readDb(): DatabaseSchema {
           linksList.forEach((l: any) => {
             l.clicks = db.clickLogs.filter((log: any) => log.linkId === l.id).length;
           });
+        }
+        changed = true;
+      }
+
+      // Auto-populate page visit logs if missing or empty
+      if (!db.visitLogs || db.visitLogs.length === 0) {
+        db.visitLogs = [];
+        const now = new Date();
+        const visitSources = [
+          { utmSource: 'instagram', referrer: 'https://l.instagram.com/' },
+          { utmSource: 'tiktok', referrer: 'https://tiktok.com/' },
+          { utmSource: 'youtube', referrer: 'https://youtube.com/' },
+          { utmSource: 'whatsapp', referrer: 'https://wa.me/' },
+          { utmSource: '', referrer: 'https://google.com/' },
+          { utmSource: '', referrer: '' }
+        ];
+
+        // Seed visit logs for the last 30 days
+        for (let i = 30; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(now.getDate() - i);
+          
+          // Daily visits (generally higher than clicks, e.g., 10 to 30 visits per day)
+          const dailyVisitsCount = Math.floor(Math.random() * 20) + 12; // 12 to 31 visits
+          for (let v = 0; v < dailyVisitsCount; v++) {
+            const hr = Math.floor(Math.random() * 24);
+            const min = Math.floor(Math.random() * 60);
+            const sec = Math.floor(Math.random() * 60);
+            const visitTime = new Date(date);
+            visitTime.setHours(hr, min, sec, 0);
+
+            const srcRand = Math.random();
+            let srcObj = visitSources[5]; // Direct
+            if (srcRand < 0.45) srcObj = visitSources[0]; // Instagram
+            else if (srcRand < 0.70) srcObj = visitSources[1]; // TikTok
+            else if (srcRand < 0.80) srcObj = visitSources[2]; // YouTube
+            else if (srcRand < 0.88) srcObj = visitSources[3]; // WhatsApp
+            else if (srcRand < 0.95) srcObj = visitSources[4]; // Google
+
+            db.visitLogs.push({
+              id: `visit-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+              timestamp: visitTime.toISOString(),
+              utmSource: srcObj.utmSource || undefined,
+              referrer: srcObj.referrer || undefined,
+              viewType: Math.random() < 0.65 ? 'linktree' : 'ratecard'
+            });
+          }
         }
         changed = true;
       }
@@ -1240,22 +1327,53 @@ app.post('/api/github/import-pc-zip', express.raw({ type: 'application/zip', lim
   }
 });
 
+// Log Page Visits (Public)
+app.post('/api/visits', (req, res) => {
+  const { referrer, utmSource, utmMedium, utmCampaign, viewType } = req.body;
+  const db = readDb();
+  
+  if (!db.visitLogs) {
+    db.visitLogs = [];
+  }
+  
+  const newVisit = {
+    id: `visit-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+    timestamp: new Date().toISOString(),
+    referrer: referrer || undefined,
+    utmSource: utmSource || undefined,
+    utmMedium: utmMedium || undefined,
+    utmCampaign: utmCampaign || undefined,
+    viewType: viewType || 'linktree'
+  };
+  
+  db.visitLogs.push(newVisit);
+  writeDb(db);
+  
+  res.json({ success: true });
+});
+
 // Increment Link Clicks (Public)
 app.post('/api/links/:id/click', (req, res) => {
   const { id } = req.params;
+  const { referrer, utmSource, utmMedium, utmCampaign } = req.body;
+  
   const db = readDb();
   const link = db.links.find(l => l.id === id);
   if (link) {
     link.clicks = (link.clicks || 0) + 1;
     
-    // Log click event with precise timestamp
     if (!db.clickLogs) {
       db.clickLogs = [];
     }
+    
     db.clickLogs.push({
       id: `click-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       linkId: id,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      referrer: referrer || req.query.referrer || undefined,
+      utmSource: utmSource || req.query.utmSource || undefined,
+      utmMedium: utmMedium || req.query.utmMedium || undefined,
+      utmCampaign: utmCampaign || req.query.utmCampaign || undefined
     });
     
     writeDb(db);
@@ -1361,7 +1479,8 @@ app.put('/api/ratecard/profile', (req, res) => {
     pricingBadge, pricingTitle, pricingDescription,
     brandsBadge, brandsTitle,
     termsBadge, termsTitle, termsDescription,
-    contactBadge, contactTitle, contactTitleHighlight, contactDescription
+    contactBadge, contactTitle, contactTitleHighlight, contactDescription,
+    linktreeTitle, ratecardTitle, faviconUrl
   } = req.body;
   const db = readDb();
   
@@ -1384,6 +1503,9 @@ app.put('/api/ratecard/profile', (req, res) => {
     termsOfService: termsOfService !== undefined ? termsOfService : db.profile.termsOfService,
     studioDirectorTitle: studioDirectorTitle !== undefined ? studioDirectorTitle : db.profile.studioDirectorTitle,
     studioEstdYear: studioEstdYear !== undefined ? studioEstdYear : db.profile.studioEstdYear,
+    linktreeTitle: linktreeTitle !== undefined ? linktreeTitle : db.profile.linktreeTitle,
+    ratecardTitle: ratecardTitle !== undefined ? ratecardTitle : db.profile.ratecardTitle,
+    faviconUrl: faviconUrl !== undefined ? faviconUrl : db.profile.faviconUrl,
     designSettings: designSettings !== undefined ? designSettings : db.profile.designSettings,
     statsBadge: statsBadge !== undefined ? statsBadge : db.profile.statsBadge,
     statsTitle: statsTitle !== undefined ? statsTitle : db.profile.statsTitle,
