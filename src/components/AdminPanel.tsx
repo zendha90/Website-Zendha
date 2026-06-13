@@ -54,7 +54,8 @@ import {
   Image,
   Cloud,
   Calendar,
-  Globe
+  Globe,
+  Server
 } from 'lucide-react';
 import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog, VisitLog } from '../types';
 import DesignSettingsForm from './DesignSettingsForm';
@@ -598,6 +599,31 @@ export default function AdminPanel({
     }
   };
 
+  const handleExportSqlDump = async () => {
+    try {
+      const response = await fetch('/api/backup/export-sql', {
+        headers: getAuthHeader()
+      });
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", url);
+        downloadAnchor.setAttribute("download", `database_migration_phpmyadmin_${new Date().toISOString().split('T')[0]}.sql`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        window.URL.revokeObjectURL(url);
+        showToast('Sukses! File database .sql siap import berhasil diunduh.');
+      } else {
+        const errData = await response.json().catch(() => ({ message: 'Gagal mengunduh script SQL' }));
+        showToast(errData.message || 'Gagal mengunduh SQL', 'error');
+      }
+    } catch (err) {
+      showToast('Koneksi gagal saat mengunduh SQL', 'error');
+    }
+  };
+
   const handleBackupFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -733,7 +759,8 @@ export default function AdminPanel({
       title: '',
       price: 'Rp ',
       description: '',
-      icon: 'Video',
+      icon: 'Briefcase',
+      category: 'OFFICIAL PLACEMENT',
       isActive: true,
       priority: services.length + 1
     });
@@ -1909,7 +1936,7 @@ export default function AdminPanel({
                   <div>
                     <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Kategori / Placement Text</label>
                     <select
-                      value={['OFFICIAL PLACEMENT', 'Instagram', 'Tiktok', 'Youtube'].includes(editingService.category || 'OFFICIAL PLACEMENT') ? (editingService.category || 'OFFICIAL PLACEMENT') : 'Custom Text'}
+                      value={(!['OFFICIAL PLACEMENT', 'Instagram', 'Tiktok', 'Youtube'].includes(editingService.category ?? 'OFFICIAL PLACEMENT') || editingService.category === '') ? 'Custom Text' : (editingService.category || 'OFFICIAL PLACEMENT')}
                       onChange={(e) => {
                         const val = e.target.value;
                         if (val === 'Custom Text') {
@@ -1926,7 +1953,7 @@ export default function AdminPanel({
                       <option value="Youtube">Youtube</option>
                       <option value="Custom Text">Custom Text...</option>
                     </select>
-                    {!['OFFICIAL PLACEMENT', 'Instagram', 'Tiktok', 'Youtube'].includes(editingService.category || 'OFFICIAL PLACEMENT') && (
+                    {(!['OFFICIAL PLACEMENT', 'Instagram', 'Tiktok', 'Youtube'].includes(editingService.category ?? 'OFFICIAL PLACEMENT') || editingService.category === '') && (
                       <input 
                         type="text" 
                         placeholder="Ketik kategori kustom..."
@@ -2724,9 +2751,6 @@ export default function AdminPanel({
           {/* Informational Hero Card */}
           <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="space-y-1">
-              <span className="text-[10px] font-mono bg-indigo-50 border border-indigo-150 px-2.5 py-1 rounded text-indigo-700 uppercase font-black tracking-wider">
-                Sistem Backup Terpadu (JSON)
-              </span>
               <h2 className="text-base font-display font-medium text-slate-800 mt-2">
                 Simpan &amp; Pulihkan Data Anda Kapan Saja
               </h2>
@@ -2744,8 +2768,8 @@ export default function AdminPanel({
                 <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4">
                   <Download className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-display font-bold text-slate-800 flex items-center gap-2">
-                  <Download className="w-4 h-4 text-indigo-500" /> Ekspor/Unduh Backup
+                <h3 className="text-sm font-display font-bold text-slate-800 mb-2">
+                  Ekspor/Unduh Backup
                 </h3>
                 <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
                   Cadangkan seluruh data yang telah Anda edit ke dalam file komputer lokal Anda. Berkas ini dapat digunakan sewaktu-waktu jika database website terhapus atau dideploy ulang.
@@ -2774,9 +2798,10 @@ export default function AdminPanel({
 
               <button
                 onClick={handleExportDatabase}
-                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer font-sans"
+                className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer font-sans"
               >
-                <Download className="w-4 h-4" /> Ekspor &amp; Unduh Berkas JSON Backup
+                <Download className="w-4 h-4 shrink-0" /> 
+                <span className="truncate">Unduh Backup JSON</span>
               </button>
             </div>
 
@@ -2786,8 +2811,8 @@ export default function AdminPanel({
                 <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 mb-4">
                   <Upload className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-display font-bold text-slate-800 flex items-center gap-2">
-                  <Upload className="w-4 h-4 text-indigo-500" /> Impor/Pulihkan Backup
+                <h3 className="text-sm font-display font-bold text-slate-800 mb-2">
+                  Impor/Pulihkan Backup
                 </h3>
                 <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
                   Unggah berkas backup `.json` yang telah Anda ekspor sebelumnya untuk memulihkan semua links dan layout ratecard Anda. Tindakan ini akan sepenuhnya MENIMPA database saat ini.
@@ -2830,29 +2855,86 @@ export default function AdminPanel({
               <button
                 onClick={handleImportDatabase}
                 disabled={!importFileContent || isImporting}
-                className={`w-full py-3 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 font-sans ${
+                className={`w-full px-4 py-3 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 font-sans ${
                   importFileContent && !isImporting
                     ? 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer'
                     : 'bg-slate-300 cursor-not-allowed opacity-75'
                 }`}
               >
                 {isImporting ? (
-                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <RefreshCw className="w-4 h-4 animate-spin shrink-0" />
                 ) : (
-                  <Upload className="w-4 h-4" />
+                  <Upload className="w-4 h-4 shrink-0" />
                 )}
-                {isImporting ? 'Memulihkan Data...' : 'Pulihkan Sekarang (Terapkan Backup)'}
+                <span className="truncate whitespace-normal text-center leading-tight">
+                  {isImporting ? 'Memulihkan...' : 'Pulihkan Data JSON'}
+                </span>
               </button>
             </div>
 
           </div>
 
-          {/* 💻 Cadangan Lokal Komputer (Ekspor / Impor Berkas ZIP) */}
+          {/* 🗄️ STRATEGI MIGRASI MYSQL / HOSTING CPANEL */}
+          <div className="mt-8 pt-8 border-t border-slate-150 space-y-4">
+            <div className="flex items-center gap-2">
+              <Server className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider font-mono">
+                Migrasi Database ke phpMyAdmin / MySQL
+              </h3>
+            </div>
+            <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
+              Opsi <strong>Migrasi Database Terpusat</strong> memungkinkan Anda menggunakan template ini pada layanan Cloud Hosting (seperti cPanel) milik Anda. Melalui arsitektur <em>Dual Engine</em>, aplikasi ini dapat secara otomatis beralih menggunakan database <strong>MySQL</strong> daripada JSON statis lokal tanpa memerlukan perombakan kode. Cukup aktifkan dengan menyesuaikan parameter pada berkas <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-600">.env</code> Anda.
+            </p>
+
+            <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4">
+                  <Server className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-display font-bold text-slate-800 mb-2">
+                  Ekspor Skema Database (SQL)
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed mb-6">
+                  Sistem secara komprehensif mengumpulkan seluruh data CMS dari template saat ini, lalu menghasilkan struktur siap unggah dalam format <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-600">.sql</code>. Berkas kompresi ini mempermudah migrasi data struktur secara efisien ke infrastruktur produksi tingkat lanjut yang didukung <strong>MySQL/MariaDB</strong> via phpMyAdmin.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleExportSqlDump}
+                className="w-full px-4 py-3 bg-indigo-600 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer font-sans"
+              >
+                <Download className="w-4 h-4 shrink-0" /> <span className="truncate">Unduh SQL (.sql)</span>
+              </button>
+            </div>
+
+            {/* Step-by-Step Guide*/}
+            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6">
+              <h5 className="text-[11px] font-mono font-bold text-indigo-700 uppercase tracking-wider mb-3">Panduan Integrasi Database MySQL / cPanel:</h5>
+              <ol className="text-[11px] text-slate-600 space-y-3 list-decimal list-inside leading-relaxed">
+                <li>Buat <strong>Database MySQL</strong> beserta akun Pengguna (User) dan Kata Sandi (Password) pada konfigurasi Hosting Anda.</li>
+                <li>Buka layanan administrasi database (seperti <strong>phpMyAdmin</strong>), navigasi ke tab <strong>Import</strong>, dan unggah berkas berekstensi <code className="bg-slate-200 px-1 py-0.5 rounded text-slate-700">.sql</code> hasil ekstraksi di atas.</li>
+                <li>Sinkronisasikan kredensial sistem melalui <em>Environment Variables</em> dengan membuat berkas bernama <code className="bg-slate-200 px-1 py-0.5 rounded text-slate-700">.env</code> di direktori asal web Anda:
+                  <pre className="bg-slate-800 text-slate-100 p-3 rounded-xl font-mono text-[10px] mt-2 leading-relaxed overflow-x-auto shadow-inner">
+{`# Parameter Konektivitas Database MySQL
+DB_TYPE=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=nama_pengguna_database_anda
+DB_PASSWORD=kata_sandi_database_anda
+DB_NAME=nama_database_anda`}
+                  </pre>
+                </li>
+                <li>Operasi template web ini kini mutlak terhubung dengan instans database MySQL secara persisten sepenuhnya.</li>
+              </ol>
+            </div>
+          </div>
+
+          {/* 💻 Cadangan Lokal Komputer Pusat Manajemen File */}
           <div className="mt-8 pt-8 border-t border-slate-150 space-y-4">
             <div className="flex items-center gap-2">
               <Database className="w-5 h-5 text-indigo-600" />
-              <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider font-mono flex items-center gap-2">
-                <Database className="w-3.5 h-3.5 text-indigo-500" /> Cadangan Lokal Komputer (Ekspor / Impor Berkas ZIP)
+              <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider font-mono">
+                Cadangan Data Komputer Lokal
               </h3>
             </div>
             <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
@@ -2866,8 +2948,8 @@ export default function AdminPanel({
                   <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 mb-4">
                     <Download className="w-5 h-5" />
                   </div>
-                  <h3 className="text-sm font-display font-bold text-slate-800 flex items-center gap-2">
-                    <FileArchive className="w-4 h-4 text-indigo-500" /> Unduh Cadangan Lengkap ke Komputer (.zip)
+                  <h3 className="text-sm font-display font-bold text-slate-800 mb-2">
+                    Unduh Cadangan Lengkap ke Komputer (.zip)
                   </h3>
                   <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
                     Mendownload bundel data utuh berisi database serta seluruh berkas gambar yang tersimpan ke dalam komputer Anda dalam satu folder berkas ZIP yang aman dan lengkap.
@@ -2877,17 +2959,17 @@ export default function AdminPanel({
                   type="button"
                   disabled={isExportingPCZip || isImportingPCZip}
                   onClick={handleExportZipToPC}
-                  className="w-full py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer font-sans"
+                  className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer font-sans"
                 >
                   {isExportingPCZip ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Menyiapkan Berkas ZIP...
+                      <RefreshCw className="w-4 h-4 animate-spin shrink-0" />
+                      <span className="truncate">Menyiapkan...</span>
                     </>
                   ) : (
                     <>
-                      <Download className="w-4 h-4" />
-                      Unduh Cadangan ZIP ke PC
+                      <Download className="w-4 h-4 shrink-0" />
+                      <span className="truncate">Unduh ZIP</span>
                     </>
                   )}
                 </button>
@@ -2899,25 +2981,25 @@ export default function AdminPanel({
                   <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
                     <Upload className="w-5 h-5" />
                   </div>
-                  <h3 className="text-sm font-display font-bold text-slate-800 flex items-center gap-2">
-                    <UploadCloud className="w-4 h-4 text-indigo-500" /> Unggah &amp; Pulihkan Cadangan ZIP dari Komputer
+                  <h3 className="text-sm font-display font-bold text-slate-800 mb-2">
+                    Unggah &amp; Pulihkan Cadangan dari Komputer
                   </h3>
                   <p className="text-xs text-slate-400 mt-1 mb-6 leading-relaxed">
                     Pilih file ZIP cadangan dari komputer Anda untuk memulihkan seluruh database dan meregenerasi file gambar-gambar di server Anda secara instan.
                   </p>
                 </div>
-                <label className={`w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer font-sans text-center select-none ${
+                <label className={`w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer font-sans text-center select-none ${
                   (isExportingPCZip || isImportingPCZip) ? 'opacity-50 pointer-events-none' : ''
                 }`}>
                   {isImportingPCZip ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Memulihkan Berkas ZIP...
+                      <RefreshCw className="w-4 h-4 animate-spin shrink-0" />
+                      <span className="truncate">Memulihkan...</span>
                     </>
                   ) : (
                     <>
-                      <Upload className="w-4 h-4" />
-                      Pilih & Unggah File ZIP PC
+                      <Upload className="w-4 h-4 shrink-0" />
+                      <span className="truncate">Pulihkan ZIP</span>
                     </>
                   )}
                   <input

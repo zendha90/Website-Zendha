@@ -1,8 +1,12 @@
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import AdmZip from 'adm-zip';
+import { setupMysqlTables, loadDbFromMysql, writeDbToMysql, generateSqlDump } from './src/db/mysql';
+
+let cachedDbState: DatabaseSchema | null = null;
 
 const app = express();
 const PORT = 3000;
@@ -374,6 +378,9 @@ const DEFAULT_DB: DatabaseSchema = {
 
 // Database helper functions
 function readDb(): DatabaseSchema {
+  if (cachedDbState) {
+    return cachedDbState;
+  }
   try {
     if (fs.existsSync(DATA_FILE)) {
       const content = fs.readFileSync(DATA_FILE, 'utf-8');
@@ -592,8 +599,14 @@ function readDb(): DatabaseSchema {
 }
 
 function writeDb(data: DatabaseSchema): boolean {
+  cachedDbState = data;
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    if (process.env.DB_TYPE === 'mysql') {
+      writeDbToMysql(data).catch((err) => {
+        console.error('MySQL Async Write-Through Failed:', err);
+      });
+    }
     return true;
   } catch (err) {
     console.error("CRITICAL ERROR: Gagal menulis ke database file (db.json). Periksa izin akses file di server!", err);
@@ -697,6 +710,27 @@ app.get('/api/backup/export', (req, res) => {
     res.json({ success: true, database: db });
   } catch (err: any) {
     res.status(500).json({ success: false, message: 'Gagal mengekspor database: ' + err.message });
+  }
+});
+
+// Export phpMyAdmin-ready SQL Dump (Admin only)
+app.get('/api/backup/export-sql', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+  try {
+    const db = readDb();
+    const sqlDump = generateSqlDump(db);
+    
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `creator_portfolio_database_${timestamp}.sql`;
+
+    res.setHeader('Content-Type', 'application/sql');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', Buffer.byteLength(sqlDump, 'utf8'));
+    res.send(sqlDump);
+  } catch (err: any) {
+    console.error("Error generating SQL dump:", err);
+    res.status(500).json({ success: false, message: 'Gagal membuat SQL dump: ' + err.message });
   }
 });
 
@@ -1757,6 +1791,23 @@ app.delete('/api/ratecard/brands/:id', (req, res) => {
 // ---------------- ASSET SERVING & INTEGRATION ----------------
 
 async function startServer() {
+  console.log('[Database] Checking configuration...');
+  if (process.env.DB_TYPE === 'mysql') {
+    const success = await setupMysqlTables();
+    if (success) {
+      console.log('[Database] Loading state from MySQL...');
+      const localFallback = readDb();
+      cachedDbState = await loadDbFromMysql(localFallback);
+      console.log('[Database] Successfully initialized with MySQL Cache!');
+    } else {
+      console.log('[Database] Setup MySQL failed. Falling back to JSON database...');
+      cachedDbState = readDb();
+    }
+  } else {
+    console.log('[Database] Initializing with standard local JSON database...');
+    cachedDbState = readDb();
+  }
+
   if (process.env.NODE_ENV !== "production") {
     // Vite Dev Mode Middleware setup
     const vite = await createViteServer({
