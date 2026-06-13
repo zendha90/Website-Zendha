@@ -1,26 +1,33 @@
-name: Auto Deploy ke cPanel
+name: Deploy Website Otomatis
 
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
-  build-and-deploy:
+  web-deploy:
+    name: Build & Deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Build
+      - name: Ambil kode dari repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install & Build
         run: |
           npm install
           npm run build
-          
-      - name: Deploy ke cPanel
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+
+      - name: Kirim ke cPanel (FTP)
+        uses: SamKirkland/FTP-Deploy-Action@v4.5.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          server-dir: /public_html/
+          server-dir: /public_html/node-app/dist/
