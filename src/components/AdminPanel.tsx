@@ -2769,7 +2769,7 @@ export default function AdminPanel({
             <div className="space-y-1">
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border w-max mb-2 ${dbEngine === 'mysql' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                 <Database className="w-3 h-3" />
-                Sistem Mesin Aktif: {dbEngine === 'mysql' ? 'MySQL Database' : 'JSON Local Data'}
+                Status koneksi database: {dbEngine === 'mysql' ? 'MySQL Database' : 'JSON Local Data'}
               </span>
               <h2 className="text-base font-display font-medium text-slate-800 mt-2">
                 Simpan &amp; Pulihkan Data Anda Kapan Saja
@@ -2937,7 +2937,7 @@ export default function AdminPanel({
                   <pre className="bg-slate-800 text-slate-100 p-3 rounded-xl font-mono text-[10px] mt-2 leading-relaxed overflow-x-auto shadow-inner">
 {`# Parameter Konektivitas Database MySQL
 DB_TYPE=mysql
-DB_HOST=127.0.0.1
+DB_HOST=localhost
 DB_PORT=3306
 DB_USER=nama_pengguna_database_anda
 DB_PASSWORD=kata_sandi_database_anda
