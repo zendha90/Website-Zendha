@@ -641,7 +641,7 @@ export default function RatecardView({
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.05]">
                       <div className="space-y-1.5">
                         <span className="text-[10px] font-mono font-bold tracking-[0.2em] text-[#8B82F6] uppercase bg-[#8B82F6]/10 px-3 py-1 rounded-full border border-[#8B82F6]/15">
-                          OFFICIAL PLACEMENT
+                          {rate.category || 'OFFICIAL PLACEMENT'}
                         </span>
                         <h3 className="text-xl sm:text-2xl font-sans font-extrabold text-white leading-tight">
                           {rate.title}

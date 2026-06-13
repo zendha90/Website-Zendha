@@ -1905,22 +1905,40 @@ export default function AdminPanel({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
                   <div>
-                    <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Aesthetic Icon Representasi</label>
+                    <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Kategori / Placement Text</label>
                     <select
-                      value={editingService.icon || 'Video'}
-                      onChange={(e) => setEditingService({...editingService, icon: e.target.value})}
+                      value={['OFFICIAL PLACEMENT', 'Instagram', 'Tiktok', 'Youtube'].includes(editingService.category || 'OFFICIAL PLACEMENT') ? (editingService.category || 'OFFICIAL PLACEMENT') : 'Custom Text'}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === 'Custom Text') {
+                          setEditingService({...editingService, category: ''});
+                        } else {
+                          setEditingService({...editingService, category: val});
+                        }
+                      }}
                       className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400 font-sans"
                     >
-                      <option value="Video">Video (TikTok/Instagram Shorts)</option>
-                      <option value="Youtube">Youtube Logo (Dedicated)</option>
-                      <option value="Instagram">Instagram Logo (Story / Feed)</option>
-                      <option value="Camera">Camera (Photography)</option>
-                      <option value="MessageSquare">MessageSquare (Review/Sponsorship)</option>
-                      <option value="Briefcase">Briefcase (Custom Partnership)</option>
+                      <option value="OFFICIAL PLACEMENT">OFFICIAL PLACEMENT</option>
+                      <option value="Instagram">Instagram</option>
+                      <option value="Tiktok">Tiktok</option>
+                      <option value="Youtube">Youtube</option>
+                      <option value="Custom Text">Custom Text...</option>
                     </select>
+                    {!['OFFICIAL PLACEMENT', 'Instagram', 'Tiktok', 'Youtube'].includes(editingService.category || 'OFFICIAL PLACEMENT') && (
+                      <input 
+                        type="text" 
+                        placeholder="Ketik kategori kustom..."
+                        value={editingService.category || ''}
+                        onChange={(e) => setEditingService({...editingService, category: e.target.value})}
+                        className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400 font-sans mt-2"
+                      />
+                    )}
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Urutan Prioritas Tampil</label>
                     <input 
@@ -2063,7 +2081,7 @@ export default function AdminPanel({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-mono bg-slate-100 border px-2 py-0.5 rounded text-slate-550 uppercase">
-                          Icon: {service.icon}
+                          {service.category || 'OFFICIAL PLACEMENT'}
                         </span>
                         <span className="text-[10px] font-mono text-slate-450">
                           Priority: {service.priority}
@@ -2121,7 +2139,9 @@ export default function AdminPanel({
       {activeTab === 'profile' && (
         <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm" id="tab-content-profile">
           <div className="mb-6">
-            <h2 className="text-md font-display font-bold text-slate-800">Informasi Profil Pembuat Konten</h2>
+            <h2 className="text-md font-display font-bold text-slate-800 flex items-center gap-2">
+              <User className="w-4 h-4 text-indigo-500" /> Informasi Profil Pembuat Konten
+            </h2>
             <p className="text-xs text-slate-400">Informasi ini akan langsung sinkron pada halaman utama Linktree dan Ratecard Anda.</p>
           </div>
 
@@ -2236,7 +2256,9 @@ export default function AdminPanel({
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Browser Halaman Tautan (Linktree)</label>
+                    <label className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">
+                      <LinkIcon className="w-3.5 h-3.5 text-indigo-500" /> Judul Browser Halaman Tautan (Linktree)
+                    </label>
                     <input 
                       type="text" 
                       placeholder="Contoh: Aesthetic Creator | Affiliate Links & Portfolio"
@@ -2247,7 +2269,9 @@ export default function AdminPanel({
                     <p className="text-[10px] text-slate-400 mt-1">Ganti judul di tab peramban untuk halaman list linktree utama.</p>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Browser Halaman Ratecard (Portfolio)</label>
+                    <label className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">
+                      <Briefcase className="w-3.5 h-3.5 text-indigo-500" /> Judul Browser Halaman Ratecard (Portfolio)
+                    </label>
                     <input 
                       type="text" 
                       placeholder="Contoh: Aesthetic Creator | Premium Ratecard"
@@ -2260,7 +2284,9 @@ export default function AdminPanel({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Favicon Website (Ikon Browser)</label>
+                  <label className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">
+                    <Globe className="w-3.5 h-3.5 text-indigo-500" /> Favicon Website (Ikon Browser)
+                  </label>
                   <div className="flex gap-2 items-center">
                     <input 
                       type="text" 

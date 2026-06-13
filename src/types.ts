@@ -104,6 +104,7 @@ export interface RatecardService {
   price: string;
   description: string;
   icon: string;
+  category?: string;
   isActive: boolean;
   priority: number;
   additionalFees?: Array<{ label: string; value: string }>;

@@ -144,6 +144,7 @@ interface RatecardService {
   price: string;
   description: string;
   icon: string; // Video, Instagram, Youtube, MessageSquare, Briefcase, etc.
+  category?: string;
   isActive: boolean;
   priority: number;
   additionalFees?: Array<{ label: string; value: string }>;
@@ -1535,7 +1536,7 @@ app.put('/api/ratecard/profile', (req, res) => {
 app.post('/api/ratecard/services', (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
   
-  const { title, price, description, icon, isActive, priority, additionalFees } = req.body;
+  const { title, price, description, icon, category, isActive, priority, additionalFees } = req.body;
   if (!title || !price) {
     return res.status(400).json({ success: false, message: 'Title dan Price wajib diisi' });
   }
@@ -1547,6 +1548,7 @@ app.post('/api/ratecard/services', (req, res) => {
     price,
     description: description || '',
     icon: icon || 'Briefcase',
+    category: category || 'OFFICIAL PLACEMENT',
     isActive: isActive !== false,
     priority: Number(priority) || (db.services.length + 1),
     additionalFees: additionalFees || []
@@ -1564,7 +1566,7 @@ app.put('/api/ratecard/services/:id', (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
   
   const { id } = req.params;
-  const { title, price, description, icon, isActive, priority, additionalFees } = req.body;
+  const { title, price, description, icon, category, isActive, priority, additionalFees } = req.body;
   
   const db = readDb();
   const index = db.services.findIndex(s => s.id === id);
@@ -1578,6 +1580,7 @@ app.put('/api/ratecard/services/:id', (req, res) => {
     price: price !== undefined ? price : db.services[index].price,
     description: description !== undefined ? description : db.services[index].description,
     icon: icon !== undefined ? icon : db.services[index].icon,
+    category: category !== undefined ? category : db.services[index].category,
     isActive: isActive !== undefined ? isActive : db.services[index].isActive,
     priority: priority !== undefined ? Number(priority) : db.services[index].priority,
     additionalFees: additionalFees !== undefined ? additionalFees : db.services[index].additionalFees
