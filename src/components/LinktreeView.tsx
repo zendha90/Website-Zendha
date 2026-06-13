@@ -75,12 +75,26 @@ export default function LinktreeView({
     .slice(0, 3)
     .map(link => link.id);
 
-  // All active links which define their permanent original index/ID numbers
-  const activeLinks = links.filter(l => l.isActive);
+  const sortOrder = profile.designSettings?.linksSortOrder || 'asc';
 
-  // Filter links based purely on the search criteria, including matching their permanent index
-  const filteredLinks = activeLinks.filter((link, index) => {
-    const permanentNumber = (index + 1).toString();
+  // Keep original list of active links used for calculating the unchanged permanent serial numbers
+  const originalActiveLinks = [...links].filter(l => l.isActive);
+
+  // All active links sorted by user preference
+  const activeLinks = [...originalActiveLinks]
+    .sort((a, b) => {
+      const priorityA = a.priority || 0;
+      const priorityB = b.priority || 0;
+      if (sortOrder === 'desc') {
+        return priorityB - priorityA;
+      }
+      return priorityA - priorityB;
+    });
+
+  // Filter links based purely on the search criteria, matching their permanent index
+  const filteredLinks = activeLinks.filter((link) => {
+    const originalIndex = originalActiveLinks.findIndex(l => l.id === link.id);
+    const permanentNumber = (originalIndex !== -1 ? originalIndex + 1 : 1).toString();
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
     
@@ -370,8 +384,8 @@ export default function LinktreeView({
             /* CLASSIC STACKED LIST LAYOUT MODE */
             <div className="flex flex-col gap-3.5 w-full" id="links-list">
               {filteredLinks.map((link, idx) => {
-                const activeIndex = activeLinks.findIndex(l => l.id === link.id);
-                const sequenceNumber = activeIndex !== -1 ? activeIndex + 1 : idx + 1;
+                const originalIndex = originalActiveLinks.findIndex(l => l.id === link.id);
+                const sequenceNumber = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
                 return (
                   <motion.div
                     key={link.id}
@@ -454,8 +468,8 @@ export default function LinktreeView({
             /* COLLAPSIBLE BENTO DECORATIVE GRID LAYOUT MODE */
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 w-full" id="links-grid">
               {filteredLinks.map((link, idx) => {
-                const activeIndex = activeLinks.findIndex(l => l.id === link.id);
-                const sequenceNumber = activeIndex !== -1 ? activeIndex + 1 : idx + 1;
+                const originalIndex = originalActiveLinks.findIndex(l => l.id === link.id);
+                const sequenceNumber = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
                 return (
                   <motion.div
                     key={link.id}

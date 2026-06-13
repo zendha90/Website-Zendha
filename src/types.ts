@@ -36,6 +36,7 @@ export interface DesignSettings {
   backgroundType?: 'solid' | 'gradient' | 'glass';
   cardOpacity?: number;
   hoverAnimation?: 'scale' | 'lift' | 'tilt' | 'none';
+  linksSortOrder?: 'asc' | 'desc';
 }
 
 export interface RatecardProfile {

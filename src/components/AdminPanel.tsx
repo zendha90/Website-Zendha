@@ -1472,7 +1472,7 @@ export default function AdminPanel({
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="col-span-1">
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Tagline Atas Badge</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1 md:min-h-[32px]">Tagline Atas Badge</label>
                 <input 
                   type="text" 
                   value={profileForm.heroTagline || ''}
@@ -1482,7 +1482,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Headline Utama (Bagian 1)</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1 md:min-h-[32px]">Headline Utama (Bagian 1)</label>
                 <input 
                   type="text" 
                   value={profileForm.heroTitle1 || ''}
@@ -1492,7 +1492,7 @@ export default function AdminPanel({
                 />
               </div>
               <div className="col-span-1">
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Headline Bagian Sorot (Gradient)</label>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1 md:min-h-[32px]">Headline Bagian Sorot (Gradient)</label>
                 <input 
                   type="text" 
                   value={profileForm.heroTitleHighlight || ''}

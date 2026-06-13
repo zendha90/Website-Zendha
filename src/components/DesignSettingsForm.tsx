@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Palette, LayoutGrid, LayoutList, Sparkles, MoveUp, Layers, Sliders, Eye } from 'lucide-react';
+import { Palette, LayoutGrid, LayoutList, Sparkles, MoveUp, Layers, Sliders, Eye, ArrowUpDown } from 'lucide-react';
 import { RatecardProfile, DesignSettings } from '../types';
 import { PREDEFINED_THEMES } from '../constants';
 
@@ -21,6 +21,7 @@ export default function DesignSettingsForm({ profile, onSave }: { profile: Ratec
     backgroundType: 'solid',
     cardOpacity: 100,
     hoverAnimation: 'lift',
+    linksSortOrder: 'asc',
   };
 
   const [design, setDesign] = useState<DesignSettings>(() => {
@@ -40,6 +41,7 @@ export default function DesignSettingsForm({ profile, onSave }: { profile: Ratec
       backgroundType: profile.designSettings.backgroundType || 'solid',
       cardOpacity: profile.designSettings.cardOpacity ?? 100,
       hoverAnimation: profile.designSettings.hoverAnimation || 'lift',
+      linksSortOrder: profile.designSettings.linksSortOrder || 'asc',
     } as DesignSettings;
   });
 
@@ -152,6 +154,50 @@ export default function DesignSettingsForm({ profile, onSave }: { profile: Ratec
             <LayoutList className="w-6 h-6 mb-2" />
             <span className="text-xs font-bold font-sans">Classic Stacked List</span>
             <span className="text-[9px] opacity-60 mt-0.5">Model lurus ke bawah</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Urutan Daftar Link (Sort Order Option) */}
+      <div className="space-y-3">
+        <label className="text-xs font-mono font-black text-indigo-600 uppercase tracking-widest flex items-center gap-2">
+          <ArrowUpDown className="w-4 h-4 text-indigo-500" />
+          Urutan Daftar Link
+        </label>
+        <p className="text-xs text-slate-400 -mt-1">Pilih metode sorting tautan/produk berdasarkan nilai nomor prioritas.</p>
+        <div className="grid grid-cols-2 gap-3 pt-1">
+          <button
+            onClick={() => setDesign({ ...design, linksSortOrder: 'asc' })}
+            className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-300 ${
+              design.linksSortOrder === 'asc' || !design.linksSortOrder
+                ? 'border-indigo-500 bg-indigo-50/50 text-indigo-700 ring-1 ring-indigo-500'
+                : 'border-slate-100 bg-white hover:border-slate-300 text-slate-500'
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-xs font-mono font-black border border-slate-200 bg-slate-50 text-slate-600 px-1 py-0.5 rounded">1</span>
+              <span className="text-xs text-slate-400">→</span>
+              <span className="text-xs font-mono font-black border border-slate-200 bg-slate-50 text-slate-600 px-1 py-0.5 rounded">99</span>
+            </div>
+            <span className="text-xs font-bold font-sans">Nomor Terendah Dulu</span>
+            <span className="text-[9px] opacity-60 mt-0.5">Ascending (Prioritas 1, 2, 3...)</span>
+          </button>
+
+          <button
+            onClick={() => setDesign({ ...design, linksSortOrder: 'desc' })}
+            className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-300 ${
+              design.linksSortOrder === 'desc'
+                ? 'border-indigo-500 bg-indigo-50/50 text-indigo-700 ring-1 ring-indigo-500'
+                : 'border-slate-100 bg-white hover:border-slate-300 text-slate-500'
+            }`}
+          >
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-xs font-mono font-black border border-slate-200 bg-slate-50 text-slate-600 px-1 py-0.5 rounded">99</span>
+              <span className="text-xs text-slate-400">→</span>
+              <span className="text-xs font-mono font-black border border-slate-200 bg-slate-50 text-slate-600 px-1 py-0.5 rounded">1</span>
+            </div>
+            <span className="text-xs font-bold font-sans">Nomor Terbesar Dulu</span>
+            <span className="text-[9px] opacity-60 mt-0.5">Descending (Prioritas 99, 98, 97...)</span>
           </button>
         </div>
       </div>
