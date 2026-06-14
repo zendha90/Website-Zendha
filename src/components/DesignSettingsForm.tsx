@@ -539,79 +539,82 @@ export default function DesignSettingsForm({ profile, onSave }: { profile: Ratec
                 </div>
              </div>
              
-             {/* Dynamic Render Mock Grid or List based on Selection */}
-             {design.layoutStyle === 'list' ? (
-               <div className="space-y-1.5 pt-1">
-                 {[1, 2].map(i => {
-                   const roundedClass = design.buttons?.style || 'rounded-2xl';
-                   const shadowStyle = design.buttons?.shadow === 'soft' 
-                     ? { boxShadow: '0 2px 6px rgba(0,0,0,0.04)' } 
-                     : design.buttons?.shadow === 'hard' 
-                     ? { boxShadow: '3px 3px 0px rgba(0,0,0,0.15)', border: '1.5px solid rgba(0,0,0,0.06)' } 
-                     : { boxShadow: 'none' };
+              {/* Dynamic Render Mock Grid or List based on Selection */}
+             {(() => {
+               const mockItems = design.linksSortOrder === 'desc' ? [2, 1] : [1, 2];
+               return design.layoutStyle === 'list' ? (
+                 <div className="space-y-1.5 pt-1">
+                   {mockItems.map(i => {
+                     const roundedClass = design.buttons?.style || 'rounded-2xl';
+                     const shadowStyle = design.buttons?.shadow === 'soft' 
+                       ? { boxShadow: '0 2px 6px rgba(0,0,0,0.04)' } 
+                       : design.buttons?.shadow === 'hard' 
+                       ? { boxShadow: '3px 3px 0px rgba(0,0,0,0.15)', border: '1.5px solid rgba(0,0,0,0.06)' } 
+                       : { boxShadow: 'none' };
 
-                   // Opacity calculation for simulation
-                   const opacityVal = design.cardOpacity !== undefined ? design.cardOpacity / 100 : 1;
-                   const bgCol = `rgba(255, 255, 255, ${0.85 * opacityVal})`;
+                     // Opacity calculation for simulation
+                     const opacityVal = design.cardOpacity !== undefined ? design.cardOpacity / 100 : 1;
+                     const bgCol = `rgba(255, 255, 255, ${0.85 * opacityVal})`;
 
-                   return (
-                     <div 
-                       key={i} 
-                       className={`border px-3 py-2 flex items-center justify-between transition-all duration-300 ${roundedClass}`}
-                       style={{ 
-                         backgroundColor: bgCol,
-                         borderColor: design.colors.pageText + '15',
-                         ...shadowStyle
-                       }}
-                     >
-                       <div className="flex items-center gap-2 truncate">
-                         <div className={`w-5 h-5 shrink-0 ${roundedClass === 'rounded-full' ? 'rounded-full' : 'rounded'}`} style={{ backgroundColor: design.colors.buttons + '20' }} />
-                         <span className="text-[8px] font-black truncate" style={{ color: design.colors.title }}>Produk Estetik #{i}</span>
-                       </div>
-                       <div className="px-2 py-1 text-[7px] font-black rounded" style={{ backgroundColor: design.colors.buttons, color: design.colors.buttonText }}>
-                         Beli
-                       </div>
-                     </div>
-                   );
-                 })}
-               </div>
-             ) : (
-               <div className="grid grid-cols-2 gap-2 pt-1">
-                 {[1, 2].map(i => {
-                   const roundedClass = design.buttons?.style || 'rounded-2xl';
-                   const shadowStyle = design.buttons?.shadow === 'soft' 
-                     ? { boxShadow: '0 2px 6px rgba(0,0,0,0.04)' } 
-                     : design.buttons?.shadow === 'hard' 
-                     ? { boxShadow: '3px 3px 0px rgba(0,0,0,0.15)', border: '1.5px solid rgba(0,0,0,0.06)' } 
-                     : { boxShadow: 'none' };
-
-                   const opacityVal = design.cardOpacity !== undefined ? design.cardOpacity / 100 : 1;
-                   const bgCol = `rgba(255, 255, 255, ${0.85 * opacityVal})`;
-
-                   return (
-                     <div 
-                       key={i} 
-                       className={`border p-2 flex flex-col justify-between h-[96px] transition-all duration-300 ${roundedClass}`}
-                       style={{ 
-                         backgroundColor: bgCol,
-                         borderColor: design.colors.pageText + '15',
-                         ...shadowStyle
-                       }}
-                     >
-                       <div className="w-full h-11 bg-slate-100 rounded-lg overflow-hidden relative">
-                         <div className="absolute inset-0 bg-gradient-to-tr from-slate-200/50 to-slate-100/30" />
-                       </div>
-                       <div className="mt-1 flex-1 flex flex-col justify-between">
-                         <div className="text-[7px] font-black line-clamp-1" style={{ color: design.colors.title }}>Produk Pilihan #{i}</div>
-                         <div className="py-0.8 text-[6.5px] font-mono font-bold text-center rounded mt-1 shadow-xs" style={{ backgroundColor: design.colors.buttons, color: design.colors.buttonText }}>
-                           Beli Sekarang
+                     return (
+                       <div 
+                         key={i} 
+                         className={`border px-3 py-2 flex items-center justify-between transition-all duration-300 ${roundedClass}`}
+                         style={{ 
+                           backgroundColor: bgCol,
+                           borderColor: design.colors.pageText + '15',
+                           ...shadowStyle
+                         }}
+                       >
+                         <div className="flex items-center gap-2 truncate">
+                           <div className={`w-5 h-5 shrink-0 ${roundedClass === 'rounded-full' ? 'rounded-full' : 'rounded'}`} style={{ backgroundColor: design.colors.buttons + '20' }} />
+                           <span className="text-[8px] font-black truncate" style={{ color: design.colors.title }}>Produk Estetik #{i}</span>
+                         </div>
+                         <div className="px-2 py-1 text-[7px] font-black rounded" style={{ backgroundColor: design.colors.buttons, color: design.colors.buttonText }}>
+                           Beli
                          </div>
                        </div>
-                     </div>
-                   );
-                 })}
-               </div>
-             )}
+                     );
+                   })}
+                 </div>
+               ) : (
+                 <div className="grid grid-cols-2 gap-2 pt-1">
+                   {mockItems.map(i => {
+                     const roundedClass = design.buttons?.style || 'rounded-2xl';
+                     const shadowStyle = design.buttons?.shadow === 'soft' 
+                       ? { boxShadow: '0 2px 6px rgba(0,0,0,0.04)' } 
+                       : design.buttons?.shadow === 'hard' 
+                       ? { boxShadow: '3px 3px 0px rgba(0,0,0,0.15)', border: '1.5px solid rgba(0,0,0,0.06)' } 
+                       : { boxShadow: 'none' };
+
+                     const opacityVal = design.cardOpacity !== undefined ? design.cardOpacity / 100 : 1;
+                     const bgCol = `rgba(255, 255, 255, ${0.85 * opacityVal})`;
+
+                     return (
+                       <div 
+                         key={i} 
+                         className={`border p-2 flex flex-col justify-between h-[96px] transition-all duration-300 ${roundedClass}`}
+                         style={{ 
+                           backgroundColor: bgCol,
+                           borderColor: design.colors.pageText + '15',
+                           ...shadowStyle
+                         }}
+                       >
+                         <div className="w-full h-11 bg-slate-100 rounded-lg overflow-hidden relative">
+                           <div className="absolute inset-0 bg-gradient-to-tr from-slate-200/50 to-slate-100/30" />
+                         </div>
+                         <div className="mt-1 flex-1 flex flex-col justify-between">
+                           <div className="text-[7px] font-black line-clamp-1" style={{ color: design.colors.title }}>Produk Pilihan #{i}</div>
+                           <div className="py-0.8 text-[6.5px] font-mono font-bold text-center rounded mt-1 shadow-xs" style={{ backgroundColor: design.colors.buttons, color: design.colors.buttonText }}>
+                             Beli Sekarang
+                           </div>
+                         </div>
+                       </div>
+                     );
+                   })}
+                 </div>
+               );
+             })()}
           </div>
         </div>
       </div>
