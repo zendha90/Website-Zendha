@@ -571,7 +571,7 @@ export default function DesignSettingsForm({ profile, onSave }: { profile: Ratec
                            <span className="text-[8px] font-black truncate" style={{ color: design.colors.title }}>Produk Estetik #{i}</span>
                          </div>
                          <div className="px-2 py-1 text-[7px] font-black rounded" style={{ backgroundColor: design.colors.buttons, color: design.colors.buttonText }}>
-                           Beli
+                           Link
                          </div>
                        </div>
                      );
@@ -606,7 +606,7 @@ export default function DesignSettingsForm({ profile, onSave }: { profile: Ratec
                          <div className="mt-1 flex-1 flex flex-col justify-between">
                            <div className="text-[7px] font-black line-clamp-1" style={{ color: design.colors.title }}>Produk Pilihan #{i}</div>
                            <div className="py-0.8 text-[6.5px] font-mono font-bold text-center rounded mt-1 shadow-xs" style={{ backgroundColor: design.colors.buttons, color: design.colors.buttonText }}>
-                             Beli Sekarang
+                             Link
                            </div>
                          </div>
                        </div>

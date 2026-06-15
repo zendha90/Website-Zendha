@@ -761,7 +761,8 @@ export default function AdminPanel({
       category: 'Shopee',
       description: '',
       isActive: true,
-      priority: links.length + 1
+      priority: links.length + 1,
+      videoUrl: '',
     });
     setIsAddingLink(true);
   };
@@ -1142,96 +1143,11 @@ export default function AdminPanel({
       {/* ======================================================== */}
       {/* 1. MANAGE AFFILIATE LINKS VIEW TAB */}
       {/* ======================================================== */}
-      {activeTab === 'links' && (
-        <div className="space-y-6" id="tab-content-links">
-            
-            {/* Visual Link Analytical Widgets (High-fidelity CRM design) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4" id="links-stats-bento">
-              {/* Total Clicks Widget */}
-              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs flex items-center justify-between col-span-1 min-w-0">
-                <div className="min-w-0">
-                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">Total Klik Tautan</span>
-                  <span className="text-3xl font-display font-bold text-slate-800 tracking-tight block mt-1.5 truncate">
-                    {totalClicks}
-                  </span>
-                  <span className="text-[11px] text-slate-400 mt-1 block font-sans">Semua tautan terakumulasi</span>
-                </div>
-                <div className="p-3 bg-indigo-50 border border-indigo-100/50 rounded-2xl text-indigo-600 shrink-0">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-              </div>
-
-              {/* Top Performing Item Widget */}
-              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs col-span-1 flex items-center justify-between min-w-0">
-                <div className="min-w-0 flex-1">
-                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">Tautan Terpopuler</span>
-                  {topLink ? (
-                    <>
-                      <h4 className="text-slate-800 text-[13px] font-bold mt-1.5 font-sans truncate pr-2">
-                        {topLink.title}
-                      </h4>
-                      <span className="text-[11px] font-mono font-bold text-emerald-600 block mt-1">
-                        {topLink.clicks || 0} klik ({totalClicks > 0 ? ((topLink.clicks / totalClicks) * 100).toFixed(1) : 0}%)
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-xs text-slate-400 block mt-2">Belum ada statistik</span>
-                  )}
-                </div>
-                <div className="p-3 bg-emerald-50 border border-emerald-100/50 rounded-2xl text-emerald-600 shrink-0">
-                  <Sparkles className="w-5 h-5" />
-                </div>
-              </div>
-
-              {/* Platform Clicks distribution */}
-              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs col-span-1 min-w-0 flex flex-col justify-center">
-                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block mb-2">Distribusi Platform</span>
-                
-                <div className="space-y-1.5 text-[11px]" id="share-platform-distribution">
-                  {Object.entries(platformStats).map(([platform, clicks]) => {
-                    const percentage = totalClicks > 0 ? (clicks / totalClicks) * 100 : 0;
-                    const barColor = platform === 'Shopee' ? 'bg-orange-500' :
-                                     platform === 'Tokopedia' ? 'bg-green-500' :
-                                     platform === 'TikTok / Social' ? 'bg-slate-900' : 'bg-blue-500';
-                    return (
-                      <div key={platform} className="space-y-0.5">
-                        <div className="flex justify-between text-[10px] font-medium font-mono text-slate-600">
-                          <span className="truncate pr-1">{platform}</span>
-                          <span>{clicks} klik ({percentage.toFixed(0)}%)</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full ${barColor} rounded-full transition-all duration-300`}
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-            
-            {/* Header Action Row */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-md font-display font-bold text-slate-800">Daftar Link Affiliate</h2>
-                <p className="text-xs text-slate-400">Total {links.length} link belanja terdaftar</p>
-              </div>
-              {!editingLink && (
-                <button
-                  onClick={triggerAddLink}
-                  className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer font-sans"
-                  id="btn-trigger-add-link"
-                >
-                  <PlusCircle className="w-4 h-4" /> Tambah Link Baru
-                </button>
-              )}
-            </div>
-
-          {/* Collapsible Add/Edit Form Box */}
-          {editingLink && (
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-inner" id="link-form-container">
+      {activeTab === 'links' && (() => {
+        const renderLinkForm = () => {
+          if (!editingLink) return null;
+          return (
+            <div className={`bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-inner ${!isAddingLink ? 'mt-2 border-indigo-200/60 shadow-indigo-100/30' : ''}`} id={isAddingLink ? "link-form-container" : `link-form-container-${editingLink.id}`}>
               <h3 className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                 <PlusCircle className="w-3.5 h-3.5 text-indigo-500" />
                 {isAddingLink ? 'TAMBAH LINK BARU' : `EDIT LINK: ${editingLink.title}`}
@@ -1326,6 +1242,17 @@ export default function AdminPanel({
                   />
                 </div>
 
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Video URL (Opsional)</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. https://youtube.com/... atau https://tiktok.com/..."
+                    value={editingLink.videoUrl ?? ''}
+                    onChange={(e) => setEditingLink({...editingLink, videoUrl: e.target.value})}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400 font-sans"
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div>
                     <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Urutan Prioritas Tampil</label>
@@ -1367,7 +1294,98 @@ export default function AdminPanel({
                 </div>
               </form>
             </div>
-          )}
+          );
+        };
+
+        return (
+          <div className="space-y-6" id="tab-content-links">
+            
+            {/* Visual Link Analytical Widgets (High-fidelity CRM design) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4" id="links-stats-bento">
+              {/* Total Clicks Widget */}
+              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs flex items-center justify-between col-span-1 min-w-0">
+                <div className="min-w-0">
+                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">Total Klik Tautan</span>
+                  <span className="text-3xl font-display font-bold text-slate-800 tracking-tight block mt-1.5 truncate">
+                    {totalClicks}
+                  </span>
+                  <span className="text-[11px] text-slate-400 mt-1 block font-sans">Semua tautan terakumulasi</span>
+                </div>
+                <div className="p-3 bg-indigo-50 border border-indigo-100/50 rounded-2xl text-indigo-600 shrink-0">
+                  <TrendingUp className="w-5 h-5" />
+                </div>
+              </div>
+
+              {/* Top Performing Item Widget */}
+              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs col-span-1 flex items-center justify-between min-w-0">
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block">Tautan Terpopuler</span>
+                  {topLink ? (
+                    <>
+                      <h4 className="text-slate-800 text-[13px] font-bold mt-1.5 font-sans truncate pr-2">
+                        {topLink.title}
+                      </h4>
+                      <span className="text-[11px] font-mono font-bold text-emerald-600 block mt-1">
+                        {topLink.clicks || 0} klik ({totalClicks > 0 ? ((topLink.clicks / totalClicks) * 100).toFixed(1) : 0}%)
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-slate-400 block mt-2">Belum ada statistik</span>
+                  )}
+                </div>
+                <div className="p-3 bg-emerald-50 border border-emerald-100/50 rounded-2xl text-emerald-600 shrink-0">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+              </div>
+
+              {/* Platform Clicks distribution */}
+              <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs col-span-1 min-w-0 flex flex-col justify-center">
+                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest block mb-2">Distribusi Platform</span>
+                
+                <div className="space-y-1.5 text-[11px]" id="share-platform-distribution">
+                  {Object.entries(platformStats).map(([platform, clicks]) => {
+                    const percentage = totalClicks > 0 ? (clicks / totalClicks) * 100 : 0;
+                    const barColor = platform === 'Shopee' ? 'bg-orange-500' :
+                                     platform === 'Tokopedia' ? 'bg-green-500' :
+                                     platform === 'TikTok / Social' ? 'bg-slate-900' : 'bg-blue-500';
+                    return (
+                      <div key={platform} className="space-y-0.5">
+                        <div className="flex justify-between text-[10px] font-medium font-mono text-slate-600">
+                          <span className="truncate pr-1">{platform}</span>
+                          <span>{clicks} klik ({percentage.toFixed(0)}%)</span>
+                        </div>
+                        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full ${barColor} rounded-full transition-all duration-300`}
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+            
+            {/* Header Action Row */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-md font-display font-bold text-slate-800">Daftar Link Affiliate</h2>
+                <p className="text-xs text-slate-400">Total {links.length} link belanja terdaftar</p>
+              </div>
+              {!editingLink && (
+                <button
+                  onClick={triggerAddLink}
+                  className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer font-sans"
+                  id="btn-trigger-add-link"
+                >
+                  <PlusCircle className="w-4 h-4" /> Tambah Link Baru
+                </button>
+              )}
+            </div>
+
+          {/* Collapsible Add Form Box (Only shown if adding a new link) */}
+          {editingLink && isAddingLink && renderLinkForm()}
 
           {/* Interactive Lists for Links with click tracking metrics */}
           <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden" id="admin-links-list">
@@ -1383,13 +1401,13 @@ export default function AdminPanel({
             </div>
             <div className="divide-y divide-slate-100">
               {links.length > 0 ? (
-                links.map((link) => (
-                  <div 
-                    key={link.id}
-                    className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/30 transition-colors ${
-                      !link.isActive ? 'opacity-60 bg-slate-50/50' : ''
-                    }`}
-                  >
+                [...links].sort((a, b) => (a.priority || 0) - (b.priority || 0)).map((link) => (
+                  <div key={link.id} className="flex flex-col border-b border-slate-50 last:border-0 relative">
+                    <div 
+                      className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
+                        editingLink?.id === link.id && !isAddingLink ? 'bg-indigo-50/20 shadow-inner' : 'hover:bg-slate-50/30'
+                      } ${!link.isActive ? 'opacity-60 bg-slate-50/50' : ''}`}
+                    >
                     <div className="flex items-center gap-3.5 flex-1 min-w-0">
                       {link.imageUrl && (
                         <img 
@@ -1446,6 +1464,13 @@ export default function AdminPanel({
                         </button>
                       </div>
                     </div>
+                    </div>
+                    {/* Inline Edit Form Integration */}
+                    {editingLink && !isAddingLink && editingLink.id === link.id && (
+                       <div className="px-4 pb-4">
+                         {renderLinkForm()}
+                       </div>
+                    )}
                   </div>
                 ))
               ) : (
@@ -1456,7 +1481,8 @@ export default function AdminPanel({
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
 
       {/* ======================================================== */}

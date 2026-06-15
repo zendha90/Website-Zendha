@@ -14,7 +14,8 @@ import {
   Compass,
   MessageCircle,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  PlayCircle
 } from 'lucide-react';
 import { AffiliateLink, RatecardProfile } from '../types';
 
@@ -384,8 +385,7 @@ export default function LinktreeView({
             /* CLASSIC STACKED LIST LAYOUT MODE */
             <div className="flex flex-col gap-3.5 w-full" id="links-list">
               {filteredLinks.map((link, idx) => {
-                const originalIndex = originalActiveLinks.findIndex(l => l.id === link.id);
-                const sequenceNumber = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
+                const sequenceNumber = idx + 1;
                 return (
                   <motion.div
                     key={link.id}
@@ -449,16 +449,36 @@ export default function LinktreeView({
                       </div>
                     </div>
 
-                    {/* Standard Action Arrow Pill */}
-                    <div 
-                      className={`py-2 px-4 text-[10px] font-black tracking-wide flex items-center justify-center gap-1 shadow-xs shrink-0 transition-transform ${getButtonRoundedClass() === 'rounded-none' ? 'rounded-none' : 'rounded-full'}`}
-                      style={{
-                        backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
-                        color: profile.designSettings?.colors.buttonText || '#ffffff'
-                      }}
-                    >
-                      <span className="truncate max-w-[85px]">{link.buttonLabel ? link.buttonLabel : "Beli"}</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                    {/* Actions Container */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {link.videoUrl && (
+                        <div 
+                          className={`p-2 flex items-center justify-center gap-1 border shadow-xs transition-transform ${getButtonRoundedClass() === 'rounded-none' ? 'rounded-none' : 'rounded-full'}`}
+                          style={{
+                            borderColor: profile.designSettings?.colors.buttons || '#0f172a',
+                            color: profile.designSettings?.colors.buttons || '#0f172a',
+                            backgroundColor: 'transparent'
+                          }}
+                          onClick={(e) => {
+                             e.stopPropagation();
+                             window.open(link.videoUrl, '_blank');
+                          }}
+                        >
+                          <PlayCircle className="w-3.5 h-3.5" />
+                        </div>
+                      )}
+                      
+                      {/* Standard Action Arrow Pill */}
+                      <div 
+                        className={`py-2 px-4 text-[10px] font-black tracking-wide flex items-center justify-center gap-1 shadow-xs transition-transform ${getButtonRoundedClass() === 'rounded-none' ? 'rounded-none' : 'rounded-full'}`}
+                        style={{
+                          backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
+                          color: profile.designSettings?.colors.buttonText || '#ffffff'
+                        }}
+                      >
+                        <span className="truncate max-w-[85px]">{link.buttonLabel ? link.buttonLabel : "Link"}</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                      </div>
                     </div>
                   </motion.div>
                 );
@@ -468,8 +488,7 @@ export default function LinktreeView({
             /* COLLAPSIBLE BENTO DECORATIVE GRID LAYOUT MODE */
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 w-full" id="links-grid">
               {filteredLinks.map((link, idx) => {
-                const originalIndex = originalActiveLinks.findIndex(l => l.id === link.id);
-                const sequenceNumber = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
+                const sequenceNumber = idx + 1;
                 return (
                   <motion.div
                     key={link.id}
@@ -537,23 +556,43 @@ export default function LinktreeView({
                           </p>
                         )}
                       </div>
+                    </div>
 
-                      {/* Highly Polished CTA Button */}
-                      <div className="mt-3 sm:mt-5 pt-2 sm:pt-3 border-t" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
-                        <div 
-                          className={`w-full py-2 sm:py-2.5 px-2 sm:px-4 text-white text-[10px] sm:text-xs font-bold tracking-wide flex items-center justify-center gap-1 sm:gap-1.5 transition-all shadow-xs cursor-pointer ${getButtonRoundedClass()}`}
-                          style={{
-                            backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
-                            color: profile.designSettings?.colors.buttonText || '#ffffff'
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLinkNavigate(link);
-                          }}
-                        >
-                          <span className="truncate">{link.buttonLabel ? link.buttonLabel : "Beli Sekarang"}</span>
-                          <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition-transform shrink-0" />
-                        </div>
+                    {/* Highly Polished CTA Button (Extracted outside padding as requested) */}
+                    <div className="border-t grid grid-cols-2 p-1.5 sm:p-2 gap-1 sm:gap-1.5 w-full bg-slate-50/50" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
+                      {/* Video Review Button */}
+                      <div 
+                        className={`min-w-0 py-2 sm:py-2.5 px-1 text-[9px] sm:text-[10px] font-bold tracking-wide flex items-center justify-center gap-1 transition-all border cursor-pointer ${getButtonRoundedClass()}`}
+                        style={{
+                          borderColor: profile.designSettings?.colors.buttons || '#0f172a',
+                          color: profile.designSettings?.colors.buttons || '#0f172a',
+                          backgroundColor: 'transparent'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (link.videoUrl) {
+                              window.open(link.videoUrl, '_blank');
+                          }
+                        }}
+                      >
+                        <PlayCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                        <span className="truncate">Video</span>
+                      </div>
+
+                      {/* Beli Sekarang Button */}
+                      <div 
+                        className={`min-w-0 py-2 sm:py-2.5 px-1 text-white text-[9px] sm:text-[10px] font-bold tracking-wide flex items-center justify-center gap-1 transition-all shadow-xs cursor-pointer ${getButtonRoundedClass()}`}
+                        style={{
+                          backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
+                          color: profile.designSettings?.colors.buttonText || '#ffffff'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLinkNavigate(link);
+                        }}
+                      >
+                        <span className="truncate">{link.buttonLabel ? link.buttonLabel : "Link"}</span>
+                        <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
                       </div>
                     </div>
 

@@ -9,6 +9,7 @@ export interface AffiliateLink {
   description?: string;
   buttonLabel?: string;
   imageUrl?: string;
+  videoUrl?: string;
 }
 
 export interface DesignSettings {

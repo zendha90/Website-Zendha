@@ -93,7 +93,8 @@ export async function setupMysqlTables() {
         \`priority\` INT DEFAULT 0,
         \`description\` TEXT,
         \`button_label\` VARCHAR(100),
-        \`image_url\` TEXT
+        \`image_url\` TEXT,
+        \`video_url\` TEXT
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
@@ -281,7 +282,8 @@ export async function loadDbFromMysql(fallbackJsonDb: any) {
       priority: l.priority || 0,
       description: l.description,
       buttonLabel: l.button_label,
-      imageUrl: l.image_url
+      imageUrl: l.image_url,
+      videoUrl: l.video_url
     }));
 
     if (linksData.length === 0 && fallbackJsonDb.links?.length > 0) {
@@ -714,7 +716,8 @@ CREATE TABLE \`links\` (
   \`priority\` INT DEFAULT 0,
   \`description\` TEXT,
   \`button_label\` VARCHAR(100),
-  \`image_url\` TEXT
+  \`image_url\` TEXT,
+  \`video_url\` TEXT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\n`;
 
   if (data.links && data.links.length > 0) {
