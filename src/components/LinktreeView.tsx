@@ -78,11 +78,13 @@ export default function LinktreeView({
 
   const sortOrder = profile.designSettings?.linksSortOrder || 'asc';
 
-  // Keep original list of active links used for calculating the unchanged permanent serial numbers
-  const originalActiveLinks = [...links].filter(l => l.isActive);
+  // Keep sorted default list of active links for permanent serial numbers (sorted by priority ASC)
+  const sortedDefaultActiveLinks = [...links]
+    .filter(l => l.isActive)
+    .sort((a, b) => (a.priority || 0) - (b.priority || 0));
 
   // All active links sorted by user preference
-  const activeLinks = [...originalActiveLinks]
+  const activeLinks = [...sortedDefaultActiveLinks]
     .sort((a, b) => {
       const priorityA = a.priority || 0;
       const priorityB = b.priority || 0;
@@ -94,7 +96,7 @@ export default function LinktreeView({
 
   // Filter links based purely on the search criteria, matching their permanent index
   const filteredLinks = activeLinks.filter((link) => {
-    const originalIndex = originalActiveLinks.findIndex(l => l.id === link.id);
+    const originalIndex = sortedDefaultActiveLinks.findIndex(l => l.id === link.id);
     const permanentNumber = (originalIndex !== -1 ? originalIndex + 1 : 1).toString();
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
@@ -385,7 +387,8 @@ export default function LinktreeView({
             /* CLASSIC STACKED LIST LAYOUT MODE */
             <div className="flex flex-col gap-3.5 w-full" id="links-list">
               {filteredLinks.map((link, idx) => {
-                const sequenceNumber = idx + 1;
+                const originalIndex = sortedDefaultActiveLinks.findIndex(l => l.id === link.id);
+                const sequenceNumber = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
                 return (
                   <motion.div
                     key={link.id}
@@ -488,7 +491,8 @@ export default function LinktreeView({
             /* COLLAPSIBLE BENTO DECORATIVE GRID LAYOUT MODE */
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 w-full" id="links-grid">
               {filteredLinks.map((link, idx) => {
-                const sequenceNumber = idx + 1;
+                const originalIndex = sortedDefaultActiveLinks.findIndex(l => l.id === link.id);
+                const sequenceNumber = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
                 return (
                   <motion.div
                     key={link.id}
