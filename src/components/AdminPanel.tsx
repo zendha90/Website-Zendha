@@ -1232,7 +1232,7 @@ export default function AdminPanel({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Nama Tombol CTA (Default: Beli Sekarang)</label>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Nama Tombol CTA (Default: Link)</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Cek di Shopee, Lihat Produk, Selengkapnya..."

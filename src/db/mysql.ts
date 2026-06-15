@@ -18,8 +18,8 @@ export async function getMysqlConnection() {
       database: process.env.DB_NAME || 'creator_links'
     });
     return connection;
-  } catch (err) {
-    console.error('FAILED TO CONNECT TO MYSQL:', err);
+  } catch (err: any) {
+    console.warn(`[DB] MySQL connect bypass: ${err.message || err}`);
     return null;
   }
 }
@@ -97,6 +97,9 @@ export async function setupMysqlTables() {
         \`video_url\` TEXT
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
+
+    // Safely add missing columns for backward compatibility!
+    try { await connection.query('ALTER TABLE `links` ADD COLUMN `video_url` TEXT'); } catch(e) {}
 
     // 3. Create Services Table
     await connection.query(`
@@ -290,9 +293,9 @@ export async function loadDbFromMysql(fallbackJsonDb: any) {
       linksData = fallbackJsonDb.links;
       for (const link of linksData) {
         await connection.query(`
-          INSERT INTO \`links\` (id, title, url, category, clicks, is_active, priority, description, button_label, image_url)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [link.id, link.title, link.url, link.category, link.clicks || 0, link.isActive ? 1 : 0, link.priority || 0, link.description || '', link.buttonLabel || '', link.imageUrl || '']);
+          INSERT INTO \`links\` (id, title, url, category, clicks, is_active, priority, description, button_label, image_url, video_url)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [link.id, link.title, link.url, link.category, link.clicks || 0, link.isActive ? 1 : 0, link.priority || 0, link.description || '', link.buttonLabel || '', link.imageUrl || '', link.videoUrl || '']);
       }
     }
 
@@ -488,9 +491,9 @@ export async function writeDbToMysql(data: any) {
       await connection.query('DELETE FROM \`links\`');
       for (const link of data.links) {
         await connection.query(`
-          INSERT INTO \`links\` (id, title, url, category, clicks, is_active, priority, description, button_label, image_url)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [link.id, link.title, link.url, link.category, link.clicks || 0, link.isActive ? 1 : 0, link.priority || 0, link.description || '', link.buttonLabel || '', link.imageUrl || '']);
+          INSERT INTO \`links\` (id, title, url, category, clicks, is_active, priority, description, button_label, image_url, video_url)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [link.id, link.title, link.url, link.category, link.clicks || 0, link.isActive ? 1 : 0, link.priority || 0, link.description || '', link.buttonLabel || '', link.imageUrl || '', link.videoUrl || '']);
       }
     }
 
@@ -722,7 +725,7 @@ CREATE TABLE \`links\` (
 
   if (data.links && data.links.length > 0) {
     sql += `INSERT INTO \`links\` VALUES \n`;
-    const linksMapped = data.links.map((l: any) => `  (${escapeStr(l.id)}, ${escapeStr(l.title)}, ${escapeStr(l.url)}, ${escapeStr(l.category)}, ${escapeNum(l.clicks)}, ${l.isActive ? 1 : 0}, ${escapeNum(l.priority)}, ${escapeStr(l.description)}, ${escapeStr(l.buttonLabel)}, ${escapeStr(l.imageUrl)})`);
+    const linksMapped = data.links.map((l: any) => `  (${escapeStr(l.id)}, ${escapeStr(l.title)}, ${escapeStr(l.url)}, ${escapeStr(l.category)}, ${escapeNum(l.clicks)}, ${l.isActive ? 1 : 0}, ${escapeNum(l.priority)}, ${escapeStr(l.description)}, ${escapeStr(l.buttonLabel)}, ${escapeStr(l.imageUrl)}, ${escapeStr(l.videoUrl)})`);
     sql += linksMapped.join(',\n') + ';\n\n';
   }
 

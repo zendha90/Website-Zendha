@@ -1429,7 +1429,7 @@ app.post('/api/links/:id/click', (req, res) => {
 app.post('/api/links', (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
   
-  const { title, url, category, description, buttonLabel, imageUrl, isActive, priority } = req.body;
+  const { title, url, category, description, buttonLabel, imageUrl, videoUrl, isActive, priority } = req.body;
   if (!title || !url) {
     return res.status(400).json({ success: false, message: 'Title dan URL wajib diisi' });
   }
@@ -1443,6 +1443,7 @@ app.post('/api/links', (req, res) => {
     description: description || '',
     buttonLabel: buttonLabel || '',
     imageUrl: imageUrl || '',
+    videoUrl: videoUrl || '',
     clicks: 0,
     isActive: isActive !== false,
     priority: Number(priority) || (db.links.length + 1)
@@ -1461,7 +1462,7 @@ app.put('/api/links/:id', (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
   
   const { id } = req.params;
-  const { title, url, category, description, buttonLabel, imageUrl, isActive, priority } = req.body;
+  const { title, url, category, description, buttonLabel, imageUrl, videoUrl, isActive, priority } = req.body;
   
   const db = readDb();
   const index = db.links.findIndex(l => l.id === id);
@@ -1477,6 +1478,7 @@ app.put('/api/links/:id', (req, res) => {
     description: description !== undefined ? description : db.links[index].description,
     buttonLabel: buttonLabel !== undefined ? buttonLabel : db.links[index].buttonLabel,
     imageUrl: imageUrl !== undefined ? imageUrl : db.links[index].imageUrl,
+    videoUrl: videoUrl !== undefined ? videoUrl : db.links[index].videoUrl,
     isActive: isActive !== undefined ? isActive : db.links[index].isActive,
     priority: priority !== undefined ? Number(priority) : db.links[index].priority
   };
