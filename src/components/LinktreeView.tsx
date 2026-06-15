@@ -559,25 +559,25 @@ export default function LinktreeView({
                     </div>
 
                     {/* Highly Polished CTA Button (Extracted outside padding as requested) */}
-                    <div className="border-t grid grid-cols-2 p-1.5 sm:p-2 gap-1 sm:gap-1.5 w-full bg-slate-50/50" style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
+                    <div className={`border-t grid p-1.5 sm:p-2 gap-1 sm:gap-1.5 w-full bg-slate-50/50 ${link.videoUrl ? 'grid-cols-2' : 'grid-cols-1'}`} style={{ borderColor: profile.designSettings?.colors.pageText + '20' }}>
                       {/* Video Review Button */}
-                      <div 
-                        className={`min-w-0 py-2 sm:py-2.5 px-1 text-[9px] sm:text-[10px] font-bold tracking-wide flex items-center justify-center gap-1 transition-all border cursor-pointer ${getButtonRoundedClass()}`}
-                        style={{
-                          borderColor: profile.designSettings?.colors.buttons || '#0f172a',
-                          color: profile.designSettings?.colors.buttons || '#0f172a',
-                          backgroundColor: 'transparent'
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (link.videoUrl) {
-                              window.open(link.videoUrl, '_blank');
-                          }
-                        }}
-                      >
-                        <PlayCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-                        <span className="truncate">Video</span>
-                      </div>
+                      {link.videoUrl && (
+                        <div 
+                          className={`min-w-0 py-2 sm:py-2.5 px-1 text-[9px] sm:text-[10px] font-bold tracking-wide flex items-center justify-center gap-1 transition-all border cursor-pointer ${getButtonRoundedClass()}`}
+                          style={{
+                            borderColor: profile.designSettings?.colors.buttons || '#0f172a',
+                            color: profile.designSettings?.colors.buttons || '#0f172a',
+                            backgroundColor: 'transparent'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(link.videoUrl, '_blank');
+                          }}
+                        >
+                          <PlayCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                          <span className="truncate">Video</span>
+                        </div>
+                      )}
 
                       {/* Beli Sekarang Button */}
                       <div 
