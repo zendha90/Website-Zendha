@@ -22,6 +22,7 @@ export default function DesignSettingsForm({ profile, onSave }: { profile: Ratec
     cardOpacity: 100,
     hoverAnimation: 'lift',
     linksSortOrder: 'asc',
+    ratecardTheme: 'classic',
   };
 
   const [design, setDesign] = useState<DesignSettings>(() => {
@@ -42,6 +43,7 @@ export default function DesignSettingsForm({ profile, onSave }: { profile: Ratec
       cardOpacity: profile.designSettings.cardOpacity ?? 100,
       hoverAnimation: profile.designSettings.hoverAnimation || 'lift',
       linksSortOrder: profile.designSettings.linksSortOrder || 'asc',
+      ratecardTheme: profile.designSettings.ratecardTheme || 'classic',
     } as DesignSettings;
   });
 

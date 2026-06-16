@@ -37,6 +37,7 @@ interface AffiliateLink {
   description?: string;
   buttonLabel?: string;
   imageUrl?: string;
+  videoUrl?: string;
 }
 
 interface ClickLog {
@@ -78,7 +79,14 @@ interface DesignSettings {
     buttonText: string;
     pageText: string;
     title: string;
+    backgroundGradientSecond?: string;
   };
+  layoutStyle?: 'grid' | 'list';
+  backgroundType?: 'solid' | 'gradient' | 'glass';
+  cardOpacity?: number;
+  hoverAnimation?: 'scale' | 'lift' | 'tilt' | 'none';
+  linksSortOrder?: 'asc' | 'desc';
+  ratecardTheme?: 'classic' | 'minimalist';
 }
 
 interface RatecardProfile {

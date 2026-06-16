@@ -91,7 +91,7 @@ export default function AdminPanel({
   const [token, setToken] = useState<string | null>(null);
 
   // Active Admin Tabs
-  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github' | 'analytics' | 'design' | 'ratecard'>('links');
+  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github' | 'analytics' | 'design' | 'ratecard' | 'design_ratecard'>('links');
 
   // Analytics View States
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState<'today' | 'yesterday' | '7days' | '30days'>('yesterday');
@@ -1049,7 +1049,7 @@ export default function AdminPanel({
               >
                 <div className="flex items-center gap-3">
                   <Palette className={`w-4 h-4 ${activeTab === 'design' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
-                  Design Theme
+                  Design Linktree
                 </div>
                 {activeTab === 'design' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
@@ -1097,6 +1097,16 @@ export default function AdminPanel({
                   Brand Partners
                 </div>
                 {activeTab === 'brands' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+              </button>
+              <button 
+                onClick={() => { setActiveTab('design_ratecard'); }} 
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'design_ratecard' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <Palette className={`w-4 h-4 ${activeTab === 'design_ratecard' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Design Ratecard
+                </div>
+                {activeTab === 'design_ratecard' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
             </div>
 
@@ -3101,6 +3111,80 @@ DB_NAME=nama_database_anda`}
         </div>
       )}
 
+      {activeTab === 'design_ratecard' && (
+        <div className="space-y-6" id="design-ratecard-tab-content">
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+               <div>
+                 <h3 className="text-xl font-display font-bold text-slate-800 flex items-center gap-2">
+                   <Palette className="w-6 h-6 text-indigo-500" /> Design Ratecard
+                 </h3>
+                 <p className="text-xs text-slate-400 font-sans">Pilih gaya tema visual khusus untuk halaman Portofolio / Ratecard Anda.</p>
+               </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <label className="text-xs font-mono font-black text-indigo-600 uppercase tracking-widest flex items-center gap-2">
+                  <Palette className="w-4 h-4 text-indigo-500" />
+                  Kategori Tema Ratecard Page
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => {
+                      const updatedDesign = {
+                        ...(profileForm.designSettings || {}),
+                        ratecardTheme: 'classic'
+                      };
+                      setProfileForm({ ...profileForm, designSettings: updatedDesign as any });
+                    }}
+                    className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-300 ${
+                      profileForm.designSettings?.ratecardTheme === 'classic' || !profileForm.designSettings?.ratecardTheme
+                        ? 'border-indigo-500 bg-indigo-50/50 text-indigo-700 ring-1 ring-indigo-500 shadow-sm'
+                        : 'border-slate-100 bg-white hover:border-slate-300 text-slate-500 shadow-xs'
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-sm mb-3 shadow-md">✨</div>
+                    <span className="text-sm font-bold font-sans">Classic Cyber Dark</span>
+                    <span className="text-xs opacity-65 text-center mt-1">Sains-fi neon berkilau & glowing orbs (Original)</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const updatedDesign = {
+                        ...(profileForm.designSettings || {}),
+                        ratecardTheme: 'minimalist'
+                      };
+                      setProfileForm({ ...profileForm, designSettings: updatedDesign as any });
+                    }}
+                    className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-300 ${
+                      profileForm.designSettings?.ratecardTheme === 'minimalist'
+                        ? 'border-indigo-500 bg-indigo-50/50 text-indigo-700 ring-1 ring-indigo-500 shadow-sm'
+                        : 'border-slate-100 bg-white hover:border-slate-300 text-slate-500 shadow-xs'
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-[#F4EFE6] border border-[#DDD3C5] flex items-center justify-center text-sm mb-3 shadow-md">🌿</div>
+                    <span className="text-sm font-bold font-sans">Minimalist Canva Cream</span>
+                    <span className="text-xs opacity-65 text-center mt-1">Editorial serif, warna krem hangat & cokelat kakao</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100">
+                <button
+                  onClick={() => saveProfile()}
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  id="save-ratecard-theme-btn"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Simpan Pilihan Tema Ratecard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {activeTab === 'github' && (
         <div className="space-y-6" id="tab-content-github">
           
@@ -3913,18 +3997,18 @@ DB_NAME=nama_database_anda`}
           </div>
 
           <div className="space-y-4">
-            {/* Latest Update v1.6.0 */}
+            {/* Latest Update v1.7.0 */}
             <div className="bg-white border-2 border-indigo-100 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50 rounded-full translate-x-24 -translate-y-24 -z-10" />
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 px-2.5 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 shrink-0 min-w-10">
-                    <span className="font-mono font-black text-xs text-white">v1.6.0</span>
+                    <span className="font-mono font-black text-xs text-white">v1.7.0</span>
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-display font-bold text-slate-800 truncate">Version 1.6.0 (Responsive Mobile Bento &amp; Stats Grid)</h3>
-                    <p className="text-[10px] font-mono text-slate-400 mt-0.5 truncate">LATEST STABLE BUILD • ULTRA RESPONSIVE</p>
-                    <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest truncate">Released: 13 June 2026</p>
+                    <h3 className="text-sm font-display font-bold text-slate-800 truncate">Version 1.7.0 (Dedicated Ratecard Design &amp; Brand Styling)</h3>
+                    <p className="text-[10px] font-mono text-slate-400 mt-0.5 truncate">LATEST STABLE BUILD • REFINED VISUALS</p>
+                    <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest truncate">Released: 15 June 2026</p>
                   </div>
                 </div>
               </div>
@@ -3932,22 +4016,45 @@ DB_NAME=nama_database_anda`}
               <ul className="space-y-3">
                 <li className="flex gap-3">
                   <div className="shrink-0 w-5 h-5 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center">
-                    <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
+                    <Palette className="w-3.5 h-3.5 text-indigo-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Optimasi Kisi Grid &amp; Simetri Statistik</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Meningkatkan total bawaan metrik audiens menjadi 6 item (menambahkan seksi Kolaborasi Brand) untuk mengisi grid 2-kolom seimbang di mobile. Menyelaraskan perataan teks vertikal (baseline) dan batas tinggi minimum agar tinggi antar-kartu tetap simetris, rapi, dan mudah dibaca.</p>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Tab Khusus Design Ratecard</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Memisahkan kustomisasi "Kategori Tema Ratecard Page" dari bagian pengaturan lain ke dalam modul tab mandiri baru bernama "Design Ratecard" di bawah bagian RATECARD ASSETS dengan tombol aksi yang dibuat full-width demi kenyamanan interaksi pengguna.</p>
                   </div>
                 </li>
                 <li className="flex gap-3">
                   <div className="shrink-0 w-5 h-5 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                    <Columns className="w-3.5 h-3.5 text-emerald-600" />
+                    <Sliders className="w-3.5 h-3.5 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 leading-tight">Bento Grid Linktree 2-Kolom di Mobile</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Mendesain ulang tampilan daftar tautan (Linktree) bermode Bento Grid pada perangkat seluler menjadi 2 kolom. Memperhalus ukuran font, lencana/ikon, padding, dan tombol CTA agar bento tetap compact, padat, indah, dan hemat ruang layar.</p>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Penamaan Eksklusi "Design Linktree"</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Mengubah label navigasi "Design Theme" menjadi "Design Linktree" untuk memperjelas konteks pengaturan visual yang secara khusus mengatur arsitektur tampilan halaman utama Linktree.</p>
                   </div>
                 </li>
+                <li className="flex gap-3">
+                  <div className="shrink-0 w-5 h-5 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-700 leading-tight">Peningkatan Kontras &amp; Background Logo Brand</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Mengubah latar belakang logo brand kolaborator menjadi warna putih bersih dengan tambahan bayangan halus (shadow-md), serta melapiskan kontras tinggi pada teks/SVG bawaan agar merek-merek partner tetap menonjol dan terbaca secara elegan.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Previous v1.6.0 */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 opacity-90">
+              <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-200">
+                <div className="flex items-center gap-3">
+                  <span className="px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-mono font-bold rounded">v1.6.0</span>
+                  <p className="text-xs font-display font-medium text-slate-600 italic">Responsive Mobile Bento &amp; Stats Grid</p>
+                </div>
+              </div>
+              <ul className="space-y-2 text-[10px] text-slate-500">
+                <li>• Optimasi Kisi Grid &amp; Simetri Statistik: Meningkatkan total bawaan metrik audiens menjadi 6 item untuk mengisi grid 2-kolom seimbang di mobile. Menyelaraskan perataan teks vertikal (baseline) dan batas tinggi minimum agar tinggi antar-kartu tetap simetris.</li>
+                <li>• Bento Grid Linktree 2-Kolom di Mobile: Mendesain ulang tampilan daftar tautan bermode Bento Grid pada perangkat seluler menjadi 2 kolom. Memperhalus font, padding, dan tombol CTA.</li>
               </ul>
             </div>
 
@@ -4016,7 +4123,7 @@ DB_NAME=nama_database_anda`}
 
       {/* Footer Administration Panel */}
       <div className="w-full text-center py-8 text-xs text-slate-400 font-mono mt-8 border-t border-slate-100">
-        <p>Admin Dashboard v1.6.0 | Personal Creator Workspace</p>
+        <p>Admin Dashboard v1.7.0 | Personal Creator Workspace</p>
       </div>
     </div>
   );
