@@ -93,7 +93,7 @@ const RatecardSkeleton = () => {
   );
 };
 
-const renderDefaultSvg = (name: string) => {
+const renderDefaultSvg = (name: string, isMinimalist: boolean = false) => {
   const normalized = name.toLowerCase().trim();
   if (normalized === 'ikea') {
     return (
@@ -107,7 +107,7 @@ const renderDefaultSvg = (name: string) => {
   if (normalized === 'bose') {
     return (
       <svg viewBox="0 0 100 40" className="w-full h-full opacity-70 hover:opacity-100 transition-opacity">
-        <text x="50" y="26" fontFamily="sans-serif" fontWeight="900" fontStyle="italic" fontSize="22" fill="#111115" textAnchor="middle" letterSpacing="-1">BOSE</text>
+        <text x="50" y="26" fontFamily="sans-serif" fontWeight="900" fontStyle="italic" fontSize="22" fill={isMinimalist ? "#111115" : "#FFFFFF"} textAnchor="middle" letterSpacing="-1">BOSE</text>
       </svg>
     );
   }
@@ -144,7 +144,7 @@ const renderDefaultSvg = (name: string) => {
   if (normalized === 'olymplast') {
     return (
       <div className="flex flex-col items-center justify-center opacity-80">
-        <span className="text-[10px] font-black text-emerald-700 tracking-tight">OLYMPLAST</span>
+        <span className={`text-[10px] font-black tracking-tight ${isMinimalist ? 'text-emerald-700' : 'text-emerald-400'}`}>OLYMPLAST</span>
         <span className="text-[5px] font-bold text-slate-500 uppercase tracking-widest">Furniture</span>
       </div>
     );
@@ -152,14 +152,14 @@ const renderDefaultSvg = (name: string) => {
   if (normalized === 'polki') {
     return (
       <div className="flex items-center gap-1 opacity-80">
-        <span className="text-xs font-black font-mono italic text-blue-700 tracking-wider">POLKI</span>
+        <span className={`text-xs font-black font-mono italic tracking-wider ${isMinimalist ? 'text-blue-700' : 'text-blue-400'}`}>POLKI</span>
         <span className="text-xs">✨</span>
       </div>
     );
   }
   if (normalized === 'home guard') {
     return (
-      <div className="flex items-center gap-1 text-[10px] font-black text-rose-700 opacity-80">
+      <div className={`flex items-center gap-1 text-[10px] font-black opacity-80 ${isMinimalist ? 'text-rose-700' : 'text-rose-400'}`}>
         <span>🛡️</span>
         <span className="leading-none text-left tracking-tighter text-[8px]">HOME GUARD</span>
       </div>
@@ -168,20 +168,20 @@ const renderDefaultSvg = (name: string) => {
   if (normalized === 'meco') {
     return (
       <div className="flex items-center gap-1.5 opacity-80">
-        <div className="w-3 h-3 rounded-full bg-pink-600" />
-        <span className="text-[10px] font-black text-pink-600 font-sans tracking-widest">meco</span>
+        <div className={`w-3 h-3 rounded-full ${isMinimalist ? 'bg-pink-600' : 'bg-pink-500'}`} />
+        <span className={`text-[10px] font-black font-sans tracking-widest ${isMinimalist ? 'text-pink-600' : 'text-pink-400'}`}>meco</span>
       </div>
     );
   }
   if (normalized === 'advance') {
     return (
       <div className="flex flex-col items-center justify-center">
-        <span className="text-[10px] font-black text-sky-700 italic uppercase">ADVANCE</span>
+        <span className={`text-[10px] font-black italic uppercase ${isMinimalist ? 'text-sky-700' : 'text-sky-400'}`}>ADVANCE</span>
         <span className="text-[5px] font-bold text-slate-500 uppercase tracking-widest">Advancing Life</span>
       </div>
     );
   }
-  return <span className="text-xs font-bold text-slate-700 group-hover:text-indigo-600 dark-text-override uppercase tracking-widest text-center px-1 truncate">{name}</span>;
+  return <span className={`text-xs font-bold uppercase tracking-widest text-center px-1 truncate group-hover:text-white ${isMinimalist ? 'text-slate-700 group-hover:text-indigo-600' : 'text-slate-300'}`}>{name}</span>;
 }
 
 const BrandLogoList = ({ brands = [], isMinimalist = false }: { brands?: RatecardBrand[]; isMinimalist?: boolean }) => {
@@ -197,7 +197,7 @@ const BrandLogoList = ({ brands = [], isMinimalist = false }: { brands?: Ratecar
           className={
             isMinimalist
               ? "bg-white rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-[#DDD3C5] hover:border-[#8E7E74] hover:scale-[1.03] transition-all duration-300 group shadow-xs hover:shadow-sm"
-              : "bg-white rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-slate-200 hover:border-indigo-500/20 hover:scale-[1.03] transition-all duration-300 group shadow-md"
+              : "bg-[#121218]/40 backdrop-blur-md rounded-2xl p-4 h-16 w-full max-w-[150px] flex items-center justify-center border border-white/5 hover:border-white/10 hover:scale-[1.03] transition-all duration-300 group"
           } 
           title={brand.name}
         >
@@ -210,8 +210,8 @@ const BrandLogoList = ({ brands = [], isMinimalist = false }: { brands?: Ratecar
               className="max-h-full max-w-full object-contain opacity-90 group-hover:opacity-100 transition-opacity" 
             />
           ) : (
-            <div className="text-slate-800 [&_span.dark-text-override]:!text-slate-800 [&_span]:!text-slate-800 [&_div]:!text-slate-800">
-              {renderDefaultSvg(brand.name)}
+            <div className={isMinimalist ? "text-[#322723] [&_span]:!text-[#322723] [&_div]:!text-[#322723]" : "text-white"}>
+              {renderDefaultSvg(brand.name, isMinimalist)}
             </div>
           )}
         </div>
