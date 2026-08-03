@@ -15,9 +15,11 @@ import {
   MessageCircle,
   Sparkles,
   ArrowRight,
-  PlayCircle
+  PlayCircle,
+  Layers,
+  X
 } from 'lucide-react';
-import { AffiliateLink, RatecardProfile } from '../types';
+import { AffiliateLink, RatecardProfile, SubLink } from '../types';
 
 interface LinktreeViewProps {
   links: AffiliateLink[];
@@ -68,6 +70,7 @@ export default function LinktreeView({
 }: LinktreeViewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedLinkId, setExpandedLinkId] = useState<string | null>(null);
+  const [selectedMultiLinkItem, setSelectedMultiLinkItem] = useState<AffiliateLink | null>(null);
 
   // Calculate top 3 links based on clicks for real-time auto Terpopuler indicator
   const topClickedIds = [...links]
@@ -101,11 +104,18 @@ export default function LinktreeView({
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
     
+    const matchesSubLink = link.subLinks?.some(sub => 
+      sub.title.toLowerCase().includes(query) || 
+      (sub.buttonLabel && sub.buttonLabel.toLowerCase().includes(query)) ||
+      (sub.category && sub.category.toLowerCase().includes(query))
+    );
+
     return link.title.toLowerCase().includes(query) || 
            (link.description && link.description.toLowerCase().includes(query)) ||
            link.category.toLowerCase().includes(query) ||
            permanentNumber === query ||
-           permanentNumber.includes(query);
+           permanentNumber.includes(query) ||
+           matchesSubLink;
   });
 
   const toggleExpand = (id: string, e: React.MouseEvent) => {
@@ -113,9 +123,21 @@ export default function LinktreeView({
     setExpandedLinkId(expandedLinkId === id ? null : id);
   };
 
-  const handleLinkNavigate = (link: AffiliateLink) => {
-    onLinkClick(link.id);
-    window.open(link.url, '_blank', 'noopener,noreferrer');
+  const handleLinkClickOrOpenMulti = (link: AffiliateLink, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const hasMultiLinks = Array.isArray(link.subLinks) && link.subLinks.length > 1;
+    if (hasMultiLinks) {
+      setSelectedMultiLinkItem(link);
+    } else {
+      onLinkClick(link.id);
+      window.open(link.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const handleSubLinkNavigate = (parentLinkId: string, subUrl: string) => {
+    onLinkClick(parentLinkId);
+    window.open(subUrl, '_blank', 'noopener,noreferrer');
+    setSelectedMultiLinkItem(null);
   };
 
   // Helper to retrieve category icon
@@ -389,6 +411,8 @@ export default function LinktreeView({
               {filteredLinks.map((link, idx) => {
                 const originalIndex = sortedDefaultActiveLinks.findIndex(l => l.id === link.id);
                 const sequenceNumber = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
+                const hasMultiLinks = Array.isArray(link.subLinks) && link.subLinks.length > 1;
+
                 return (
                   <motion.div
                     key={link.id}
@@ -399,7 +423,7 @@ export default function LinktreeView({
                     whileHover={getCardHoverStyle()}
                     transition={{ delay: Math.min(idx * 0.04, 0.2), duration: 0.3 }}
                     className={`border p-3.5 flex items-center justify-between gap-4 transition-all duration-350 cursor-pointer overflow-hidden group select-none ${getButtonRoundedClass()} ${getButtonShadowClass()}`}
-                    onClick={() => handleLinkNavigate(link)}
+                    onClick={(e) => handleLinkClickOrOpenMulti(link, e)}
                     id={`link-list-item-${link.id}`}
                     style={{ 
                       backgroundColor: getCardBgColor(),
@@ -437,10 +461,17 @@ export default function LinktreeView({
 
                       {/* Descriptive metadata text */}
                       <div className="min-w-0 flex-1">
-                        <span className="inline-flex items-center gap-1 text-[8px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                          {getCategoryIcon(link.category)}
-                          {link.category}
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="inline-flex items-center gap-1 text-[8px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                            {getCategoryIcon(link.category)}
+                            {link.category}
+                          </span>
+                          {hasMultiLinks && (
+                            <span className="inline-flex items-center gap-1 text-[8px] font-mono font-bold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded-md border border-indigo-100">
+                              <Layers className="w-2.5 h-2.5" /> {link.subLinks!.length} Toko
+                            </span>
+                          )}
+                        </div>
                         <h3 className="font-extrabold text-xs sm:text-sm truncate mt-0.5" style={{ color: profile.designSettings?.colors.title }}>
                           {link.title}
                         </h3>
@@ -478,9 +509,16 @@ export default function LinktreeView({
                           backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
                           color: profile.designSettings?.colors.buttonText || '#ffffff'
                         }}
+                        onClick={(e) => handleLinkClickOrOpenMulti(link, e)}
                       >
-                        <span className="truncate max-w-[85px]">{link.buttonLabel ? link.buttonLabel : "Link"}</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        <span className="truncate max-w-[85px]">
+                          {link.buttonLabel ? link.buttonLabel : (hasMultiLinks ? "Pilih Link" : "Link")}
+                        </span>
+                        {hasMultiLinks ? (
+                          <ChevronDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform shrink-0" />
+                        ) : (
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -493,6 +531,8 @@ export default function LinktreeView({
               {filteredLinks.map((link, idx) => {
                 const originalIndex = sortedDefaultActiveLinks.findIndex(l => l.id === link.id);
                 const sequenceNumber = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
+                const hasMultiLinks = Array.isArray(link.subLinks) && link.subLinks.length > 1;
+
                 return (
                   <motion.div
                     key={link.id}
@@ -503,7 +543,7 @@ export default function LinktreeView({
                     whileHover={getCardHoverStyle()}
                     transition={{ delay: Math.min(idx * 0.05, 0.25), duration: 0.3 }}
                     className={`border transition-all duration-350 cursor-pointer overflow-hidden group flex flex-col relative ${getButtonRoundedClass()} ${getButtonShadowClass()}`}
-                    onClick={() => handleLinkNavigate(link)}
+                    onClick={(e) => handleLinkClickOrOpenMulti(link, e)}
                     id={`link-card-${link.id}`}
                     style={{ 
                        backgroundColor: getCardBgColor(),
@@ -534,6 +574,13 @@ export default function LinktreeView({
                       <span className="absolute top-2 left-2 sm:top-3 sm:left-3 text-[9px] sm:text-[11px] text-slate-500 font-sans font-extrabold bg-white/95 backdrop-blur-md px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg border border-slate-100 shadow-xs">
                         {sequenceNumber}
                       </span>
+
+                      {/* Multi-Link Badge on image bottom-left if present */}
+                      {hasMultiLinks && (
+                        <span className="absolute bottom-2 left-2 text-[8px] font-mono font-bold text-indigo-700 bg-white/95 backdrop-blur-md px-2 py-0.5 rounded-md border border-indigo-200 shadow-xs flex items-center gap-1">
+                          <Layers className="w-2.5 h-2.5 text-indigo-600" /> {link.subLinks!.length} TOKO
+                        </span>
+                      )}
 
                       {/* Indicator for High-Clicks Products */}
                       {topClickedIds.includes(link.id) && link.clicks > 0 && (
@@ -590,13 +637,16 @@ export default function LinktreeView({
                           backgroundColor: profile.designSettings?.colors.buttons || '#0f172a',
                           color: profile.designSettings?.colors.buttonText || '#ffffff'
                         }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleLinkNavigate(link);
-                        }}
+                        onClick={(e) => handleLinkClickOrOpenMulti(link, e)}
                       >
-                        <span className="truncate">{link.buttonLabel ? link.buttonLabel : "Link"}</span>
-                        <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        <span className="truncate">
+                          {link.buttonLabel ? link.buttonLabel : (hasMultiLinks ? "Pilih Link" : "Link")}
+                        </span>
+                        {hasMultiLinks ? (
+                          <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-y-0.5 transition-transform shrink-0" />
+                        ) : (
+                          <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                        )}
                       </div>
                     </div>
 
@@ -621,6 +671,121 @@ export default function LinktreeView({
               Reset Pencarian
             </button>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Multi-Link Store Selector Modal */}
+      <AnimatePresence>
+        {selectedMultiLinkItem && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" 
+            id="multi-link-modal-backdrop" 
+            onClick={() => setSelectedMultiLinkItem(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl relative overflow-hidden"
+              id="multi-link-modal-content"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header Close Button */}
+              <button
+                onClick={() => setSelectedMultiLinkItem(null)}
+                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
+                id="close-multi-link-modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Product Info Preview Header */}
+              <div className="flex items-center gap-3.5 mb-4 pr-8">
+                {selectedMultiLinkItem.imageUrl ? (
+                  <img
+                    src={selectedMultiLinkItem.imageUrl}
+                    alt={selectedMultiLinkItem.title}
+                    referrerPolicy="no-referrer"
+                    className="w-14 h-14 object-cover rounded-2xl border border-slate-100 shrink-0 bg-slate-50"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 text-indigo-600">
+                    <Layers className="w-6 h-6" />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                    <Layers className="w-2.5 h-2.5" /> Multi-Link ({selectedMultiLinkItem.subLinks?.length} Opsi)
+                  </span>
+                  <h3 className="font-extrabold text-sm sm:text-base text-slate-900 leading-snug mt-1 truncate">
+                    {selectedMultiLinkItem.title}
+                  </h3>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-500 font-medium mb-4">
+                Pilih toko atau platform yang ingin Anda kunjungi:
+              </p>
+
+              {/* Sub-links Option List */}
+              <div className="space-y-2.5 max-h-[60vh] overflow-y-auto pr-0.5">
+                {/* Main default link option */}
+                {selectedMultiLinkItem.url && (
+                  <button
+                    onClick={() => handleSubLinkNavigate(selectedMultiLinkItem.id, selectedMultiLinkItem.url)}
+                    className="w-full p-3.5 bg-slate-50 hover:bg-indigo-50/80 border border-slate-200 hover:border-indigo-200 rounded-2xl flex items-center justify-between gap-3 text-left transition-all group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
+                        {getCategoryIcon(selectedMultiLinkItem.category)}
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-slate-800 group-hover:text-indigo-900 block truncate">
+                          {selectedMultiLinkItem.buttonLabel || `Toko Utama (${selectedMultiLinkItem.category})`}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono block truncate">
+                          {selectedMultiLinkItem.category}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-1.5 bg-white border border-slate-200 rounded-lg group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-colors shrink-0">
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </div>
+                  </button>
+                )}
+
+                {/* Additional subLinks */}
+                {selectedMultiLinkItem.subLinks?.map((sub, idx) => {
+                  const label = sub.buttonLabel || sub.title || `Opsi #${idx + 2}`;
+                  return (
+                    <button
+                      key={sub.id || idx}
+                      onClick={() => handleSubLinkNavigate(selectedMultiLinkItem.id, sub.url)}
+                      className="w-full p-3.5 bg-slate-50 hover:bg-indigo-50/80 border border-slate-200 hover:border-indigo-200 rounded-2xl flex items-center justify-between gap-3 text-left transition-all group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
+                          {getCategoryIcon(sub.category || label)}
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-xs font-bold text-slate-800 group-hover:text-indigo-900 block truncate">
+                            {label}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono block truncate">
+                            Link Opsi #{idx + 2}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="p-1.5 bg-white border border-slate-200 rounded-lg group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-colors shrink-0">
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 

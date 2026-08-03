@@ -1,3 +1,11 @@
+export interface SubLink {
+  id: string;
+  title: string;
+  url: string;
+  category?: string;
+  buttonLabel?: string;
+}
+
 export interface AffiliateLink {
   id: string;
   title: string;
@@ -10,6 +18,7 @@ export interface AffiliateLink {
   buttonLabel?: string;
   imageUrl?: string;
   videoUrl?: string;
+  subLinks?: SubLink[];
 }
 
 export interface DesignSettings {

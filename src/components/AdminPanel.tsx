@@ -56,9 +56,10 @@ import {
   Calendar,
   Globe,
   Server,
-  Columns
+  Columns,
+  Layers
 } from 'lucide-react';
-import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog, VisitLog } from '../types';
+import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog, VisitLog, SubLink } from '../types';
 import DesignSettingsForm from './DesignSettingsForm';
 
 interface AdminPanelProps {
@@ -763,12 +764,16 @@ export default function AdminPanel({
       isActive: true,
       priority: links.length + 1,
       videoUrl: '',
+      subLinks: [],
     });
     setIsAddingLink(true);
   };
 
   const triggerEditLink = (link: AffiliateLink) => {
-    setEditingLink({ ...link });
+    setEditingLink({ 
+      ...link,
+      subLinks: link.subLinks ? [...link.subLinks] : []
+    });
     setIsAddingLink(false);
   };
 
@@ -1203,6 +1208,90 @@ export default function AdminPanel({
                     onChange={(e) => setEditingLink({...editingLink, url: e.target.value})}
                     className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400 font-mono"
                   />
+
+                  {/* Tombol & List Tambah Link Opsi (Multi-Link) */}
+                  <div className="mt-2.5 space-y-2">
+                    {editingLink.subLinks && editingLink.subLinks.length > 0 && (
+                      <div className="space-y-2 bg-slate-50/80 p-2.5 border border-slate-200 rounded-xl">
+                        {editingLink.subLinks.map((sub, sIdx) => (
+                          <div key={sub.id || sIdx} className="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2 shadow-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-mono font-bold text-indigo-600 uppercase flex items-center gap-1">
+                                <Layers className="w-3 h-3" /> Link Opsi #{sIdx + 2}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = editingLink.subLinks!.filter((_, i) => i !== sIdx);
+                                  setEditingLink({ ...editingLink, subLinks: updated });
+                                }}
+                                className="text-red-500 hover:text-red-700 p-0.5 text-[11px] flex items-center gap-1 font-mono cursor-pointer"
+                              >
+                                <Trash2 className="w-3 h-3" /> Hapus
+                              </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[10px] text-slate-500 font-mono mb-1">Label Tombol (misal: Tokopedia / Shopee)</label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. Beli di Tokopedia"
+                                  value={sub.buttonLabel || sub.title || ''}
+                                  onChange={(e) => {
+                                    const updated = [...editingLink.subLinks!];
+                                    updated[sIdx] = { 
+                                      ...updated[sIdx], 
+                                      buttonLabel: e.target.value,
+                                      title: e.target.value 
+                                    };
+                                    setEditingLink({ ...editingLink, subLinks: updated });
+                                  }}
+                                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-md text-xs bg-white font-sans outline-none focus:border-indigo-400"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] text-slate-500 font-mono mb-1">URL Link Opsi</label>
+                                <input
+                                  type="url"
+                                  placeholder="https://tokopedia.link/..."
+                                  value={sub.url || ''}
+                                  onChange={(e) => {
+                                    const updated = [...editingLink.subLinks!];
+                                    updated[sIdx] = { ...updated[sIdx], url: e.target.value };
+                                    setEditingLink({ ...editingLink, subLinks: updated });
+                                  }}
+                                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-md text-xs bg-white font-mono outline-none focus:border-indigo-400"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = editingLink.subLinks || [];
+                        setEditingLink({
+                          ...editingLink,
+                          subLinks: [
+                            ...current,
+                            {
+                              id: `sub-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+                              title: current.length === 0 ? 'Tokopedia' : 'Opsi Link',
+                              buttonLabel: current.length === 0 ? 'Beli di Tokopedia' : 'Link Opsi',
+                              url: ''
+                            }
+                          ]
+                        });
+                      }}
+                      className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Tambah Link Opsi (Multi-Link)
+                    </button>
+                  </div>
                 </div>
 
                  <div>
@@ -1262,6 +1351,8 @@ export default function AdminPanel({
                     className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:border-indigo-400 font-sans"
                   />
                 </div>
+
+
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div>
@@ -1435,6 +1526,11 @@ export default function AdminPanel({
                           <span className="text-[10px] font-mono text-slate-400">
                             Prioritas: {link.priority}
                           </span>
+                          {link.subLinks && link.subLinks.length > 1 && (
+                            <span className="text-[10px] bg-indigo-50 text-indigo-700 font-mono font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                              <Layers className="w-2.5 h-2.5" /> {link.subLinks.length} Multi-Link
+                            </span>
+                          )}
                           {!link.isActive && (
                             <span className="text-[10px] bg-red-50 text-red-600 font-mono px-2 py-0.5 rounded-md">
                               Dihide (Draft)
