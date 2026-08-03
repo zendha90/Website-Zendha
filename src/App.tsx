@@ -113,7 +113,7 @@ export default function App() {
       document.title = 'Admin Dashboard | Creator Workspace';
     } else if (data?.profile) {
       if (currentView === 'ratecard') {
-        document.title = data.profile.ratecardTitle || `${data.profile.name} | Premium Ratecard`;
+        document.title = data.profile.ratecardTitle || `${data.profile.name} | Ratecard`;
       } else {
         document.title = data.profile.linktreeTitle || `${data.profile.name} | Affiliate Links & Portfolio`;
       }
