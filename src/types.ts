@@ -106,6 +106,19 @@ export interface RatecardProfile {
   ratecardTitle?: string;
   faviconUrl?: string;
 
+  // Portfolio Customizable Texts (/portofolio)
+  portfolioPageTitle?: string;
+  portfolioStudioName?: string;
+  portfolioHeroIndexMarker?: string;
+  portfolioHeroSubtitle?: string;
+  portfolioHeroDescription?: string;
+  portfolioArchiveMarker?: string;
+  portfolioArchiveQuote?: string;
+  portfolioCtaTitle?: string;
+  portfolioCtaDescription?: string;
+  portfolioCtaButtonText?: string;
+  portfolioModalDescription?: string;
+
   // Design Settings
   designSettings?: DesignSettings;
 }

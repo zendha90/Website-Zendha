@@ -178,7 +178,27 @@ export default function PortfolioView({
     ? activeReels 
     : activeReels.filter(r => r.category.toUpperCase() === selectedCategory);
 
-  const studioName = profile.name ? profile.name.toUpperCase() : "STUDIO_01";
+  const studioName = profile.portfolioStudioName 
+    ? profile.portfolioStudioName.toUpperCase() 
+    : (profile.name ? profile.name.toUpperCase() : "STUDIO_01");
+
+  const heroIndexMarker = profile.portfolioHeroIndexMarker || "00 // INDEX";
+  const heroSubtitle = profile.portfolioHeroSubtitle || "VISUAL STORYTELLER";
+  const heroDescription = profile.portfolioHeroDescription || "Precision editing for brands and creators. Crafting narratives through meticulous cut, color, and sound in a distraction-free technical environment.";
+  const archiveMarker = profile.portfolioArchiveMarker || "02 // CREATOR ARCHIVE";
+  const archiveQuote = profile.portfolioArchiveQuote || "\"Every edit is built with mathematical rhythm and pacing. Specialized in retaining visual focus, crafting dynamic sound beds, and polishing color grade to industry benchmarks.\"";
+  const ctaTitle = profile.portfolioCtaTitle || "READY TO COLLABORATE?";
+  const ctaDescription = profile.portfolioCtaDescription || "Available for freelance projects globally. Specialized in commercial, documentary, and narrative editing.";
+  const ctaButtonText = profile.portfolioCtaButtonText || "GET IN TOUCH";
+  const modalDescription = profile.portfolioModalDescription || "Hubungi langsung melalui saluran komunikasi resmi untuk diskusi brief video reel, jadwal produksi, dan penawaran khusus.";
+
+  React.useEffect(() => {
+    if (profile.portfolioPageTitle) {
+      document.title = profile.portfolioPageTitle;
+    } else if (profile.name) {
+      document.title = `${profile.name} // Portfolio & Reels`;
+    }
+  }, [profile]);
 
   return (
     <div className="min-h-screen bg-[#121414] text-[#e2e2e2] font-['Montserrat',sans-serif] selection:bg-[#e2e2e2] selection:text-[#121414] relative overflow-x-hidden" id="portfolio-view">
@@ -236,13 +256,13 @@ export default function PortfolioView({
         </div>
       </header>
 
-      {/* SECTION 00 // INDEX (HERO) */}
-      <section className="max-w-[1440px] mx-auto px-4 md:px-12 pt-16 md:pt-24 pb-16">
-        <div className="space-y-6 max-w-4xl">
+      {/* COMBINED HERO & CREATOR ARCHIVE SECTION */}
+      <section id="about" className="max-w-[1440px] mx-auto px-4 md:px-12 pt-12 md:pt-20 pb-12">
+        <div className="space-y-8">
           
           {/* Index Marker */}
           <div className="inline-block px-2.5 py-1 bg-[#1a1c1c] border border-[#333535] rounded text-xs font-['JetBrains_Mono',monospace] text-[#8e9192] tracking-widest">
-            00 // INDEX
+            {heroIndexMarker}
           </div>
 
           {/* Studio Title */}
@@ -251,14 +271,78 @@ export default function PortfolioView({
               {studioName}
             </h2>
             <h3 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#8e9192] uppercase">
-              VISUAL STORYTELLER
+              {heroSubtitle}
             </h3>
           </div>
 
-          {/* Subtitle */}
-          <p className="text-[#c4c7c7] text-sm md:text-base leading-relaxed max-w-2xl font-normal">
-            Precision editing for brands and creators. Crafting narratives through meticulous cut, color, and sound in a distraction-free technical environment.
-          </p>
+          {/* Combined Content Grid (Profile & Bio + Hero Description & Creator Quote) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start bg-[#1a1c1c] border border-[#282a2b] rounded-2xl p-6 sm:p-8 md:p-10">
+            
+            {/* Left Col: Avatar + Creator Bio + Socials */}
+            <div className="lg:col-span-4 flex flex-col items-center sm:items-start text-center sm:text-left gap-4 pb-6 lg:pb-0 border-b lg:border-b-0 lg:border-r border-[#282a2b] lg:pr-8">
+              <img 
+                src={profile.avatarUrl} 
+                alt={profile.name}
+                className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl object-cover border border-[#444748] shadow-2xl shrink-0"
+              />
+              <div className="space-y-1">
+                <h4 className="text-lg sm:text-xl font-bold text-white uppercase">{profile.name}</h4>
+                <p className="text-xs font-['JetBrains_Mono',monospace] text-[#8e9192] leading-relaxed">{profile.bio}</p>
+              </div>
+
+              {/* Social links */}
+              <div className="flex flex-wrap gap-2 pt-2 font-['JetBrains_Mono',monospace] justify-center sm:justify-start">
+                {profile.instagram && (
+                  <a 
+                    href={profile.instagram} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-colors"
+                  >
+                    <Instagram className="w-3.5 h-3.5 text-[#b1cad7]" />
+                    <span>INSTAGRAM</span>
+                  </a>
+                )}
+                {profile.tiktok && (
+                  <a 
+                    href={profile.tiktok} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-colors"
+                  >
+                    <VideoIcon className="w-3.5 h-3.5 text-[#b1cad7]" />
+                    <span>TIKTOK</span>
+                  </a>
+                )}
+                {profile.email && (
+                  <a 
+                    href={`mailto:${profile.email}`}
+                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-colors"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-[#b1cad7]" />
+                    <span>EMAIL</span>
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Right Col: Hero Description + Creator Statement Quote */}
+            <div className="lg:col-span-8 space-y-6">
+              <p className="text-[#e2e2e2] text-sm md:text-base leading-relaxed font-normal">
+                {heroDescription}
+              </p>
+
+              <div className="pt-4 border-t border-[#282a2b] space-y-3">
+                <div className="text-xs font-['JetBrains_Mono',monospace] text-[#8e9192] tracking-widest uppercase">
+                  {archiveMarker}
+                </div>
+                <p className="text-[#c4c7c7] text-xs md:text-sm leading-relaxed italic font-['JetBrains_Mono',monospace]">
+                  {archiveQuote}
+                </p>
+              </div>
+            </div>
+
+          </div>
 
         </div>
       </section>
@@ -281,77 +365,15 @@ export default function PortfolioView({
 
       </section>
 
-      {/* SECTION 02 // CREATOR STATEMENT & ARCHIVE */}
-      <section id="about" className="max-w-[1440px] mx-auto px-4 md:px-12 py-16 border-t border-[#282a2b]">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-[#1a1c1c] border border-[#282a2b] rounded-2xl p-8 md:p-12">
-          
-          <div className="md:col-span-4 flex flex-col items-center text-center md:items-start md:text-left gap-4">
-            <img 
-              src={profile.avatarUrl} 
-              alt={profile.name}
-              className="w-28 h-28 md:w-36 md:h-36 rounded-2xl object-cover border border-[#444748] shadow-2xl"
-            />
-            <div>
-              <h4 className="text-xl font-bold text-white uppercase">{profile.name}</h4>
-              <p className="text-xs font-['JetBrains_Mono',monospace] text-[#8e9192] mt-1">{profile.bio}</p>
-            </div>
-          </div>
-
-          <div className="md:col-span-8 space-y-6">
-            <div className="text-xs font-['JetBrains_Mono',monospace] text-[#8e9192] tracking-widest uppercase">
-              02 // CREATOR ARCHIVE
-            </div>
-            <p className="text-[#c4c7c7] text-sm md:text-base leading-relaxed">
-              "Every edit is built with mathematical rhythm and pacing. Specialized in retaining visual focus, crafting dynamic sound beds, and polishing color grade to industry benchmarks."
-            </p>
-            
-            <div className="flex flex-wrap gap-3 pt-2 font-['JetBrains_Mono',monospace]">
-              {profile.instagram && (
-                <a 
-                  href={profile.instagram} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="px-4 py-2 rounded bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-colors"
-                >
-                  <Instagram className="w-4 h-4 text-[#b1cad7]" />
-                  <span>INSTAGRAM</span>
-                </a>
-              )}
-              {profile.tiktok && (
-                <a 
-                  href={profile.tiktok} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="px-4 py-2 rounded bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-colors"
-                >
-                  <VideoIcon className="w-4 h-4 text-[#b1cad7]" />
-                  <span>TIKTOK</span>
-                </a>
-              )}
-              {profile.email && (
-                <a 
-                  href={`mailto:${profile.email}`}
-                  className="px-4 py-2 rounded bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-colors"
-                >
-                  <Mail className="w-4 h-4 text-[#b1cad7]" />
-                  <span>EMAIL</span>
-                </a>
-              )}
-            </div>
-          </div>
-
-        </div>
-      </section>
-
       {/* SECTION // READY TO COLLABORATE? (CTA) */}
       <section className="max-w-[1440px] mx-auto px-4 md:px-12 py-20 text-center border-t border-[#282a2b]">
         <div className="max-w-2xl mx-auto space-y-6">
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight uppercase">
-            READY TO COLLABORATE?
+            {ctaTitle}
           </h2>
 
           <p className="text-[#c4c7c7] text-sm md:text-base leading-relaxed font-['JetBrains_Mono',monospace]">
-            Available for freelance projects globally. Specialized in commercial, documentary, and narrative editing.
+            {ctaDescription}
           </p>
 
           <div className="pt-4">
@@ -359,7 +381,7 @@ export default function PortfolioView({
               onClick={() => setShowHireModal(true)}
               className="px-8 py-3.5 rounded bg-transparent hover:bg-white text-white hover:text-black border border-[#e2e2e2] font-['JetBrains_Mono',monospace] font-bold text-xs tracking-widest uppercase transition-all cursor-pointer inline-flex items-center gap-3"
             >
-              <span>GET IN TOUCH</span>
+              <span>{ctaButtonText}</span>
               <ArrowUpRight className="w-4 h-4" />
             </button>
           </div>
@@ -409,7 +431,7 @@ export default function PortfolioView({
             </div>
 
             <p className="text-xs font-['JetBrains_Mono',monospace] text-[#c4c7c7] leading-relaxed">
-              Hubungi langsung melalui saluran komunikasi resmi untuk diskusi brief video reel, jadwal produksi, dan penawaran khusus.
+              {modalDescription}
             </p>
 
             <div className="space-y-3 font-['JetBrains_Mono',monospace]">
