@@ -199,12 +199,23 @@ interface RatecardBrand {
   priority: number;
 }
 
+interface PortfolioReel {
+  id: string;
+  title: string;
+  category: string;
+  coverImageUrl: string;
+  videoUrl?: string;
+  isActive: boolean;
+  priority: number;
+}
+
 interface DatabaseSchema {
   links: AffiliateLink[];
   profile: RatecardProfile;
   services: RatecardService[];
   projects: RatecardProject[];
   brands?: RatecardBrand[];
+  portfolioReels?: PortfolioReel[];
   clickLogs?: ClickLog[];
   visitLogs?: VisitLog[];
   githubSettings?: {
@@ -391,6 +402,62 @@ const DEFAULT_DB: DatabaseSchema = {
     { id: "brand-8", name: "Home Guard", logoUrl: "", priority: 8, isActive: true },
     { id: "brand-9", name: "Meco", logoUrl: "", priority: 9, isActive: true },
     { id: "brand-10", name: "Advance", logoUrl: "", priority: 10, isActive: true }
+  ],
+  portfolioReels: [
+    {
+      id: "reel-1",
+      title: "MIDNIGHT RUN",
+      category: "AUTOMOTIVE",
+      coverImageUrl: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=800&h=1400",
+      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-sports-car-driving-on-a-road-at-night-41551-large.mp4",
+      isActive: true,
+      priority: 1
+    },
+    {
+      id: "reel-2",
+      title: "THE ARCHITECT",
+      category: "SHORT FILM",
+      coverImageUrl: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&q=80&w=800&h=1400",
+      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-modern-city-skyscrapers-and-buildings-42582-large.mp4",
+      isActive: true,
+      priority: 2
+    },
+    {
+      id: "reel-3",
+      title: "PRECISION GEAR",
+      category: "PRODUCT",
+      coverImageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=800&h=1400",
+      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-camera-at-sunset-41549-large.mp4",
+      isActive: true,
+      priority: 3
+    },
+    {
+      id: "reel-4",
+      title: "CONCRETE JUNGLE",
+      category: "DOCUMENTARY",
+      coverImageUrl: "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=800&h=1400",
+      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-top-view-of-a-traffic-junction-in-a-city-41552-large.mp4",
+      isActive: true,
+      priority: 4
+    },
+    {
+      id: "reel-5",
+      title: "FORWARD MOTION",
+      category: "CAMPAIGN",
+      coverImageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800&h=1400",
+      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-man-running-on-the-beach-at-sunset-41550-large.mp4",
+      isActive: true,
+      priority: 5
+    },
+    {
+      id: "reel-6",
+      title: "SYNTHWAVE",
+      category: "MUSIC VIDEO",
+      coverImageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=800&h=1400",
+      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-dj-mixing-music-at-a-nightclub-41553-large.mp4",
+      isActive: true,
+      priority: 6
+    }
   ]
 };
 
@@ -412,6 +479,21 @@ function readDb(): DatabaseSchema {
       if (!db.brands || db.brands.length === 0) {
         db.brands = DEFAULT_DB.brands;
         changed = true;
+      }
+
+      if (!db.portfolioReels || db.portfolioReels.length === 0) {
+        db.portfolioReels = DEFAULT_DB.portfolioReels;
+        changed = true;
+      } else {
+        // Upgrade any generic instagram dummy urls to direct working mp4 videos
+        db.portfolioReels.forEach((reel, i) => {
+          if (!reel.videoUrl || reel.videoUrl === "https://www.instagram.com/reels/") {
+            if (DEFAULT_DB.portfolioReels[i]) {
+              reel.videoUrl = DEFAULT_DB.portfolioReels[i].videoUrl;
+              changed = true;
+            }
+          }
+        });
       }
 
       if (db.profile) {
@@ -1811,6 +1893,84 @@ app.delete('/api/ratecard/brands/:id', (req, res) => {
   
   writeDb(db);
   res.json({ success: true, message: 'Brand berhasil dihapus' });
+});
+
+// Add Portfolio Reel
+app.post('/api/portfolio/reels', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+  const { title, category, coverImageUrl, videoUrl, priority, isActive } = req.body;
+  if (!title) {
+    return res.status(400).json({ success: false, message: 'Judul reel wajib diisi' });
+  }
+  
+  const db = readDb();
+  if (!db.portfolioReels) db.portfolioReels = [];
+  
+  const newReel: PortfolioReel = {
+    id: `reel-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    title,
+    category: category || 'AUTOMOTIVE',
+    coverImageUrl: coverImageUrl || 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=800&h=1400',
+    videoUrl: videoUrl || '',
+    priority: priority !== undefined ? Number(priority) : db.portfolioReels.length + 1,
+    isActive: isActive !== undefined ? !!isActive : true
+  };
+  
+  db.portfolioReels.push(newReel);
+  db.portfolioReels.sort((a, b) => a.priority - b.priority);
+  writeDb(db);
+  
+  res.status(201).json({ success: true, reel: newReel });
+});
+
+// Update Portfolio Reel
+app.put('/api/portfolio/reels/:id', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+  const { id } = req.params;
+  const { title, category, coverImageUrl, videoUrl, priority, isActive } = req.body;
+  
+  const db = readDb();
+  if (!db.portfolioReels) db.portfolioReels = [];
+  
+  const index = db.portfolioReels.findIndex(r => r.id === id);
+  if (index === -1) {
+    return res.status(404).json({ success: false, message: 'Reel tidak ditemukan' });
+  }
+  
+  db.portfolioReels[index] = {
+    ...db.portfolioReels[index],
+    title: title !== undefined ? title : db.portfolioReels[index].title,
+    category: category !== undefined ? category : db.portfolioReels[index].category,
+    coverImageUrl: coverImageUrl !== undefined ? coverImageUrl : db.portfolioReels[index].coverImageUrl,
+    videoUrl: videoUrl !== undefined ? videoUrl : db.portfolioReels[index].videoUrl,
+    priority: priority !== undefined ? Number(priority) : db.portfolioReels[index].priority,
+    isActive: isActive !== undefined ? !!isActive : db.portfolioReels[index].isActive
+  };
+  
+  db.portfolioReels.sort((a, b) => a.priority - b.priority);
+  writeDb(db);
+  res.json({ success: true, reel: db.portfolioReels[index] });
+});
+
+// Delete Portfolio Reel
+app.delete('/api/portfolio/reels/:id', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+  const { id } = req.params;
+  const db = readDb();
+  if (!db.portfolioReels) db.portfolioReels = [];
+  
+  const initialLength = db.portfolioReels.length;
+  db.portfolioReels = db.portfolioReels.filter(r => r.id !== id);
+  
+  if (db.portfolioReels.length === initialLength) {
+    return res.status(404).json({ success: false, message: 'Reel tidak ditemukan' });
+  }
+  
+  writeDb(db);
+  res.json({ success: true, message: 'Reel berhasil dihapus' });
 });
 
 

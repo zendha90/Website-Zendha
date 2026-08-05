@@ -140,6 +140,16 @@ export interface RatecardBrand {
   priority: number;
 }
 
+export interface PortfolioReel {
+  id: string;
+  title: string;
+  category: string;
+  coverImageUrl: string;
+  videoUrl?: string;
+  isActive: boolean;
+  priority: number;
+}
+
 export interface ClickLog {
   id: string;
   linkId: string;
@@ -157,7 +167,7 @@ export interface VisitLog {
   utmSource?: string;
   utmMedium?: string;
   utmCampaign?: string;
-  viewType: 'linktree' | 'ratecard';
+  viewType: 'linktree' | 'ratecard' | 'portfolio';
 }
 
 export interface AppData {
@@ -166,6 +176,7 @@ export interface AppData {
   services: RatecardService[];
   projects: RatecardProject[];
   brands?: RatecardBrand[];
+  portfolioReels?: PortfolioReel[];
   clickLogs?: ClickLog[];
   visitLogs?: VisitLog[];
 }

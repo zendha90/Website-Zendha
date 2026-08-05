@@ -10,6 +10,7 @@ import { AppData, AffiliateLink, RatecardProfile, RatecardService } from './type
 import LinktreeView from './components/LinktreeView';
 import RatecardView from './components/RatecardView';
 import AdminPanel from './components/AdminPanel';
+import PortfolioView from './components/PortfolioView';
 
 export default function App() {
   const [data, setData] = useState<AppData | null>(null);
@@ -17,10 +18,11 @@ export default function App() {
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
 
   // Simple, super robust client router based on window path routing
-  const [currentView, setCurrentView] = useState<'home' | 'ratecard' | 'admin'>(() => {
+  const [currentView, setCurrentView] = useState<'home' | 'ratecard' | 'admin' | 'portfolio'>(() => {
     const path = window.location.pathname;
     if (path === '/ratecard') return 'ratecard';
     if (path === '/admin') return 'admin';
+    if (path === '/portofolio' || path === '/portfolio') return 'portfolio';
     return 'home';
   });
 
@@ -30,6 +32,7 @@ export default function App() {
       const path = window.location.pathname;
       if (path === '/ratecard') setCurrentView('ratecard');
       else if (path === '/admin') setCurrentView('admin');
+      else if (path === '/portofolio' || path === '/portfolio') setCurrentView('portfolio');
       else setCurrentView('home');
     };
 
@@ -37,9 +40,9 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const navigateTo = (view: 'home' | 'ratecard' | 'admin') => {
+  const navigateTo = (view: 'home' | 'ratecard' | 'admin' | 'portfolio') => {
     setCurrentView(view);
-    const path = view === 'home' ? '/' : `/${view}`;
+    const path = view === 'home' ? '/' : (view === 'portfolio' ? '/portofolio' : `/${view}`);
     window.history.pushState(null, '', path);
     // Smooth scroll back to top of the page on view switch
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -74,7 +77,7 @@ export default function App() {
               utmSource: trafficContext.utmSource,
               utmMedium: trafficContext.utmMedium,
               utmCampaign: trafficContext.utmCampaign,
-              viewType: currentView === 'ratecard' ? 'ratecard' : 'linktree'
+              viewType: currentView === 'ratecard' ? 'ratecard' : (currentView === 'portfolio' ? 'portfolio' : 'linktree')
             })
           });
         } catch (err) {
@@ -205,6 +208,9 @@ export default function App() {
     if (currentView === 'ratecard') {
       return { backgroundColor: '#0B0B0F' };
     }
+    if (currentView === 'portfolio') {
+      return { backgroundColor: '#0a0a0e' };
+    }
     if (currentView === 'admin') {
       return { backgroundColor: '#f8fafc' };
     }
@@ -219,12 +225,12 @@ export default function App() {
 
   return (
     <div 
-      className={`min-h-screen w-full relative transition-all duration-500 selection:bg-indigo-500 selection:text-white ${currentView === 'ratecard' ? '' : 'pb-20'}`} 
+      className={`min-h-screen w-full relative transition-all duration-500 selection:bg-indigo-500 selection:text-white ${currentView === 'ratecard' || currentView === 'portfolio' ? '' : 'pb-20'}`} 
       id="main-application-frame"
       style={getAppBgStyle()}
     >
       {/* Visual background lights for top-tier aesthetics */}
-      {currentView !== 'ratecard' && (
+      {currentView !== 'ratecard' && currentView !== 'portfolio' && (
         <>
           <div className="absolute top-0 right-0 w-[40%] h-[40%] rounded-full bg-indigo-100/20 blur-3xl pointer-events-none" />
           <div className="absolute bottom-[20%] left-0 w-[40%] h-[40%] rounded-full bg-slate-100/50 blur-3xl pointer-events-none" />
@@ -272,6 +278,25 @@ export default function App() {
             </motion.div>
           )}
 
+          {currentView === 'portfolio' && (
+            <motion.div
+              key="portfolio"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.25 }}
+              id="view-portfolio"
+            >
+              <PortfolioView 
+                profile={data.profile}
+                reels={data.portfolioReels || []}
+                onNavigateToHome={() => navigateTo('home')}
+                onNavigateToRatecard={() => navigateTo('ratecard')}
+                onNavigateToAdmin={() => navigateTo('admin')}
+              />
+            </motion.div>
+          )}
+
           {currentView === 'admin' && (
             <motion.div
               key="admin"
@@ -289,6 +314,7 @@ export default function App() {
                 services={data.services}
                 projects={data.projects}
                 brands={data.brands}
+                portfolioReels={data.portfolioReels}
                 clickLogs={data.clickLogs}
                 visitLogs={data.visitLogs}
               />

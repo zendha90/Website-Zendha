@@ -57,9 +57,11 @@ import {
   Globe,
   Server,
   Columns,
-  Layers
+  Layers,
+  Film,
+  X
 } from 'lucide-react';
-import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog, VisitLog, SubLink } from '../types';
+import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, PortfolioReel, ClickLog, VisitLog, SubLink } from '../types';
 import DesignSettingsForm from './DesignSettingsForm';
 
 interface AdminPanelProps {
@@ -70,6 +72,7 @@ interface AdminPanelProps {
   services: RatecardService[];
   projects: RatecardProject[];
   brands?: RatecardBrand[];
+  portfolioReels?: PortfolioReel[];
   clickLogs?: ClickLog[];
   visitLogs?: VisitLog[];
 }
@@ -82,6 +85,7 @@ export default function AdminPanel({
   services,
   projects,
   brands: initialBrands,
+  portfolioReels: initialPortfolioReels = [],
   clickLogs = [],
   visitLogs = []
 }: AdminPanelProps) {
@@ -92,7 +96,7 @@ export default function AdminPanel({
   const [token, setToken] = useState<string | null>(null);
 
   // Active Admin Tabs
-  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github' | 'analytics' | 'design' | 'ratecard' | 'design_ratecard'>('links');
+  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'portfolio_reels' | 'backup' | 'github' | 'analytics' | 'design' | 'ratecard' | 'design_ratecard'>('links');
 
   // Analytics View States
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState<'today' | 'yesterday' | '7days' | '30days'>('yesterday');
@@ -138,12 +142,23 @@ export default function AdminPanel({
   const [editingBrand, setEditingBrand] = useState<Partial<RatecardBrand> | null>(null);
   const [isAddingBrand, setIsAddingBrand] = useState(false);
 
-  // Sync brands once loaded
+  // Interactive portfolio reel editor states
+  const [portfolioReels, setPortfolioReels] = useState<PortfolioReel[]>(initialPortfolioReels || []);
+  const [editingReel, setEditingReel] = useState<Partial<PortfolioReel> | null>(null);
+  const [isAddingReel, setIsAddingReel] = useState(false);
+
+  // Sync brands & portfolio reels once loaded
   useEffect(() => {
     if (initialBrands) {
       setBrands(initialBrands);
     }
   }, [initialBrands]);
+
+  useEffect(() => {
+    if (initialPortfolioReels) {
+      setPortfolioReels(initialPortfolioReels);
+    }
+  }, [initialPortfolioReels]);
 
   // State management for backup & restore configurations
   const [importFileContent, setImportFileContent] = useState<any>(null);
@@ -503,7 +518,7 @@ export default function AdminPanel({
 
   const [isUploading, setIsUploading] = useState<{[key: string]: boolean}>({});
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetField: 'avatarUrl' | 'faviconUrl' | 'link' | 'project' | 'brand') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetField: 'avatarUrl' | 'faviconUrl' | 'link' | 'project' | 'brand' | 'reel') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -544,6 +559,8 @@ export default function AdminPanel({
             setEditingProject(prev => ({ ...prev, imageUrl: data.url }));
           } else if (targetField === 'brand') {
             setEditingBrand(prev => ({ ...prev, logoUrl: data.url }));
+          } else if (targetField === 'reel') {
+            setEditingReel(prev => ({ ...prev, coverImageUrl: data.url }));
           }
         } else {
           showToast(data.message || 'Gagal mengunggah gambar', 'error');
@@ -929,6 +946,74 @@ export default function AdminPanel({
   };
 
 
+  // ================= PORTFOLIO REELS OPERATIONS =================
+
+  const saveReel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingReel) return;
+
+    const isEdit = !!editingReel.id;
+    const urlField = isEdit ? `/api/portfolio/reels/${editingReel.id}` : '/api/portfolio/reels';
+    const methodField = isEdit ? 'PUT' : 'POST';
+
+    try {
+      const response = await fetch(urlField, {
+        method: methodField,
+        headers: getAuthHeader(),
+        body: JSON.stringify(editingReel)
+      });
+      const data = await response.json();
+      if (data.success) {
+        showToast(isEdit ? 'Reel berhasil diupdate!' : 'Reel baru berhasil ditambahkan!');
+        setEditingReel(null);
+        setIsAddingReel(false);
+        await onRefreshData();
+      } else {
+        showToast(data.message || 'Gagal menyimpan reel', 'error');
+      }
+    } catch (err) {
+      showToast('Terjadi kesalahan jaringan', 'error');
+    }
+  };
+
+  const deleteReel = async (id: string) => {
+    if (!window.confirm('Yakin ingin menghapus reel ini dari portofolio?')) return;
+
+    try {
+      const response = await fetch(`/api/portfolio/reels/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeader()
+      });
+      const data = await response.json();
+      if (data.success) {
+        showToast('Reel berhasil dihapus!');
+        await onRefreshData();
+      } else {
+        showToast(data.message || 'Gagal menghapus reel', 'error');
+      }
+    } catch (err) {
+      showToast('Koneksi gagal', 'error');
+    }
+  };
+
+  const triggerAddReel = () => {
+    setEditingReel({
+      title: '',
+      category: 'REEL',
+      coverImageUrl: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=600&auto=format&fit=crop&q=80',
+      videoUrl: '',
+      isActive: true,
+      priority: (portfolioReels.length > 0 ? Math.max(...portfolioReels.map(r => r.priority || 0)) + 1 : 1)
+    });
+    setIsAddingReel(true);
+  };
+
+  const triggerEditReel = (reel: PortfolioReel) => {
+    setEditingReel({ ...reel });
+    setIsAddingReel(false);
+  };
+
+
   // If NOT Logged In, Render standard beautiful Lock screen
   if (!isLoggedIn) {
     return (
@@ -1092,6 +1177,16 @@ export default function AdminPanel({
                   Portfolio Videos
                 </div>
                 {activeTab === 'projects' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+              </button>
+              <button 
+                onClick={() => { setActiveTab('portfolio_reels'); setEditingReel(null); }} 
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'portfolio_reels' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <Film className={`w-4 h-4 ${activeTab === 'portfolio_reels' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
+                  Portofolio IG Reels (/portofolio)
+                </div>
+                {activeTab === 'portfolio_reels' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
               <button 
                 onClick={() => { setActiveTab('brands'); setEditingBrand(null); }} 
@@ -2891,6 +2986,230 @@ export default function AdminPanel({
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* 5. MANAGE PORTFOLIO REELS (/portofolio) VIEW TAB */}
+      {/* ======================================================== */}
+      {activeTab === 'portfolio_reels' && (
+        <div className="space-y-6" id="tab-content-portfolio-reels">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
+            <div>
+              <h2 className="text-md font-display font-bold text-slate-800 flex items-center gap-2">
+                <Film className="w-4 h-4 text-indigo-500" /> Portofolio IG Reels (/portofolio)
+              </h2>
+              <p className="text-xs text-slate-400">Kelola video reel, foto sampul, dan tautan Instagram Reels yang muncul pada halaman sub-domain /portofolio.</p>
+            </div>
+            <button
+              onClick={triggerAddReel}
+              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors font-sans flex items-center justify-center gap-2 cursor-pointer shrink-0"
+            >
+              <Plus className="w-4 h-4" /> Tambah Reel Baru
+            </button>
+          </div>
+
+          {/* Form Create/Edit Portfolio Reel */}
+          {editingReel && (
+            <div className="bg-slate-900 text-white border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 animate-fadeIn">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 className="text-sm font-display font-bold text-white flex items-center gap-2">
+                  <Film className="w-4 h-4 text-indigo-400" />
+                  {isAddingReel ? 'Tambah Video Reel Baru' : 'Edit Video Reel'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setEditingReel(null)}
+                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form onSubmit={saveReel} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-400 uppercase mb-1">Judul Project Reel</label>
+                    <input
+                      type="text"
+                      value={editingReel.title || ''}
+                      required
+                      placeholder="Misal: MIDNIGHT RUN - CYBERPUNK EDIT"
+                      onChange={(e) => setEditingReel({ ...editingReel, title: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-indigo-400 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-400 uppercase mb-1">Kategori (Category)</label>
+                    <input
+                      type="text"
+                      value={editingReel.category || ''}
+                      required
+                      placeholder="Misal: AUTOMOTIVE, SHORT FILM, PRODUCT, CAMPAIGN"
+                      onChange={(e) => setEditingReel({ ...editingReel, category: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-indigo-400 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-mono font-bold text-slate-400 uppercase mb-1">URL Sampul (Cover Image URL)</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      value={editingReel.coverImageUrl || ''}
+                      required
+                      placeholder="https://images.unsplash.com/... atau unggah file"
+                      onChange={(e) => setEditingReel({ ...editingReel, coverImageUrl: e.target.value })}
+                      className="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-indigo-400 outline-none font-mono"
+                    />
+                    <label className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold cursor-pointer transition-colors shrink-0 text-center select-none">
+                      {isUploading['reel'] ? 'Uploading...' : 'Unggah Foto'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileUpload(e, 'reel')}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-400 uppercase mb-1">URL Video Direct (MP4/WebM) atau Link Instagram Reel</label>
+                    <input
+                      type="url"
+                      value={editingReel.videoUrl || ''}
+                      placeholder="URL .mp4 langsung atau https://www.instagram.com/reel/Cxxxxxx/"
+                      onChange={(e) => setEditingReel({ ...editingReel, videoUrl: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-indigo-400 outline-none font-mono"
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1 font-mono">Video MP4/WebM diputar langsung di web tanpa perlu membuka Instagram.</p>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-400 uppercase mb-1">Urutan Prioritas (Urutan Tampil)</label>
+                    <input
+                      type="number"
+                      value={editingReel.priority || 1}
+                      onChange={(e) => setEditingReel({ ...editingReel, priority: parseInt(e.target.value) || 1 })}
+                      className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-indigo-400 outline-none font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    type="checkbox"
+                    id="reel-active"
+                    checked={editingReel.isActive !== false}
+                    onChange={(e) => setEditingReel({ ...editingReel, isActive: e.target.checked })}
+                    className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+                  />
+                  <label htmlFor="reel-active" className="text-xs text-slate-300 font-mono">Tampilkan video reel ini secara publik</label>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setEditingReel(null)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-950 flex items-center gap-1.5"
+                  >
+                    <Save className="w-3.5 h-3.5" /> Simpan Reel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Grid display of Portfolio Reels */}
+          <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden" id="admin-portfolio-reels-list">
+            <div className="p-4 border-b border-slate-100 bg-slate-50 text-xs font-mono text-slate-500 font-bold uppercase">
+              Daftar Portfolio Reels ({portfolioReels.length})
+            </div>
+            <div className="divide-y divide-slate-100">
+              {portfolioReels && portfolioReels.length > 0 ? (
+                portfolioReels
+                  .sort((a, b) => (a.priority || 0) - (b.priority || 0))
+                  .map((reel) => (
+                    <div
+                      key={reel.id}
+                      className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-20 bg-slate-900 rounded-xl overflow-hidden shrink-0 border border-slate-200 relative">
+                          <img
+                            src={reel.coverImageUrl}
+                            alt={reel.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[10px] font-mono bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded text-indigo-700 uppercase font-bold">
+                              {reel.category || 'REEL'}
+                            </span>
+                            <span className="text-[10px] font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                              Prioritas: {reel.priority || 1}
+                            </span>
+                            {reel.isActive !== false ? (
+                              <span className="text-[10px] font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">
+                                ● Aktif
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded">
+                                Nonaktif
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="font-display font-bold text-slate-800 text-sm">
+                            {reel.title}
+                          </h3>
+                          {reel.videoUrl && (
+                            <a
+                              href={reel.videoUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-[11px] font-mono text-indigo-600 hover:underline flex items-center gap-1"
+                            >
+                              <span>Buka Instagram Reel</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          onClick={() => triggerEditReel(reel)}
+                          className="p-2 text-slate-400 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 border border-slate-100 hover:border-indigo-100 rounded-lg transition-colors cursor-pointer"
+                          title="Edit Reel"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => deleteReel(reel.id)}
+                          className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 border border-slate-100 hover:border-red-100 rounded-lg transition-colors cursor-pointer"
+                          title="Hapus Reel"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+              ) : (
+                <div className="p-8 text-center text-slate-400 text-xs">
+                  Belum ada reel terdaftar. Klik 'Tambah Reel Baru' diatas untuk mengisi portofolio.
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
