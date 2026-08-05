@@ -224,16 +224,6 @@ export default function PortfolioView({
             </h1>
           </div>
 
-          {/* Center Links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-['JetBrains_Mono',monospace] tracking-widest text-[#8e9192]">
-            <a href="#work" className="hover:text-white transition-colors">REEL</a>
-            <a href="#work" className="hover:text-white transition-colors">PROJECTS</a>
-            <a href="#about" className="hover:text-white transition-colors">ARCHIVE</a>
-            <button onClick={onNavigateToRatecard} className="hover:text-white transition-colors cursor-pointer uppercase">
-              RATECARD
-            </button>
-          </nav>
-
           {/* Right Action */}
           <div className="flex items-center gap-3">
             <button
@@ -260,11 +250,6 @@ export default function PortfolioView({
       <section id="about" className="max-w-[1440px] mx-auto px-4 md:px-12 pt-12 md:pt-20 pb-12">
         <div className="space-y-8">
           
-          {/* Index Marker */}
-          <div className="inline-block px-2.5 py-1 bg-[#1a1c1c] border border-[#333535] rounded text-xs font-['JetBrains_Mono',monospace] text-[#8e9192] tracking-widest">
-            {heroIndexMarker}
-          </div>
-
           {/* Studio Title */}
           <div className="space-y-2">
             <h2 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white uppercase leading-none">
@@ -275,29 +260,28 @@ export default function PortfolioView({
             </h3>
           </div>
 
-          {/* Combined Content Grid (Profile & Bio + Hero Description & Creator Quote) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start bg-[#1a1c1c] border border-[#282a2b] rounded-2xl p-6 sm:p-8 md:p-10">
+          {/* Combined Content Grid (Profile & Hero Description & Creator Quote) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-[#1a1c1c] border border-[#282a2b] rounded-2xl p-6 sm:p-8 md:p-10">
             
-            {/* Left Col: Avatar + Creator Bio + Socials */}
-            <div className="lg:col-span-4 flex flex-col items-center sm:items-start text-center sm:text-left gap-4 pb-6 lg:pb-0 border-b lg:border-b-0 lg:border-r border-[#282a2b] lg:pr-8">
-              <img 
-                src={profile.avatarUrl} 
-                alt={profile.name}
-                className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl object-cover border border-[#444748] shadow-2xl shrink-0"
-              />
-              <div className="space-y-1">
-                <h4 className="text-lg sm:text-xl font-bold text-white uppercase">{profile.name}</h4>
-                <p className="text-xs font-['JetBrains_Mono',monospace] text-[#8e9192] leading-relaxed">{profile.bio}</p>
+            {/* Left Col: Avatar + Social Links */}
+            <div className="lg:col-span-4 flex flex-col items-center sm:items-start gap-5 pb-6 lg:pb-0 border-b lg:border-b-0 lg:border-r border-[#282a2b] lg:pr-8">
+              <div className="relative group shrink-0">
+                <img 
+                  src={profile.avatarUrl} 
+                  alt="Creator Avatar"
+                  className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl object-cover border border-[#444748] shadow-2xl shrink-0"
+                />
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-[#1a1c1c] rounded-full" title="Available for projects" />
               </div>
 
               {/* Social links */}
-              <div className="flex flex-wrap gap-2 pt-2 font-['JetBrains_Mono',monospace] justify-center sm:justify-start">
+              <div className="flex flex-wrap gap-2 pt-1 font-['JetBrains_Mono',monospace] justify-center sm:justify-start w-full">
                 {profile.instagram && (
                   <a 
                     href={profile.instagram} 
                     target="_blank" 
                     rel="noreferrer"
-                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-colors"
+                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] hover:text-white border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-all cursor-pointer"
                   >
                     <Instagram className="w-3.5 h-3.5 text-[#b1cad7]" />
                     <span>INSTAGRAM</span>
@@ -308,7 +292,7 @@ export default function PortfolioView({
                     href={profile.tiktok} 
                     target="_blank" 
                     rel="noreferrer"
-                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-colors"
+                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] hover:text-white border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-all cursor-pointer"
                   >
                     <VideoIcon className="w-3.5 h-3.5 text-[#b1cad7]" />
                     <span>TIKTOK</span>
@@ -317,7 +301,7 @@ export default function PortfolioView({
                 {profile.email && (
                   <a 
                     href={`mailto:${profile.email}`}
-                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-colors"
+                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] hover:text-white border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-all cursor-pointer"
                   >
                     <Mail className="w-3.5 h-3.5 text-[#b1cad7]" />
                     <span>EMAIL</span>
@@ -326,20 +310,11 @@ export default function PortfolioView({
               </div>
             </div>
 
-            {/* Right Col: Hero Description + Creator Statement Quote */}
-            <div className="lg:col-span-8 space-y-6">
+            {/* Right Col: Hero Description */}
+            <div className="lg:col-span-8">
               <p className="text-[#e2e2e2] text-sm md:text-base leading-relaxed font-normal">
                 {heroDescription}
               </p>
-
-              <div className="pt-4 border-t border-[#282a2b] space-y-3">
-                <div className="text-xs font-['JetBrains_Mono',monospace] text-[#8e9192] tracking-widest uppercase">
-                  {archiveMarker}
-                </div>
-                <p className="text-[#c4c7c7] text-xs md:text-sm leading-relaxed italic font-['JetBrains_Mono',monospace]">
-                  {archiveQuote}
-                </p>
-              </div>
             </div>
 
           </div>

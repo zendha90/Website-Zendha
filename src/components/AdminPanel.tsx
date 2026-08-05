@@ -3066,30 +3066,16 @@ export default function AdminPanel({
                 <Sparkles className="w-4 h-4 text-indigo-500" /> Header & Hero Intro
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Index Marker Tag</label>
-                  <input
-                    type="text"
-                    value={profileForm.portfolioHeroIndexMarker || ''}
-                    placeholder="00 // INDEX"
-                    onChange={(e) => setProfileForm({ ...profileForm, portfolioHeroIndexMarker: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all font-mono"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-1 font-mono">Tag badge kecil di atas judul hero (Default: 00 // INDEX).</p>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Sub-Judul Hero / Tagline Role</label>
-                  <input
-                    type="text"
-                    value={profileForm.portfolioHeroSubtitle || ''}
-                    placeholder="VISUAL STORYTELLER"
-                    onChange={(e) => setProfileForm({ ...profileForm, portfolioHeroSubtitle: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all uppercase font-bold"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-1 font-mono">Sub-judul warna abu-abu besar di bawah nama studio.</p>
-                </div>
+              <div>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Sub-Judul Hero / Tagline Role</label>
+                <input
+                  type="text"
+                  value={profileForm.portfolioHeroSubtitle || ''}
+                  placeholder="VISUAL STORYTELLER"
+                  onChange={(e) => setProfileForm({ ...profileForm, portfolioHeroSubtitle: e.target.value })}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all uppercase font-bold"
+                />
+                <p className="text-[10px] text-slate-400 mt-1 font-mono">Sub-judul warna abu-abu besar di bawah nama studio.</p>
               </div>
 
               <div>
@@ -3099,35 +3085,6 @@ export default function AdminPanel({
                   value={profileForm.portfolioHeroDescription || ''}
                   placeholder="Precision editing for brands and creators. Crafting narratives through meticulous cut, color, and sound in a distraction-free technical environment."
                   onChange={(e) => setProfileForm({ ...profileForm, portfolioHeroDescription: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all leading-relaxed"
-                />
-              </div>
-            </div>
-
-            {/* 3. Archive & Creator Statement Section */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-xs font-mono font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                <FileText className="w-4 h-4 text-indigo-500" /> Creator Archive & Filosofi Karya
-              </h3>
-
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Tag Marker Archive Section</label>
-                <input
-                  type="text"
-                  value={profileForm.portfolioArchiveMarker || ''}
-                  placeholder="02 // CREATOR ARCHIVE"
-                  onChange={(e) => setProfileForm({ ...profileForm, portfolioArchiveMarker: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Statement / Kutipan Creator</label>
-                <textarea
-                  rows={3}
-                  value={profileForm.portfolioArchiveQuote || ''}
-                  placeholder="Every edit is built with mathematical rhythm and pacing. Specialized in retaining visual focus, crafting dynamic sound beds, and polishing color grade to industry benchmarks."
-                  onChange={(e) => setProfileForm({ ...profileForm, portfolioArchiveQuote: e.target.value })}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all leading-relaxed"
                 />
               </div>
