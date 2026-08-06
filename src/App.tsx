@@ -115,10 +115,10 @@ export default function App() {
       if (currentView === 'ratecard') {
         document.title = data.profile.ratecardTitle || `${data.profile.name} | Ratecard`;
       } else {
-        document.title = data.profile.linktreeTitle || `${data.profile.name} | Affiliate Links & Portfolio`;
+        document.title = data.profile.linktreeTitle || `${data.profile.name} | Linkstree`;
       }
     } else {
-      document.title = 'Creator Linktree & Premium Ratecard';
+      document.title = 'Creator Linktree & Ratecard';
     }
   }, [currentView, data?.profile?.name, data?.profile?.ratecardTitle, data?.profile?.linktreeTitle]);
 
