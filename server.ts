@@ -156,6 +156,32 @@ interface RatecardProfile {
   ratecardTitle?: string;
   faviconUrl?: string;
 
+  // Portfolio Section Customizations
+  portfolioPageTitle?: string;
+  portfolioHeroIndexMarker?: string;
+  portfolioHeroSubtitle?: string;
+  portfolioHeroDescription?: string;
+  portfolioCreatorName?: string;
+  portfolioCreatorAvatarUrl?: string;
+  portfolioCreatorBio?: string;
+  portfolioCreatorInstagram?: string;
+  portfolioCreatorTiktok?: string;
+  portfolioCreatorEmail?: string;
+  portfolioArchiveMarker?: string;
+  portfolioArchiveQuote?: string;
+  portfolioProcessMarker?: string;
+  portfolioProcess1Title?: string;
+  portfolioProcess1Desc?: string;
+  portfolioProcess2Title?: string;
+  portfolioProcess2Desc?: string;
+  portfolioProcess3Title?: string;
+  portfolioProcess3Desc?: string;
+  portfolioProcess4Title?: string;
+  portfolioProcess4Desc?: string;
+  portfolioCtaTitle?: string;
+  portfolioCtaDescription?: string;
+  portfolioCtaButtonText?: string;
+
   // Design Settings
   designSettings?: DesignSettings;
 }
@@ -1603,61 +1629,11 @@ app.delete('/api/links/:id', (req, res) => {
 app.put('/api/ratecard/profile', (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
   
-  const { 
-    name, bio, instagram, tiktok, youtube, email, avatarUrl, whatsapp,
-    heroTagline, heroTitle1, heroTitleHighlight, heroDescription, domicile, contactPhone,
-    stats, termsOfService, studioDirectorTitle, studioEstdYear, designSettings,
-    statsBadge, statsTitle, statsDescription,
-    projectsBadge, projectsTitle, projectsDescription,
-    pricingBadge, pricingTitle, pricingDescription,
-    brandsBadge, brandsTitle,
-    termsBadge, termsTitle, termsDescription,
-    contactBadge, contactTitle, contactTitleHighlight, contactDescription,
-    linktreeTitle, ratecardTitle, faviconUrl
-  } = req.body;
   const db = readDb();
   
   db.profile = {
-    name: name || db.profile.name,
-    bio: bio || db.profile.bio,
-    instagram: instagram !== undefined ? instagram : db.profile.instagram,
-    tiktok: tiktok !== undefined ? tiktok : db.profile.tiktok,
-    youtube: youtube !== undefined ? youtube : db.profile.youtube,
-    email: email !== undefined ? email : db.profile.email,
-    avatarUrl: avatarUrl !== undefined ? avatarUrl : db.profile.avatarUrl,
-    whatsapp: whatsapp !== undefined ? whatsapp : db.profile.whatsapp,
-    heroTagline: heroTagline !== undefined ? heroTagline : db.profile.heroTagline,
-    heroTitle1: heroTitle1 !== undefined ? heroTitle1 : db.profile.heroTitle1,
-    heroTitleHighlight: heroTitleHighlight !== undefined ? heroTitleHighlight : db.profile.heroTitleHighlight,
-    heroDescription: heroDescription !== undefined ? heroDescription : db.profile.heroDescription,
-    domicile: domicile !== undefined ? domicile : db.profile.domicile,
-    contactPhone: contactPhone !== undefined ? contactPhone : db.profile.contactPhone,
-    stats: stats !== undefined ? stats : db.profile.stats,
-    termsOfService: termsOfService !== undefined ? termsOfService : db.profile.termsOfService,
-    studioDirectorTitle: studioDirectorTitle !== undefined ? studioDirectorTitle : db.profile.studioDirectorTitle,
-    studioEstdYear: studioEstdYear !== undefined ? studioEstdYear : db.profile.studioEstdYear,
-    linktreeTitle: linktreeTitle !== undefined ? linktreeTitle : db.profile.linktreeTitle,
-    ratecardTitle: ratecardTitle !== undefined ? ratecardTitle : db.profile.ratecardTitle,
-    faviconUrl: faviconUrl !== undefined ? faviconUrl : db.profile.faviconUrl,
-    designSettings: designSettings !== undefined ? designSettings : db.profile.designSettings,
-    statsBadge: statsBadge !== undefined ? statsBadge : db.profile.statsBadge,
-    statsTitle: statsTitle !== undefined ? statsTitle : db.profile.statsTitle,
-    statsDescription: statsDescription !== undefined ? statsDescription : db.profile.statsDescription,
-    projectsBadge: projectsBadge !== undefined ? projectsBadge : db.profile.projectsBadge,
-    projectsTitle: projectsTitle !== undefined ? projectsTitle : db.profile.projectsTitle,
-    projectsDescription: projectsDescription !== undefined ? projectsDescription : db.profile.projectsDescription,
-    pricingBadge: pricingBadge !== undefined ? pricingBadge : db.profile.pricingBadge,
-    pricingTitle: pricingTitle !== undefined ? pricingTitle : db.profile.pricingTitle,
-    pricingDescription: pricingDescription !== undefined ? pricingDescription : db.profile.pricingDescription,
-    brandsBadge: brandsBadge !== undefined ? brandsBadge : db.profile.brandsBadge,
-    brandsTitle: brandsTitle !== undefined ? brandsTitle : db.profile.brandsTitle,
-    termsBadge: termsBadge !== undefined ? termsBadge : db.profile.termsBadge,
-    termsTitle: termsTitle !== undefined ? termsTitle : db.profile.termsTitle,
-    termsDescription: termsDescription !== undefined ? termsDescription : db.profile.termsDescription,
-    contactBadge: contactBadge !== undefined ? contactBadge : db.profile.contactBadge,
-    contactTitle: contactTitle !== undefined ? contactTitle : db.profile.contactTitle,
-    contactTitleHighlight: contactTitleHighlight !== undefined ? contactTitleHighlight : db.profile.contactTitleHighlight,
-    contactDescription: contactDescription !== undefined ? contactDescription : db.profile.contactDescription
+    ...db.profile,
+    ...req.body
   };
   
   writeDb(db);
