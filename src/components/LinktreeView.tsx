@@ -361,8 +361,6 @@ export default function LinktreeView({
                   <Mail className="w-4.5 h-4.5" />
                 </a>
               )}
-
-
             </motion.div>
           </div>
         </div>

@@ -106,34 +106,6 @@ export interface RatecardProfile {
   ratecardTitle?: string;
   faviconUrl?: string;
 
-  // Portfolio Customizable Texts (/portofolio)
-  portfolioPageTitle?: string;
-  portfolioStudioName?: string;
-  portfolioHeroIndexMarker?: string;
-  portfolioHeroSubtitle?: string;
-  portfolioHeroDescription?: string;
-  portfolioCreatorName?: string;
-  portfolioCreatorAvatarUrl?: string;
-  portfolioCreatorBio?: string;
-  portfolioCreatorInstagram?: string;
-  portfolioCreatorTiktok?: string;
-  portfolioCreatorEmail?: string;
-  portfolioArchiveMarker?: string;
-  portfolioArchiveQuote?: string;
-  portfolioProcessMarker?: string;
-  portfolioProcess1Title?: string;
-  portfolioProcess1Desc?: string;
-  portfolioProcess2Title?: string;
-  portfolioProcess2Desc?: string;
-  portfolioProcess3Title?: string;
-  portfolioProcess3Desc?: string;
-  portfolioProcess4Title?: string;
-  portfolioProcess4Desc?: string;
-  portfolioCtaTitle?: string;
-  portfolioCtaDescription?: string;
-  portfolioCtaButtonText?: string;
-  portfolioModalDescription?: string;
-
   // Design Settings
   designSettings?: DesignSettings;
 }
@@ -168,16 +140,6 @@ export interface RatecardBrand {
   priority: number;
 }
 
-export interface PortfolioReel {
-  id: string;
-  title: string;
-  category: string;
-  coverImageUrl: string;
-  videoUrl?: string;
-  isActive: boolean;
-  priority: number;
-}
-
 export interface ClickLog {
   id: string;
   linkId: string;
@@ -195,7 +157,7 @@ export interface VisitLog {
   utmSource?: string;
   utmMedium?: string;
   utmCampaign?: string;
-  viewType: 'linktree' | 'ratecard' | 'portfolio';
+  viewType: 'linktree' | 'ratecard';
 }
 
 export interface AppData {
@@ -204,7 +166,6 @@ export interface AppData {
   services: RatecardService[];
   projects: RatecardProject[];
   brands?: RatecardBrand[];
-  portfolioReels?: PortfolioReel[];
   clickLogs?: ClickLog[];
   visitLogs?: VisitLog[];
 }

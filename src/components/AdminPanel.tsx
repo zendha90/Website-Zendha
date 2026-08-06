@@ -57,13 +57,9 @@ import {
   Globe,
   Server,
   Columns,
-  Layers,
-  Film,
-  Type,
-  FileText,
-  X
+  Layers
 } from 'lucide-react';
-import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, PortfolioReel, ClickLog, VisitLog, SubLink } from '../types';
+import { AffiliateLink, RatecardProfile, RatecardService, RatecardProject, RatecardBrand, ClickLog, VisitLog, SubLink } from '../types';
 import DesignSettingsForm from './DesignSettingsForm';
 
 interface AdminPanelProps {
@@ -74,7 +70,6 @@ interface AdminPanelProps {
   services: RatecardService[];
   projects: RatecardProject[];
   brands?: RatecardBrand[];
-  portfolioReels?: PortfolioReel[];
   clickLogs?: ClickLog[];
   visitLogs?: VisitLog[];
 }
@@ -87,7 +82,6 @@ export default function AdminPanel({
   services,
   projects,
   brands: initialBrands,
-  portfolioReels: initialPortfolioReels = [],
   clickLogs = [],
   visitLogs = []
 }: AdminPanelProps) {
@@ -98,7 +92,7 @@ export default function AdminPanel({
   const [token, setToken] = useState<string | null>(null);
 
   // Active Admin Tabs
-  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'portfolio_reels' | 'backup' | 'github' | 'analytics' | 'design' | 'ratecard' | 'design_ratecard'>('links');
+  const [activeTab, setActiveTab] = useState<'links' | 'profile' | 'services' | 'projects' | 'brands' | 'backup' | 'github' | 'analytics' | 'design' | 'ratecard' | 'design_ratecard'>('links');
 
   // Analytics View States
   const [analyticsTimeRange, setAnalyticsTimeRange] = useState<'today' | 'yesterday' | '7days' | '30days'>('yesterday');
@@ -144,23 +138,12 @@ export default function AdminPanel({
   const [editingBrand, setEditingBrand] = useState<Partial<RatecardBrand> | null>(null);
   const [isAddingBrand, setIsAddingBrand] = useState(false);
 
-  // Interactive portfolio reel editor states
-  const [portfolioReels, setPortfolioReels] = useState<PortfolioReel[]>(initialPortfolioReels || []);
-  const [editingReel, setEditingReel] = useState<Partial<PortfolioReel> | null>(null);
-  const [isAddingReel, setIsAddingReel] = useState(false);
-
-  // Sync brands & portfolio reels once loaded
+  // Sync brands once loaded
   useEffect(() => {
     if (initialBrands) {
       setBrands(initialBrands);
     }
   }, [initialBrands]);
-
-  useEffect(() => {
-    if (initialPortfolioReels) {
-      setPortfolioReels(initialPortfolioReels);
-    }
-  }, [initialPortfolioReels]);
 
   // State management for backup & restore configurations
   const [importFileContent, setImportFileContent] = useState<any>(null);
@@ -520,7 +503,7 @@ export default function AdminPanel({
 
   const [isUploading, setIsUploading] = useState<{[key: string]: boolean}>({});
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetField: 'avatarUrl' | 'faviconUrl' | 'link' | 'project' | 'brand' | 'reel' | 'portfolioCreatorAvatarUrl') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetField: 'avatarUrl' | 'faviconUrl' | 'link' | 'project' | 'brand') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -553,8 +536,6 @@ export default function AdminPanel({
           showToast('Gambar berhasil diunggah!');
           if (targetField === 'avatarUrl') {
             setProfileForm(prev => ({ ...prev, avatarUrl: data.url }));
-          } else if (targetField === 'portfolioCreatorAvatarUrl') {
-            setProfileForm(prev => ({ ...prev, portfolioCreatorAvatarUrl: data.url }));
           } else if (targetField === 'faviconUrl') {
             setProfileForm(prev => ({ ...prev, faviconUrl: data.url }));
           } else if (targetField === 'link') {
@@ -563,8 +544,6 @@ export default function AdminPanel({
             setEditingProject(prev => ({ ...prev, imageUrl: data.url }));
           } else if (targetField === 'brand') {
             setEditingBrand(prev => ({ ...prev, logoUrl: data.url }));
-          } else if (targetField === 'reel') {
-            setEditingReel(prev => ({ ...prev, coverImageUrl: data.url }));
           }
         } else {
           showToast(data.message || 'Gagal mengunggah gambar', 'error');
@@ -604,9 +583,6 @@ export default function AdminPanel({
       const data = await response.json();
       if (data.success) {
         showToast('Profile & Ratecard berhasil disimpan!');
-        if (data.profile) {
-          setProfileForm(data.profile);
-        }
         await onRefreshData();
       } else {
         showToast(data.message || 'Gagal mengupdate profile', 'error');
@@ -953,100 +929,6 @@ export default function AdminPanel({
   };
 
 
-  // ================= PORTFOLIO REELS OPERATIONS =================
-
-  const LOCAL_STORAGE_KEY = 'creator_portfolio_persistent_data_v2';
-
-  const updateLocalStorageReels = (newReels: PortfolioReel[]) => {
-    try {
-      const existingRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
-      let existingData = existingRaw ? JSON.parse(existingRaw) : {};
-      existingData.portfolioReels = newReels;
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(existingData));
-    } catch (e) {
-      console.warn("Error saving reels to localStorage", e);
-    }
-  };
-
-  const saveReel = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingReel) return;
-
-    const isEdit = !!editingReel.id;
-    const urlField = isEdit ? `/api/portfolio/reels/${editingReel.id}` : '/api/portfolio/reels';
-    const methodField = isEdit ? 'PUT' : 'POST';
-
-    try {
-      const response = await fetch(urlField, {
-        method: methodField,
-        headers: getAuthHeader(),
-        body: JSON.stringify(editingReel)
-      });
-      const data = await response.json();
-      if (data.success) {
-        showToast(isEdit ? 'Reel berhasil diupdate & tersimpan!' : 'Reel baru berhasil ditambahkan & tersimpan!');
-        if (data.reel) {
-          let updatedList: PortfolioReel[] = [];
-          if (isEdit) {
-            updatedList = portfolioReels.map(r => r.id === data.reel.id ? data.reel : r);
-          } else {
-            updatedList = [...portfolioReels, data.reel];
-          }
-          setPortfolioReels(updatedList);
-          updateLocalStorageReels(updatedList);
-        }
-        setEditingReel(null);
-        setIsAddingReel(false);
-        await onRefreshData();
-      } else {
-        showToast(data.message || 'Gagal menyimpan reel', 'error');
-      }
-    } catch (err) {
-      showToast('Terjadi kesalahan jaringan', 'error');
-    }
-  };
-
-  const deleteReel = async (id: string) => {
-    if (!window.confirm('Yakin ingin menghapus reel ini dari portofolio?')) return;
-
-    try {
-      const response = await fetch(`/api/portfolio/reels/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeader()
-      });
-      const data = await response.json();
-      if (data.success) {
-        showToast('Reel berhasil dihapus!');
-        const updatedList = portfolioReels.filter(r => r.id !== id);
-        setPortfolioReels(updatedList);
-        updateLocalStorageReels(updatedList);
-        await onRefreshData();
-      } else {
-        showToast(data.message || 'Gagal menghapus reel', 'error');
-      }
-    } catch (err) {
-      showToast('Koneksi gagal', 'error');
-    }
-  };
-
-  const triggerAddReel = () => {
-    setEditingReel({
-      title: '',
-      category: 'REEL',
-      coverImageUrl: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=600&auto=format&fit=crop&q=80',
-      videoUrl: '',
-      isActive: true,
-      priority: (portfolioReels.length > 0 ? Math.max(...portfolioReels.map(r => r.priority || 0)) + 1 : 1)
-    });
-    setIsAddingReel(true);
-  };
-
-  const triggerEditReel = (reel: PortfolioReel) => {
-    setEditingReel({ ...reel });
-    setIsAddingReel(false);
-  };
-
-
   // If NOT Logged In, Render standard beautiful Lock screen
   if (!isLoggedIn) {
     return (
@@ -1230,31 +1112,6 @@ export default function AdminPanel({
                   Design Ratecard
                 </div>
                 {activeTab === 'design_ratecard' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
-              </button>
-            </div>
-
-            {/* Portofolio Page Section */}
-            <div className="space-y-1.5 pt-2">
-              <span className="text-[10px] font-mono font-bold tracking-[0.2em] text-slate-400 uppercase block pl-3 mb-1">PORTOFOLIO PAGE (/portofolio)</span>
-              <button 
-                onClick={() => { setActiveTab('portfolio_settings'); }} 
-                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'portfolio_settings' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
-              >
-                <div className="flex items-center gap-3">
-                  <Type className={`w-4 h-4 ${activeTab === 'portfolio_settings' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
-                  Custom Text & Konten
-                </div>
-                {activeTab === 'portfolio_settings' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
-              </button>
-              <button 
-                onClick={() => { setActiveTab('portfolio_reels'); setEditingReel(null); }} 
-                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${activeTab === 'portfolio_reels' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
-              >
-                <div className="flex items-center gap-3">
-                  <Film className={`w-4 h-4 ${activeTab === 'portfolio_reels' ? 'text-indigo-200' : 'text-slate-400 group-hover:text-indigo-600'}`} /> 
-                  Video Reels
-                </div>
-                {activeTab === 'portfolio_reels' && <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
               </button>
             </div>
 
@@ -3034,531 +2891,6 @@ export default function AdminPanel({
             </div>
           </div>
 
-        </div>
-      )}
-
-      {/* ======================================================== */}
-      {/* 5A. MANAGE PORTFOLIO CUSTOM TEXTS (/portofolio) VIEW TAB */}
-      {/* ======================================================== */}
-      {activeTab === 'portfolio_settings' && (
-        <div className="space-y-6" id="tab-content-portfolio-settings">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
-            <div>
-              <h2 className="text-md font-display font-bold text-slate-800 flex items-center gap-2">
-                <Type className="w-4 h-4 text-indigo-500" /> Kustomisasi Text & Konten Portofolio <span className="text-xs font-mono italic text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">/portofolio</span>
-              </h2>
-              <p className="text-xs text-slate-400">Atur semua judul, tag, statement creator, deskripsi, dan tombol pada halaman sub-domain /portofolio.</p>
-            </div>
-            <button
-              onClick={(e) => saveProfile(e)}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
-            >
-              <Save className="w-4 h-4" /> Simpan Perubahan
-            </button>
-          </div>
-
-          <form onSubmit={(e) => saveProfile(e)} className="space-y-6">
-            {/* 1. SEO & Brand Settings */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-xs font-mono font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                <Globe className="w-4 h-4 text-indigo-500" /> Brand & Identitas Halaman Tab Browser
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Tab Browser (SEO Title)</label>
-                  <input
-                    type="text"
-                    value={profileForm.portfolioPageTitle || ''}
-                    placeholder={`Misal: ${profileForm.name || 'STUDIO_01'} // Portfolio & Visual Storyteller`}
-                    onChange={(e) => setProfileForm({ ...profileForm, portfolioPageTitle: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-1 font-mono">Judul yang muncul pada tab browser saat pengunjung membuka /portofolio.</p>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Nama Studio / Brand Logo Header</label>
-                  <input
-                    type="text"
-                    value={profileForm.portfolioStudioName || ''}
-                    placeholder={`Misal: ${profileForm.name ? profileForm.name.toUpperCase() : 'STUDIO_01'}`}
-                    onChange={(e) => setProfileForm({ ...profileForm, portfolioStudioName: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all font-mono uppercase"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-1 font-mono">Teks logo/brand di pojok kiri atas header dan footer.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. Hero Section */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-xs font-mono font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                <Sparkles className="w-4 h-4 text-indigo-500" /> Header & Hero Intro
-              </h3>
-
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Sub-Judul Hero / Tagline Role</label>
-                <input
-                  type="text"
-                  value={profileForm.portfolioHeroSubtitle || ''}
-                  placeholder="VISUAL STORYTELLER"
-                  onChange={(e) => setProfileForm({ ...profileForm, portfolioHeroSubtitle: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all uppercase font-bold"
-                />
-                <p className="text-[10px] text-slate-400 mt-1 font-mono">Sub-judul warna abu-abu besar di bawah nama studio.</p>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Singkat Hero Intro</label>
-                <textarea
-                  rows={3}
-                  value={profileForm.portfolioHeroDescription || ''}
-                  placeholder="Precision editing for brands and creators. Crafting narratives through meticulous cut, color, and sound in a distraction-free technical environment."
-                  onChange={(e) => setProfileForm({ ...profileForm, portfolioHeroDescription: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all leading-relaxed"
-                />
-              </div>
-            </div>
-
-            {/* 3. Custom Portfolio Creator Profile Block (Separated from General Account Profile) */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-xs font-mono font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                <User className="w-4 h-4 text-indigo-500" /> Identitas Creator / Profile Card (/portofolio)
-              </h3>
-              <p className="text-xs text-slate-400">Atur profil creator khusus halaman /portofolio (terpisah dari Profil Akun Linktree/Ratecard).</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Nama Creator Portofolio</label>
-                  <input
-                    type="text"
-                    value={profileForm.portfolioCreatorName || ''}
-                    placeholder={`Misal: ${profileForm.name || 'CREATOR NAME'}`}
-                    onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorName: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all font-bold uppercase"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-1 font-mono">Nama publik creator yang tampil di kartu hero portofolio.</p>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Foto Avatar Portofolio</label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="text"
-                      value={profileForm.portfolioCreatorAvatarUrl || ''}
-                      placeholder={profileForm.avatarUrl || "URL gambar..."}
-                      onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorAvatarUrl: e.target.value })}
-                      className="flex-1 px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none font-mono"
-                    />
-                    <label className="px-3.5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-xs font-bold cursor-pointer transition-colors shrink-0 text-center select-none">
-                      {isUploading['portfolioCreatorAvatarUrl'] ? 'Uploading...' : 'Unggah File'}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleFileUpload(e, 'portfolioCreatorAvatarUrl')}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  <p className="text-[10px] text-slate-400 mt-1 font-mono">URL atau upload foto khusus untuk avatar portofolio.</p>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Bio / Peran Singkat Creator</label>
-                <input
-                  type="text"
-                  value={profileForm.portfolioCreatorBio || ''}
-                  placeholder="Senior Video Editor & Colorist"
-                  onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorBio: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all leading-relaxed"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Instagram Portofolio</label>
-                  <input
-                    type="url"
-                    value={profileForm.portfolioCreatorInstagram || ''}
-                    placeholder={profileForm.instagram || "https://instagram.com/..."}
-                    onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorInstagram: e.target.value })}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">TikTok Portofolio</label>
-                  <input
-                    type="url"
-                    value={profileForm.portfolioCreatorTiktok || ''}
-                    placeholder={profileForm.tiktok || "https://tiktok.com/@..."}
-                    onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorTiktok: e.target.value })}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Email Portofolio</label>
-                  <input
-                    type="email"
-                    value={profileForm.portfolioCreatorEmail || ''}
-                    placeholder={profileForm.email || "email@domain.com"}
-                    onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorEmail: e.target.value })}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* 4. Bagian Section Process (02 // PROCESS) */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-xs font-mono font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                <Sliders className="w-4 h-4 text-indigo-500" /> Kustomisasi Bagian Process (02 // PROCESS)
-              </h3>
-              <p className="text-xs text-slate-400">Atur judul marker section dan 4 alur langkah kerja (Discovery, Editing, Sound & Color, Delivery).</p>
-
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Marker Sub-Judul Section</label>
-                <input
-                  type="text"
-                  value={profileForm.portfolioProcessMarker || ''}
-                  placeholder="02 // PROCESS"
-                  onChange={(e) => setProfileForm({ ...profileForm, portfolioProcessMarker: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all font-mono uppercase"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                {/* Step 1 */}
-                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
-                  <div className="text-[11px] font-mono font-bold text-indigo-600 uppercase">Langkah 01</div>
-                  <div>
-                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Langkah 01</label>
-                    <input
-                      type="text"
-                      value={profileForm.portfolioProcess1Title || ''}
-                      placeholder="Discovery & Strategy"
-                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess1Title: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 uppercase focus:border-indigo-500 outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Langkah 01</label>
-                    <textarea
-                      rows={2}
-                      value={profileForm.portfolioProcess1Desc || ''}
-                      placeholder="Deep dive into the brand voice and narrative goals to establish a clear creative direction."
-                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess1Desc: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:border-indigo-500 outline-none leading-relaxed"
-                    />
-                  </div>
-                </div>
-
-                {/* Step 2 */}
-                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
-                  <div className="text-[11px] font-mono font-bold text-indigo-600 uppercase">Langkah 02</div>
-                  <div>
-                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Langkah 02</label>
-                    <input
-                      type="text"
-                      value={profileForm.portfolioProcess2Title || ''}
-                      placeholder="Creative Editing"
-                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess2Title: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 uppercase focus:border-indigo-500 outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Langkah 02</label>
-                    <textarea
-                      rows={2}
-                      value={profileForm.portfolioProcess2Desc || ''}
-                      placeholder="The technical craft of assembly, pacing, and rhythm to build a compelling visual story."
-                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess2Desc: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:border-indigo-500 outline-none leading-relaxed"
-                    />
-                  </div>
-                </div>
-
-                {/* Step 3 */}
-                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
-                  <div className="text-[11px] font-mono font-bold text-indigo-600 uppercase">Langkah 03</div>
-                  <div>
-                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Langkah 03</label>
-                    <input
-                      type="text"
-                      value={profileForm.portfolioProcess3Title || ''}
-                      placeholder="Sound & Color"
-                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess3Title: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 uppercase focus:border-indigo-500 outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Langkah 03</label>
-                    <textarea
-                      rows={2}
-                      value={profileForm.portfolioProcess3Desc || ''}
-                      placeholder="Applying the cinematic polish through professional color grading and immersive sound design."
-                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess3Desc: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:border-indigo-500 outline-none leading-relaxed"
-                    />
-                  </div>
-                </div>
-
-                {/* Step 4 */}
-                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
-                  <div className="text-[11px] font-mono font-bold text-indigo-600 uppercase">Langkah 04</div>
-                  <div>
-                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Langkah 04</label>
-                    <input
-                      type="text"
-                      value={profileForm.portfolioProcess4Title || ''}
-                      placeholder="Review & Delivery"
-                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess4Title: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 uppercase focus:border-indigo-500 outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Langkah 04</label>
-                    <textarea
-                      rows={2}
-                      value={profileForm.portfolioProcess4Desc || ''}
-                      placeholder="Collaborative refinement and final export in high-fidelity formats for all platforms."
-                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess4Desc: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:border-indigo-500 outline-none leading-relaxed"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 5. Collaboration CTA & Pop-up Modal */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-xs font-mono font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
-                <MessageSquare className="w-4 h-4 text-indigo-500" /> Bagian CTA & Modal Diskusi Project
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Judul CTA Kolaborasi</label>
-                  <input
-                    type="text"
-                    value={profileForm.portfolioCtaTitle || ''}
-                    placeholder="READY TO COLLABORATE?"
-                    onChange={(e) => setProfileForm({ ...profileForm, portfolioCtaTitle: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all font-bold uppercase"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Teks Tombol Utama CTA</label>
-                  <input
-                    type="text"
-                    value={profileForm.portfolioCtaButtonText || ''}
-                    placeholder="GET IN TOUCH"
-                    onChange={(e) => setProfileForm({ ...profileForm, portfolioCtaButtonText: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all font-mono uppercase"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Bagian CTA</label>
-                <textarea
-                  rows={2}
-                  value={profileForm.portfolioCtaDescription || ''}
-                  placeholder="Available for freelance projects globally. Specialized in commercial, documentary, and narrative editing."
-                  onChange={(e) => setProfileForm({ ...profileForm, portfolioCtaDescription: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all leading-relaxed font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Pada Pop-Up Modal Kontak ("Start a Project")</label>
-                <textarea
-                  rows={2}
-                  value={profileForm.portfolioModalDescription || ''}
-                  placeholder="Hubungi langsung melalui saluran komunikasi resmi untuk diskusi brief video reel, jadwal produksi, dan penawaran khusus."
-                  onChange={(e) => setProfileForm({ ...profileForm, portfolioModalDescription: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all leading-relaxed"
-                />
-              </div>
-            </div>
-
-            {/* Bottom Save Bar */}
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <button
-                type="submit"
-                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <Save className="w-4 h-4" /> Simpan Pengaturan Halaman Portofolio
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* ======================================================== */}
-      {/* 5B. MANAGE PORTFOLIO REELS (/portofolio) VIEW TAB */}
-      {/* ======================================================== */}
-      {activeTab === 'portfolio_reels' && (
-        <div className="space-y-6" id="tab-content-portfolio-reels">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
-            <div>
-              <h2 className="text-md font-display font-bold text-slate-800 flex items-center gap-2">
-                <Film className="w-4 h-4 text-indigo-500" /> Portfolio IG Reels <span className="text-xs font-mono italic text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">/portofolio</span>
-              </h2>
-              <p className="text-xs text-slate-400">Kelola video reel, foto sampul, dan tautan Instagram Reels yang muncul pada halaman sub-domain /portofolio.</p>
-            </div>
-            <button
-              onClick={triggerAddReel}
-              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors font-sans flex items-center justify-center gap-2 cursor-pointer shrink-0"
-            >
-              <Plus className="w-4 h-4" /> Tambah Reel Baru
-            </button>
-          </div>
-
-          {/* Form Create/Edit Portfolio Reel */}
-          {editingReel && (
-            <div className="bg-slate-900 text-white border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 animate-fadeIn">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 className="text-sm font-display font-bold text-white flex items-center gap-2">
-                  <Film className="w-4 h-4 text-indigo-400" />
-                  {isAddingReel ? 'Tambah Video Reel Baru' : 'Edit Video Reel'}
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setEditingReel(null)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <form onSubmit={saveReel} className="space-y-4">
-                <div>
-                  <label className="block text-[10px] font-mono font-bold text-slate-400 uppercase mb-1">Judul Project Reel</label>
-                  <input
-                    type="text"
-                    value={editingReel.title || ''}
-                    required
-                    placeholder="Misal: MIDNIGHT RUN - CYBERPUNK EDIT"
-                    onChange={(e) => setEditingReel({ ...editingReel, title: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-indigo-400 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-mono font-bold text-slate-400 uppercase mb-1">URL Video Direct (MP4/WebM) atau Link Instagram Reel</label>
-                  <input
-                    type="url"
-                    value={editingReel.videoUrl || ''}
-                    placeholder="URL .mp4 langsung atau https://www.instagram.com/reel/Cxxxxxx/"
-                    onChange={(e) => setEditingReel({ ...editingReel, videoUrl: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:border-indigo-400 outline-none font-mono"
-                  />
-                  <p className="text-[10px] text-slate-500 mt-1 font-mono">Video MP4/WebM diputar langsung di web tanpa perlu membuka Instagram.</p>
-                </div>
-
-                <div className="flex items-center gap-2 pt-1">
-                  <input
-                    type="checkbox"
-                    id="reel-active"
-                    checked={editingReel.isActive !== false}
-                    onChange={(e) => setEditingReel({ ...editingReel, isActive: e.target.checked })}
-                    className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"
-                  />
-                  <label htmlFor="reel-active" className="text-xs text-slate-300 font-mono cursor-pointer">Tampilkan video reel ini secara publik</label>
-                </div>
-
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
-                  <button
-                    type="button"
-                    onClick={() => setEditingReel(null)}
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold cursor-pointer"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-950 flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Save className="w-3.5 h-3.5" /> Simpan Reel
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {/* Grid display of Portfolio Reels */}
-          <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden" id="admin-portfolio-reels-list">
-            <div className="p-4 border-b border-slate-100 bg-slate-50 text-xs font-mono text-slate-500 font-bold uppercase">
-              Daftar Portfolio Reels ({portfolioReels.length})
-            </div>
-            <div className="divide-y divide-slate-100">
-              {portfolioReels && portfolioReels.length > 0 ? (
-                portfolioReels
-                  .map((reel) => (
-                    <div
-                      key={reel.id}
-                      className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            {reel.isActive !== false ? (
-                              <span className="text-[10px] font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">
-                                ● Aktif
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded">
-                                Nonaktif
-                              </span>
-                            )}
-                          </div>
-                          <h3 className="font-display font-bold text-slate-800 text-sm">
-                            {reel.title}
-                          </h3>
-                          {reel.videoUrl && (
-                            <a
-                              href={reel.videoUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-[11px] font-mono text-indigo-600 hover:underline flex items-center gap-1"
-                            >
-                              <span>Buka Video / Instagram Reel</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2 justify-end">
-                        <button
-                          onClick={() => triggerEditReel(reel)}
-                          className="p-2 text-slate-400 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 border border-slate-100 hover:border-indigo-100 rounded-lg transition-colors cursor-pointer"
-                          title="Edit Reel"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => deleteReel(reel.id)}
-                          className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 border border-slate-100 hover:border-red-100 rounded-lg transition-colors cursor-pointer"
-                          title="Hapus Reel"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))
-              ) : (
-                <div className="p-8 text-center text-slate-400 text-xs">
-                  Belum ada reel terdaftar. Klik 'Tambah Reel Baru' diatas untuk mengisi portofolio.
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       )}
 

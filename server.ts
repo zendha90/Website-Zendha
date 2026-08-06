@@ -156,32 +156,6 @@ interface RatecardProfile {
   ratecardTitle?: string;
   faviconUrl?: string;
 
-  // Portfolio Section Customizations
-  portfolioPageTitle?: string;
-  portfolioHeroIndexMarker?: string;
-  portfolioHeroSubtitle?: string;
-  portfolioHeroDescription?: string;
-  portfolioCreatorName?: string;
-  portfolioCreatorAvatarUrl?: string;
-  portfolioCreatorBio?: string;
-  portfolioCreatorInstagram?: string;
-  portfolioCreatorTiktok?: string;
-  portfolioCreatorEmail?: string;
-  portfolioArchiveMarker?: string;
-  portfolioArchiveQuote?: string;
-  portfolioProcessMarker?: string;
-  portfolioProcess1Title?: string;
-  portfolioProcess1Desc?: string;
-  portfolioProcess2Title?: string;
-  portfolioProcess2Desc?: string;
-  portfolioProcess3Title?: string;
-  portfolioProcess3Desc?: string;
-  portfolioProcess4Title?: string;
-  portfolioProcess4Desc?: string;
-  portfolioCtaTitle?: string;
-  portfolioCtaDescription?: string;
-  portfolioCtaButtonText?: string;
-
   // Design Settings
   designSettings?: DesignSettings;
 }
@@ -225,23 +199,12 @@ interface RatecardBrand {
   priority: number;
 }
 
-interface PortfolioReel {
-  id: string;
-  title: string;
-  category: string;
-  coverImageUrl: string;
-  videoUrl?: string;
-  isActive: boolean;
-  priority: number;
-}
-
 interface DatabaseSchema {
   links: AffiliateLink[];
   profile: RatecardProfile;
   services: RatecardService[];
   projects: RatecardProject[];
   brands?: RatecardBrand[];
-  portfolioReels?: PortfolioReel[];
   clickLogs?: ClickLog[];
   visitLogs?: VisitLog[];
   githubSettings?: {
@@ -428,62 +391,6 @@ const DEFAULT_DB: DatabaseSchema = {
     { id: "brand-8", name: "Home Guard", logoUrl: "", priority: 8, isActive: true },
     { id: "brand-9", name: "Meco", logoUrl: "", priority: 9, isActive: true },
     { id: "brand-10", name: "Advance", logoUrl: "", priority: 10, isActive: true }
-  ],
-  portfolioReels: [
-    {
-      id: "reel-1",
-      title: "MIDNIGHT RUN",
-      category: "AUTOMOTIVE",
-      coverImageUrl: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=800&h=1400",
-      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-sports-car-driving-on-a-road-at-night-41551-large.mp4",
-      isActive: true,
-      priority: 1
-    },
-    {
-      id: "reel-2",
-      title: "THE ARCHITECT",
-      category: "SHORT FILM",
-      coverImageUrl: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&q=80&w=800&h=1400",
-      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-modern-city-skyscrapers-and-buildings-42582-large.mp4",
-      isActive: true,
-      priority: 2
-    },
-    {
-      id: "reel-3",
-      title: "PRECISION GEAR",
-      category: "PRODUCT",
-      coverImageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=800&h=1400",
-      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-camera-at-sunset-41549-large.mp4",
-      isActive: true,
-      priority: 3
-    },
-    {
-      id: "reel-4",
-      title: "CONCRETE JUNGLE",
-      category: "DOCUMENTARY",
-      coverImageUrl: "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=800&h=1400",
-      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-top-view-of-a-traffic-junction-in-a-city-41552-large.mp4",
-      isActive: true,
-      priority: 4
-    },
-    {
-      id: "reel-5",
-      title: "FORWARD MOTION",
-      category: "CAMPAIGN",
-      coverImageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800&h=1400",
-      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-man-running-on-the-beach-at-sunset-41550-large.mp4",
-      isActive: true,
-      priority: 5
-    },
-    {
-      id: "reel-6",
-      title: "SYNTHWAVE",
-      category: "MUSIC VIDEO",
-      coverImageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=800&h=1400",
-      videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-dj-mixing-music-at-a-nightclub-41553-large.mp4",
-      isActive: true,
-      priority: 6
-    }
   ]
 };
 
@@ -507,12 +414,22 @@ function readDb(): DatabaseSchema {
         changed = true;
       }
 
-      if (db.portfolioReels === undefined) {
-        db.portfolioReels = DEFAULT_DB.portfolioReels;
-        changed = true;
-      }
-
       if (db.profile) {
+        if (db.profile.name === "Zendha Refitra") {
+          db.profile.name = "Aesthetic Creator";
+          db.profile.bio = DEFAULT_DB.profile.bio;
+          db.profile.instagram = DEFAULT_DB.profile.instagram;
+          db.profile.tiktok = DEFAULT_DB.profile.tiktok;
+          db.profile.youtube = DEFAULT_DB.profile.youtube;
+          db.profile.email = DEFAULT_DB.profile.email;
+          db.profile.contactPhone = DEFAULT_DB.profile.contactPhone || "+62-8123-456-789";
+          db.profile.whatsapp = DEFAULT_DB.profile.whatsapp;
+          if (db.profile.heroDescription && db.profile.heroDescription.includes("Zendha")) {
+            db.profile.heroDescription = DEFAULT_DB.profile.heroDescription;
+          }
+          changed = true;
+        }
+
         if (!db.profile.designSettings) {
           db.profile.designSettings = { ...DEFAULT_DB.profile.designSettings! };
           changed = true;
@@ -1614,11 +1531,61 @@ app.delete('/api/links/:id', (req, res) => {
 app.put('/api/ratecard/profile', (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
   
+  const { 
+    name, bio, instagram, tiktok, youtube, email, avatarUrl, whatsapp,
+    heroTagline, heroTitle1, heroTitleHighlight, heroDescription, domicile, contactPhone,
+    stats, termsOfService, studioDirectorTitle, studioEstdYear, designSettings,
+    statsBadge, statsTitle, statsDescription,
+    projectsBadge, projectsTitle, projectsDescription,
+    pricingBadge, pricingTitle, pricingDescription,
+    brandsBadge, brandsTitle,
+    termsBadge, termsTitle, termsDescription,
+    contactBadge, contactTitle, contactTitleHighlight, contactDescription,
+    linktreeTitle, ratecardTitle, faviconUrl
+  } = req.body;
   const db = readDb();
   
   db.profile = {
-    ...db.profile,
-    ...req.body
+    name: name || db.profile.name,
+    bio: bio || db.profile.bio,
+    instagram: instagram !== undefined ? instagram : db.profile.instagram,
+    tiktok: tiktok !== undefined ? tiktok : db.profile.tiktok,
+    youtube: youtube !== undefined ? youtube : db.profile.youtube,
+    email: email !== undefined ? email : db.profile.email,
+    avatarUrl: avatarUrl !== undefined ? avatarUrl : db.profile.avatarUrl,
+    whatsapp: whatsapp !== undefined ? whatsapp : db.profile.whatsapp,
+    heroTagline: heroTagline !== undefined ? heroTagline : db.profile.heroTagline,
+    heroTitle1: heroTitle1 !== undefined ? heroTitle1 : db.profile.heroTitle1,
+    heroTitleHighlight: heroTitleHighlight !== undefined ? heroTitleHighlight : db.profile.heroTitleHighlight,
+    heroDescription: heroDescription !== undefined ? heroDescription : db.profile.heroDescription,
+    domicile: domicile !== undefined ? domicile : db.profile.domicile,
+    contactPhone: contactPhone !== undefined ? contactPhone : db.profile.contactPhone,
+    stats: stats !== undefined ? stats : db.profile.stats,
+    termsOfService: termsOfService !== undefined ? termsOfService : db.profile.termsOfService,
+    studioDirectorTitle: studioDirectorTitle !== undefined ? studioDirectorTitle : db.profile.studioDirectorTitle,
+    studioEstdYear: studioEstdYear !== undefined ? studioEstdYear : db.profile.studioEstdYear,
+    linktreeTitle: linktreeTitle !== undefined ? linktreeTitle : db.profile.linktreeTitle,
+    ratecardTitle: ratecardTitle !== undefined ? ratecardTitle : db.profile.ratecardTitle,
+    faviconUrl: faviconUrl !== undefined ? faviconUrl : db.profile.faviconUrl,
+    designSettings: designSettings !== undefined ? designSettings : db.profile.designSettings,
+    statsBadge: statsBadge !== undefined ? statsBadge : db.profile.statsBadge,
+    statsTitle: statsTitle !== undefined ? statsTitle : db.profile.statsTitle,
+    statsDescription: statsDescription !== undefined ? statsDescription : db.profile.statsDescription,
+    projectsBadge: projectsBadge !== undefined ? projectsBadge : db.profile.projectsBadge,
+    projectsTitle: projectsTitle !== undefined ? projectsTitle : db.profile.projectsTitle,
+    projectsDescription: projectsDescription !== undefined ? projectsDescription : db.profile.projectsDescription,
+    pricingBadge: pricingBadge !== undefined ? pricingBadge : db.profile.pricingBadge,
+    pricingTitle: pricingTitle !== undefined ? pricingTitle : db.profile.pricingTitle,
+    pricingDescription: pricingDescription !== undefined ? pricingDescription : db.profile.pricingDescription,
+    brandsBadge: brandsBadge !== undefined ? brandsBadge : db.profile.brandsBadge,
+    brandsTitle: brandsTitle !== undefined ? brandsTitle : db.profile.brandsTitle,
+    termsBadge: termsBadge !== undefined ? termsBadge : db.profile.termsBadge,
+    termsTitle: termsTitle !== undefined ? termsTitle : db.profile.termsTitle,
+    termsDescription: termsDescription !== undefined ? termsDescription : db.profile.termsDescription,
+    contactBadge: contactBadge !== undefined ? contactBadge : db.profile.contactBadge,
+    contactTitle: contactTitle !== undefined ? contactTitle : db.profile.contactTitle,
+    contactTitleHighlight: contactTitleHighlight !== undefined ? contactTitleHighlight : db.profile.contactTitleHighlight,
+    contactDescription: contactDescription !== undefined ? contactDescription : db.profile.contactDescription
   };
   
   writeDb(db);
@@ -1844,84 +1811,6 @@ app.delete('/api/ratecard/brands/:id', (req, res) => {
   
   writeDb(db);
   res.json({ success: true, message: 'Brand berhasil dihapus' });
-});
-
-// Add Portfolio Reel
-app.post('/api/portfolio/reels', (req, res) => {
-  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
-  
-  const { title, category, coverImageUrl, videoUrl, priority, isActive } = req.body;
-  if (!title) {
-    return res.status(400).json({ success: false, message: 'Judul reel wajib diisi' });
-  }
-  
-  const db = readDb();
-  if (!db.portfolioReels) db.portfolioReels = [];
-  
-  const newReel: PortfolioReel = {
-    id: `reel-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-    title,
-    category: category || 'AUTOMOTIVE',
-    coverImageUrl: coverImageUrl || 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=800&h=1400',
-    videoUrl: videoUrl || '',
-    priority: priority !== undefined ? Number(priority) : db.portfolioReels.length + 1,
-    isActive: isActive !== undefined ? !!isActive : true
-  };
-  
-  db.portfolioReels.push(newReel);
-  db.portfolioReels.sort((a, b) => a.priority - b.priority);
-  writeDb(db);
-  
-  res.status(201).json({ success: true, reel: newReel });
-});
-
-// Update Portfolio Reel
-app.put('/api/portfolio/reels/:id', (req, res) => {
-  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
-  
-  const { id } = req.params;
-  const { title, category, coverImageUrl, videoUrl, priority, isActive } = req.body;
-  
-  const db = readDb();
-  if (!db.portfolioReels) db.portfolioReels = [];
-  
-  const index = db.portfolioReels.findIndex(r => r.id === id);
-  if (index === -1) {
-    return res.status(404).json({ success: false, message: 'Reel tidak ditemukan' });
-  }
-  
-  db.portfolioReels[index] = {
-    ...db.portfolioReels[index],
-    title: title !== undefined ? title : db.portfolioReels[index].title,
-    category: category !== undefined ? category : db.portfolioReels[index].category,
-    coverImageUrl: coverImageUrl !== undefined ? coverImageUrl : db.portfolioReels[index].coverImageUrl,
-    videoUrl: videoUrl !== undefined ? videoUrl : db.portfolioReels[index].videoUrl,
-    priority: priority !== undefined ? Number(priority) : db.portfolioReels[index].priority,
-    isActive: isActive !== undefined ? !!isActive : db.portfolioReels[index].isActive
-  };
-  
-  db.portfolioReels.sort((a, b) => a.priority - b.priority);
-  writeDb(db);
-  res.json({ success: true, reel: db.portfolioReels[index] });
-});
-
-// Delete Portfolio Reel
-app.delete('/api/portfolio/reels/:id', (req, res) => {
-  if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Unauthorized' });
-  
-  const { id } = req.params;
-  const db = readDb();
-  if (!db.portfolioReels) db.portfolioReels = [];
-  
-  const initialLength = db.portfolioReels.length;
-  db.portfolioReels = db.portfolioReels.filter(r => r.id !== id);
-  
-  if (db.portfolioReels.length === initialLength) {
-    return res.status(404).json({ success: false, message: 'Reel tidak ditemukan' });
-  }
-  
-  writeDb(db);
-  res.json({ success: true, message: 'Reel berhasil dihapus' });
 });
 
 
