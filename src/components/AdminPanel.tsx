@@ -950,6 +950,19 @@ export default function AdminPanel({
 
   // ================= PORTFOLIO REELS OPERATIONS =================
 
+  const LOCAL_STORAGE_KEY = 'creator_portfolio_persistent_data_v2';
+
+  const updateLocalStorageReels = (newReels: PortfolioReel[]) => {
+    try {
+      const existingRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
+      let existingData = existingRaw ? JSON.parse(existingRaw) : {};
+      existingData.portfolioReels = newReels;
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(existingData));
+    } catch (e) {
+      console.warn("Error saving reels to localStorage", e);
+    }
+  };
+
   const saveReel = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingReel) return;
@@ -966,7 +979,17 @@ export default function AdminPanel({
       });
       const data = await response.json();
       if (data.success) {
-        showToast(isEdit ? 'Reel berhasil diupdate!' : 'Reel baru berhasil ditambahkan!');
+        showToast(isEdit ? 'Reel berhasil diupdate & tersimpan!' : 'Reel baru berhasil ditambahkan & tersimpan!');
+        if (data.reel) {
+          let updatedList: PortfolioReel[] = [];
+          if (isEdit) {
+            updatedList = portfolioReels.map(r => r.id === data.reel.id ? data.reel : r);
+          } else {
+            updatedList = [...portfolioReels, data.reel];
+          }
+          setPortfolioReels(updatedList);
+          updateLocalStorageReels(updatedList);
+        }
         setEditingReel(null);
         setIsAddingReel(false);
         await onRefreshData();
@@ -989,6 +1012,9 @@ export default function AdminPanel({
       const data = await response.json();
       if (data.success) {
         showToast('Reel berhasil dihapus!');
+        const updatedList = portfolioReels.filter(r => r.id !== id);
+        setPortfolioReels(updatedList);
+        updateLocalStorageReels(updatedList);
         await onRefreshData();
       } else {
         showToast(data.message || 'Gagal menghapus reel', 'error');

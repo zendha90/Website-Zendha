@@ -26,7 +26,7 @@ interface PortfolioViewProps {
   onNavigateToAdmin?: () => void;
 }
 
-// Subcomponent for individual video card with inline video player
+// Subcomponent for individual video card with inline video player (Obsidian Studio 9:16 Style)
 function ReelCard({ reel }: { reel: PortfolioReel; key?: React.Key }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -63,7 +63,7 @@ function ReelCard({ reel }: { reel: PortfolioReel; key?: React.Key }) {
   };
 
   return (
-    <div className="group relative aspect-[9/16] rounded-xl overflow-hidden bg-[#1a1c1c] border border-[#333535] hover:border-[#8e9192] transition-all duration-300 flex flex-col justify-between">
+    <div className="group relative aspect-[9/16] bg-[#282a2b] border border-[#444748] overflow-hidden transition-all duration-300 flex flex-col justify-between hover:border-[#b1cad7]">
       {/* Video / Image Area */}
       <div className="absolute inset-0 w-full h-full bg-black overflow-hidden">
         {instagramShortcode ? (
@@ -83,25 +83,28 @@ function ReelCard({ reel }: { reel: PortfolioReel; key?: React.Key }) {
               loop
               muted={isMuted}
               playsInline
-              className="w-full h-full object-cover cursor-pointer"
+              className="w-full h-full object-cover cursor-pointer group-hover:scale-105 transition-transform duration-700 ease-out"
               onClick={togglePlay}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
             />
+
+            {/* Dark overlay */}
+            <div className={`absolute inset-0 bg-black/40 transition-colors duration-300 pointer-events-none ${isPlaying ? 'bg-black/10' : 'group-hover:bg-black/20'}`} />
 
             {/* Play/Pause Controller Overlay */}
             <button
               type="button"
               onClick={togglePlay}
               aria-label={isPlaying ? "Pause video" : "Play video"}
-              className={`absolute inset-0 m-auto w-14 h-14 rounded-full bg-black/60 border border-white/20 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-300 cursor-pointer ${
-                isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100 scale-100'
+              className={`absolute inset-0 m-auto w-16 h-16 rounded-full bg-[#121414]/70 border border-white/20 backdrop-blur-md flex items-center justify-center text-[#b1cad7] transition-all duration-300 cursor-pointer ${
+                isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-90 group-hover:opacity-100 scale-100'
               }`}
             >
               {isPlaying ? (
-                <Pause className="w-6 h-6 fill-current" />
+                <Pause className="w-7 h-7 fill-current" />
               ) : (
-                <Play className="w-6 h-6 fill-current translate-x-0.5" />
+                <Play className="w-7 h-7 fill-current translate-x-0.5" />
               )}
             </button>
 
@@ -110,34 +113,31 @@ function ReelCard({ reel }: { reel: PortfolioReel; key?: React.Key }) {
               type="button"
               onClick={toggleMute}
               aria-label={isMuted ? "Unmute video" : "Mute video"}
-              className="absolute top-3 right-3 z-20 p-2 rounded-lg bg-black/70 text-white/80 hover:text-white backdrop-blur-md border border-white/10 transition-colors cursor-pointer"
+              className="absolute top-3 right-3 z-20 p-2 rounded bg-[#0c0f0f]/80 text-white/80 hover:text-white backdrop-blur-md border border-white/10 transition-colors cursor-pointer"
               title={isMuted ? "Aktifkan Suara" : "Matikan Suara"}
             >
-              {isMuted ? <VolumeX className="w-3.5 h-3.5 text-slate-400" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-400" />}
+              {isMuted ? <VolumeX className="w-4 h-4 text-slate-400" /> : <Volume2 className="w-4 h-4 text-[#b1cad7]" />}
             </button>
           </>
         ) : (
           <img
             src={reel.coverImageUrl}
             alt={reel.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-80"
           />
         )}
       </div>
 
-      {/* Gradient Bottom Overlay for Text Readability */}
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0c0f0f] via-[#0c0f0f]/80 to-transparent pointer-events-none z-10" />
-
       {/* Top Left Tag */}
       <div className="relative z-20 p-4">
-        <span className="px-2.5 py-1 rounded bg-[#121414]/80 backdrop-blur-md border border-[#444748] text-[10px] font-['JetBrains_Mono',monospace] text-[#c4c7c7] uppercase tracking-wider">
+        <span className="px-3 py-1 bg-[#121414]/90 backdrop-blur-md border border-[#444748] text-[11px] font-['JetBrains_Mono',monospace] text-[#c9c6c5] uppercase tracking-widest">
           {reel.category || 'REEL'}
         </span>
       </div>
 
-      {/* Bottom Title Label (Technical Obsidian Studio Style) */}
-      <div className="relative z-20 p-4 font-['JetBrains_Mono',monospace] flex items-center justify-between text-xs tracking-wider">
-        <div className="truncate pr-2 text-slate-200 font-medium">
+      {/* Bottom Title Label */}
+      <div className="relative z-20 p-4 bg-gradient-to-t from-[#121414] via-[#121414]/80 to-transparent font-['JetBrains_Mono',monospace] flex items-center justify-between text-xs tracking-wider">
+        <div className="truncate pr-2 text-[#e2e2e2] font-medium">
           <span className="text-[#8e9192] uppercase">{reel.category || 'REEL'} // </span>
           <span className="text-white uppercase font-bold">{reel.title}</span>
         </div>
@@ -146,10 +146,10 @@ function ReelCard({ reel }: { reel: PortfolioReel; key?: React.Key }) {
             href={reel.videoUrl}
             target="_blank"
             rel="noreferrer"
-            className="p-1 text-slate-400 hover:text-white transition-colors"
+            className="p-1 text-[#8e9192] hover:text-white transition-colors shrink-0"
             title="Buka Reel di Instagram"
           >
-            <ExternalLink className="w-3.5 h-3.5" />
+            <ExternalLink className="w-4 h-4" />
           </a>
         )}
       </div>
@@ -164,19 +164,10 @@ export default function PortfolioView({
   onNavigateToRatecard,
   onNavigateToAdmin
 }: PortfolioViewProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [showHireModal, setShowHireModal] = useState<boolean>(false);
 
   // Filter active reels
   const activeReels = reels.filter(r => r.isActive);
-
-  // Extract unique categories
-  const categories = ['ALL', ...Array.from(new Set(activeReels.map(r => r.category.toUpperCase())))];
-
-  // Filtered reels list
-  const filteredReels = selectedCategory === 'ALL' 
-    ? activeReels 
-    : activeReels.filter(r => r.category.toUpperCase() === selectedCategory);
 
   const studioName = profile.portfolioStudioName 
     ? profile.portfolioStudioName.toUpperCase() 
@@ -185,8 +176,6 @@ export default function PortfolioView({
   const heroIndexMarker = profile.portfolioHeroIndexMarker || "00 // INDEX";
   const heroSubtitle = profile.portfolioHeroSubtitle || "VISUAL STORYTELLER";
   const heroDescription = profile.portfolioHeroDescription || "Precision editing for brands and creators. Crafting narratives through meticulous cut, color, and sound in a distraction-free technical environment.";
-  const archiveMarker = profile.portfolioArchiveMarker || "02 // CREATOR ARCHIVE";
-  const archiveQuote = profile.portfolioArchiveQuote || "\"Every edit is built with mathematical rhythm and pacing. Specialized in retaining visual focus, crafting dynamic sound beds, and polishing color grade to industry benchmarks.\"";
   const ctaTitle = profile.portfolioCtaTitle || "READY TO COLLABORATE?";
   const ctaDescription = profile.portfolioCtaDescription || "Available for freelance projects globally. Specialized in commercial, documentary, and narrative editing.";
   const ctaButtonText = profile.portfolioCtaButtonText || "GET IN TOUCH";
@@ -201,34 +190,54 @@ export default function PortfolioView({
   }, [profile]);
 
   return (
-    <div className="min-h-screen bg-[#121414] text-[#e2e2e2] font-['Montserrat',sans-serif] selection:bg-[#e2e2e2] selection:text-[#121414] relative overflow-x-hidden" id="portfolio-view">
+    <div className="min-h-screen bg-[#121414] text-[#e2e2e2] font-['Montserrat',sans-serif] selection:bg-[#c9c6c5] selection:text-[#121414] flex flex-col relative overflow-x-hidden" id="portfolio-view">
       
       {/* TOP NAVIGATION BAR */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#121414]/90 border-b border-[#282a2b] px-4 md:px-12 py-4">
-        <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
+      <nav className="w-full top-0 border-b border-[#444748] bg-[#121414]/95 backdrop-blur-md sticky z-50">
+        <div className="flex justify-between items-center px-4 md:px-8 py-4 max-w-[1440px] mx-auto">
           
-          {/* Studio Brand Logo */}
+          {/* Logo / Brand Name */}
           <div className="flex items-center gap-3">
             <button 
               onClick={onNavigateToHome}
-              className="group flex items-center gap-2 px-3 py-1.5 rounded bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#333535] text-xs font-['JetBrains_Mono',monospace] text-[#c4c7c7] transition-all cursor-pointer"
+              className="group flex items-center gap-2 px-2.5 py-1.5 bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#444748] text-xs font-['JetBrains_Mono',monospace] text-[#c4c7c7] transition-all cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
               <span>LINKTREE</span>
             </button>
-
-            <span className="text-[#444748]">/</span>
-
-            <h1 className="text-sm md:text-base font-['Montserrat',sans-serif] font-bold tracking-widest text-white uppercase">
+            <span className="text-[#444748] hidden sm:inline">/</span>
+            <div className="font-['Montserrat',sans-serif] text-lg md:text-xl font-bold tracking-tight text-white uppercase">
               {studioName}
-            </h1>
+            </div>
           </div>
 
-          {/* Right Action */}
-          <div className="flex items-center gap-3">
-            <button
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-8 font-['JetBrains_Mono',monospace] text-xs tracking-widest">
+            <a href="#work" className="text-[#c9c6c5] font-bold border-b border-[#c9c6c5] pb-1 uppercase">
+              REEL
+            </a>
+            <a href="#process" className="text-[#c4c7c7] font-medium hover:text-white transition-colors uppercase">
+              PROCESS
+            </a>
+            <button 
+              onClick={onNavigateToRatecard} 
+              className="text-[#c4c7c7] font-medium hover:text-white transition-colors cursor-pointer uppercase"
+            >
+              RATECARD
+            </button>
+            <button 
+              onClick={() => setShowHireModal(true)} 
+              className="text-[#c4c7c7] font-medium hover:text-white transition-colors cursor-pointer uppercase"
+            >
+              CONTACT
+            </button>
+          </div>
+
+          {/* Right Action Button */}
+          <div className="flex items-center space-x-3">
+            <button 
               onClick={() => setShowHireModal(true)}
-              className="px-5 py-2 rounded bg-transparent hover:bg-white/10 border border-[#e2e2e2] text-white font-['JetBrains_Mono',monospace] font-bold text-xs tracking-wider transition-all cursor-pointer"
+              className="bg-[#b1cad7] hover:bg-[#cde6f4] text-[#1c333e] font-['JetBrains_Mono',monospace] text-xs font-bold px-5 py-2.5 uppercase tracking-widest transition-colors cursor-pointer"
             >
               HIRE ME
             </button>
@@ -236,144 +245,187 @@ export default function PortfolioView({
             {onNavigateToAdmin && (
               <button
                 onClick={onNavigateToAdmin}
-                className="p-2 rounded bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#333535] text-[#8e9192] hover:text-white transition-colors cursor-pointer"
+                className="p-2 bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#444748] text-[#8e9192] hover:text-white transition-colors cursor-pointer"
                 title="Admin Settings"
               >
                 <SlidersHorizontal className="w-4 h-4" />
               </button>
             )}
           </div>
+
         </div>
-      </header>
+      </nav>
 
-      {/* COMBINED HERO & CREATOR ARCHIVE SECTION */}
-      <section id="about" className="max-w-[1440px] mx-auto px-4 md:px-12 pt-12 md:pt-20 pb-12">
-        <div className="space-y-8">
-          
-          {/* Studio Title */}
-          <div className="space-y-2">
-            <h2 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white uppercase leading-none">
-              {studioName}
-            </h2>
-            <h3 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#8e9192] uppercase">
-              {heroSubtitle}
-            </h3>
+      {/* MAIN CONTENT AREA */}
+      <main className="flex-grow max-w-[1440px] mx-auto w-full px-4 md:px-8 py-10 md:py-16 space-y-16 md:space-y-24">
+        
+        {/* HERO SECTION */}
+        <section className="border-b border-[#444748] pb-12 md:pb-16 pt-4">
+          <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] mb-6 uppercase tracking-widest bg-[#282a2b] px-3 py-1.5 border border-[#444748] inline-block">
+            {heroIndexMarker}
           </div>
+          
+          <h1 className="font-['Montserrat',sans-serif] text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white mb-6 uppercase leading-tight tracking-tight">
+            {studioName} <br />
+            <span className="text-[#8e9192] font-bold">{heroSubtitle}</span>
+          </h1>
 
-          {/* Combined Content Grid (Profile & Hero Description & Creator Quote) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-[#1a1c1c] border border-[#282a2b] rounded-2xl p-6 sm:p-8 md:p-10">
-            
-            {/* Left Col: Avatar + Social Links */}
-            <div className="lg:col-span-4 flex flex-col items-center sm:items-start gap-5 pb-6 lg:pb-0 border-b lg:border-b-0 lg:border-r border-[#282a2b] lg:pr-8">
-              <div className="relative group shrink-0">
-                <img 
-                  src={profile.avatarUrl} 
-                  alt="Creator Avatar"
-                  className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl object-cover border border-[#444748] shadow-2xl shrink-0"
-                />
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-[#1a1c1c] rounded-full" title="Available for projects" />
-              </div>
+          <p className="font-['Montserrat',sans-serif] text-sm sm:text-base md:text-lg text-[#c4c7c7] max-w-3xl leading-relaxed">
+            {heroDescription}
+          </p>
 
-              {/* Social links */}
-              <div className="flex flex-wrap gap-2 pt-1 font-['JetBrains_Mono',monospace] justify-center sm:justify-start w-full">
-                {profile.instagram && (
-                  <a 
-                    href={profile.instagram} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] hover:text-white border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-all cursor-pointer"
-                  >
-                    <Instagram className="w-3.5 h-3.5 text-[#b1cad7]" />
-                    <span>INSTAGRAM</span>
-                  </a>
-                )}
-                {profile.tiktok && (
-                  <a 
-                    href={profile.tiktok} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] hover:text-white border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-all cursor-pointer"
-                  >
-                    <VideoIcon className="w-3.5 h-3.5 text-[#b1cad7]" />
-                    <span>TIKTOK</span>
-                  </a>
-                )}
-                {profile.email && (
-                  <a 
-                    href={`mailto:${profile.email}`}
-                    className="px-3 py-1.5 rounded bg-[#121414] hover:bg-[#282a2b] hover:text-white border border-[#333535] text-xs text-[#c4c7c7] flex items-center gap-2 transition-all cursor-pointer"
-                  >
-                    <Mail className="w-3.5 h-3.5 text-[#b1cad7]" />
-                    <span>EMAIL</span>
-                  </a>
-                )}
+          {/* Profile Creator Bar & Socials */}
+          <div className="mt-8 pt-6 border-t border-[#282a2b] flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <img 
+                src={profile.avatarUrl} 
+                alt={profile.name || "Creator"}
+                className="w-12 h-12 rounded border border-[#444748] object-cover shrink-0"
+              />
+              <div>
+                <div className="font-bold text-sm text-white uppercase">{profile.name}</div>
+                {profile.bio && <div className="text-xs font-['JetBrains_Mono',monospace] text-[#8e9192]">{profile.bio}</div>}
               </div>
             </div>
 
-            {/* Right Col: Hero Description */}
-            <div className="lg:col-span-8">
-              <p className="text-[#e2e2e2] text-sm md:text-base leading-relaxed font-normal">
-                {heroDescription}
+            <div className="flex flex-wrap gap-2 font-['JetBrains_Mono',monospace]">
+              {profile.instagram && (
+                <a 
+                  href={profile.instagram} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="px-3 py-1.5 bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#444748] text-xs text-[#c4c7c7] hover:text-white flex items-center gap-2 transition-colors"
+                >
+                  <Instagram className="w-3.5 h-3.5 text-[#b1cad7]" />
+                  <span>INSTAGRAM</span>
+                </a>
+              )}
+              {profile.tiktok && (
+                <a 
+                  href={profile.tiktok} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="px-3 py-1.5 bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#444748] text-xs text-[#c4c7c7] hover:text-white flex items-center gap-2 transition-colors"
+                >
+                  <VideoIcon className="w-3.5 h-3.5 text-[#b1cad7]" />
+                  <span>TIKTOK</span>
+                </a>
+              )}
+              {profile.email && (
+                <a 
+                  href={`mailto:${profile.email}`}
+                  className="px-3 py-1.5 bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#444748] text-xs text-[#c4c7c7] hover:text-white flex items-center gap-2 transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5 text-[#b1cad7]" />
+                  <span>EMAIL</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 01 // WORK (VIDEO REELS GALLERY) */}
+        <section id="work" className="space-y-8">
+          <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] uppercase tracking-widest flex items-center">
+            <span>01 // WORK</span>
+            <div className="h-[1px] bg-[#444748] flex-grow ml-4"></div>
+          </div>
+
+          {activeReels.length === 0 ? (
+            <div className="p-16 text-center bg-[#1a1c1c] border border-[#444748] text-[#8e9192] font-['JetBrains_Mono',monospace] text-xs uppercase tracking-widest">
+              Belum ada video reel aktif. Silakan tambahkan melalui Admin Panel.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {activeReels.map((reel) => (
+                <ReelCard key={reel.id} reel={reel} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* SECTION 02 // PROCESS */}
+        <section id="process" className="space-y-8">
+          <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] uppercase tracking-widest flex items-center">
+            <span>02 // PROCESS</span>
+            <div className="h-[1px] bg-[#444748] flex-grow ml-4"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <div className="p-6 bg-[#1a1c1c] border border-[#444748] space-y-3">
+              <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] font-bold">01.</div>
+              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">Discovery & Strategy</h3>
+              <p className="font-['Montserrat',sans-serif] text-xs text-[#c4c7c7] leading-relaxed">
+                Deep dive into the brand voice and narrative goals to establish a clear creative direction.
               </p>
             </div>
 
+            <div className="p-6 bg-[#1a1c1c] border border-[#444748] space-y-3">
+              <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] font-bold">02.</div>
+              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">Creative Editing</h3>
+              <p className="font-['Montserrat',sans-serif] text-xs text-[#c4c7c7] leading-relaxed">
+                The technical craft of assembly, pacing, and rhythm to build a compelling visual story.
+              </p>
+            </div>
+
+            <div className="p-6 bg-[#1a1c1c] border border-[#444748] space-y-3">
+              <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] font-bold">03.</div>
+              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">Sound & Color</h3>
+              <p className="font-['Montserrat',sans-serif] text-xs text-[#c4c7c7] leading-relaxed">
+                Applying the cinematic polish through professional color grading and immersive sound design.
+              </p>
+            </div>
+
+            <div className="p-6 bg-[#1a1c1c] border border-[#444748] space-y-3">
+              <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] font-bold">04.</div>
+              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">Review & Delivery</h3>
+              <p className="font-['Montserrat',sans-serif] text-xs text-[#c4c7c7] leading-relaxed">
+                Collaborative refinement and final export in high-fidelity formats for all platforms.
+              </p>
+            </div>
           </div>
+        </section>
 
-        </div>
-      </section>
-
-      {/* SECTION 01 // WORK */}
-      <section id="work" className="max-w-[1440px] mx-auto px-4 md:px-12 py-12 border-t border-[#282a2b]">
-        
-        {/* 9:16 Vertical Video Reels Grid - Videos Play Direct Inline */}
-        {activeReels.length === 0 ? (
-          <div className="p-16 text-center rounded-xl bg-[#1a1c1c] border border-[#282a2b] text-[#8e9192] font-['JetBrains_Mono',monospace] text-xs uppercase tracking-widest">
-            Belum ada video reel.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {activeReels.map((reel) => (
-              <ReelCard key={reel.id} reel={reel} />
-            ))}
-          </div>
-        )}
-
-      </section>
-
-      {/* SECTION // READY TO COLLABORATE? (CTA) */}
-      <section className="max-w-[1440px] mx-auto px-4 md:px-12 py-20 text-center border-t border-[#282a2b]">
-        <div className="max-w-2xl mx-auto space-y-6">
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight uppercase">
+        {/* READY TO COLLABORATE CTA SECTION */}
+        <section className="pt-12 border-t border-[#444748] text-center space-y-6">
+          <h2 className="font-['Montserrat',sans-serif] text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight uppercase">
             {ctaTitle}
           </h2>
 
-          <p className="text-[#c4c7c7] text-sm md:text-base leading-relaxed font-['JetBrains_Mono',monospace]">
+          <p className="font-['JetBrains_Mono',monospace] text-xs sm:text-sm text-[#c4c7c7] max-w-xl mx-auto leading-relaxed">
             {ctaDescription}
           </p>
 
-          <div className="pt-4">
-            <button
+          <div className="pt-2">
+            <button 
               onClick={() => setShowHireModal(true)}
-              className="px-8 py-3.5 rounded bg-transparent hover:bg-white text-white hover:text-black border border-[#e2e2e2] font-['JetBrains_Mono',monospace] font-bold text-xs tracking-widest uppercase transition-all cursor-pointer inline-flex items-center gap-3"
+              className="inline-block border border-[#b1cad7] text-[#b1cad7] hover:bg-[#b1cad7] hover:text-[#1c333e] font-['JetBrains_Mono',monospace] text-xs font-bold px-8 py-3.5 uppercase tracking-widest transition-colors cursor-pointer"
             >
-              <span>{ctaButtonText}</span>
-              <ArrowUpRight className="w-4 h-4" />
+              {ctaButtonText}
             </button>
           </div>
-        </div>
-      </section>
+        </section>
+
+      </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-[#282a2b] py-8 px-4 md:px-12 text-xs font-['JetBrains_Mono',monospace] text-[#8e9192]">
-        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="font-bold text-white uppercase tracking-wider">
+      <footer className="w-full py-10 border-t border-[#444748] bg-[#0c0f0f] mt-auto">
+        <div className="flex flex-col md:flex-row justify-between items-center px-4 md:px-8 max-w-[1440px] mx-auto gap-6 font-['JetBrains_Mono',monospace] text-xs">
+          <div className="font-['Montserrat',sans-serif] text-lg font-bold text-white tracking-tight uppercase">
             {studioName}
           </div>
 
-          <div className="flex items-center gap-6">
-            <a href={profile.instagram || "#"} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-              INSTAGRAM
-            </a>
+          <div className="flex flex-wrap gap-6 text-[#c4c7c7]">
+            {profile.instagram && (
+              <a href={profile.instagram} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+                INSTAGRAM
+              </a>
+            )}
+            {profile.tiktok && (
+              <a href={profile.tiktok} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+                TIKTOK
+              </a>
+            )}
             <button onClick={onNavigateToHome} className="hover:text-white transition-colors cursor-pointer">
               LINKTREE
             </button>
@@ -382,7 +434,7 @@ export default function PortfolioView({
             </button>
           </div>
 
-          <div>
+          <div className="text-[#8e9192]">
             © {new Date().getFullYear()} {studioName}. ALL RIGHTS RESERVED.
           </div>
         </div>
@@ -391,7 +443,7 @@ export default function PortfolioView({
       {/* HIRE ME CONTACT MODAL */}
       {showHireModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-          <div className="relative w-full max-w-md bg-[#1a1c1c] border border-[#444748] rounded-2xl p-6 shadow-2xl space-y-6">
+          <div className="relative w-full max-w-md bg-[#1a1c1c] border border-[#444748] p-6 shadow-2xl space-y-6">
             <div className="flex items-center justify-between border-b border-[#282a2b] pb-4">
               <h3 className="text-sm font-bold font-['JetBrains_Mono',monospace] text-white uppercase flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#b1cad7]" />
@@ -399,7 +451,7 @@ export default function PortfolioView({
               </h3>
               <button
                 onClick={() => setShowHireModal(false)}
-                className="p-1 rounded bg-[#282a2b] text-[#8e9192] hover:text-white transition-colors cursor-pointer"
+                className="p-1 bg-[#282a2b] text-[#8e9192] hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -415,7 +467,7 @@ export default function PortfolioView({
                   href={profile.whatsapp.startsWith('http') ? profile.whatsapp : `https://wa.me/${profile.whatsapp.replace(/[^0-9]/g, '')}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full py-3.5 px-4 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-between transition-colors shadow-lg"
+                  className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-between transition-colors shadow-lg"
                 >
                   <div className="flex items-center gap-2.5">
                     <MessageSquare className="w-4 h-4" />
@@ -428,7 +480,7 @@ export default function PortfolioView({
               {profile.email && (
                 <a
                   href={`mailto:${profile.email}`}
-                  className="w-full py-3.5 px-4 rounded bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-white font-bold text-xs flex items-center justify-between transition-colors"
+                  className="w-full py-3.5 px-4 bg-[#121414] hover:bg-[#282a2b] border border-[#333535] text-white font-bold text-xs flex items-center justify-between transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
                     <Mail className="w-4 h-4 text-[#b1cad7]" />
@@ -440,7 +492,7 @@ export default function PortfolioView({
 
               <button
                 onClick={() => { setShowHireModal(false); onNavigateToRatecard(); }}
-                className="w-full py-3.5 px-4 rounded bg-[#334a55]/40 hover:bg-[#334a55]/60 border border-[#b1cad7]/30 text-[#a0b9c5] font-bold text-xs flex items-center justify-between transition-colors cursor-pointer"
+                className="w-full py-3.5 px-4 bg-[#334a55]/40 hover:bg-[#334a55]/60 border border-[#b1cad7]/30 text-[#a0b9c5] font-bold text-xs flex items-center justify-between transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
                   <Film className="w-4 h-4 text-[#b1cad7]" />
@@ -456,3 +508,4 @@ export default function PortfolioView({
     </div>
   );
 }
+

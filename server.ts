@@ -481,19 +481,9 @@ function readDb(): DatabaseSchema {
         changed = true;
       }
 
-      if (!db.portfolioReels || db.portfolioReels.length === 0) {
+      if (db.portfolioReels === undefined) {
         db.portfolioReels = DEFAULT_DB.portfolioReels;
         changed = true;
-      } else {
-        // Upgrade any generic instagram dummy urls to direct working mp4 videos
-        db.portfolioReels.forEach((reel, i) => {
-          if (!reel.videoUrl || reel.videoUrl === "https://www.instagram.com/reels/") {
-            if (DEFAULT_DB.portfolioReels[i]) {
-              reel.videoUrl = DEFAULT_DB.portfolioReels[i].videoUrl;
-              changed = true;
-            }
-          }
-        });
       }
 
       if (db.profile) {

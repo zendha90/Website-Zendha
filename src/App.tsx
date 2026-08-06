@@ -89,17 +89,59 @@ export default function App() {
     }
   }, [currentView, trafficContext]);
 
-  // Fetch all initial linktree and ratecard content
+  const LOCAL_STORAGE_KEY = 'creator_portfolio_persistent_data_v2';
+
+  // Fetch all initial linktree, portfolio reels, and ratecard content
   const loadData = async () => {
     try {
-      // Added timestamp parameter to prevent browser caching on production/CPanel
+      // Read local storage saved state if available
+      const localSavedRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
+      let localSaved: AppData | null = null;
+      if (localSavedRaw) {
+        try {
+          localSaved = JSON.parse(localSavedRaw);
+        } catch (e) {
+          console.warn('Failed to parse local storage cache', e);
+        }
+      }
+
       const res = await fetch(`/api/data?t=${Date.now()}`);
-      if (!res.ok) throw new Error('Gagal mengambil data dari server database');
-      const json = await res.json();
-      setData(json);
+      if (!res.ok) {
+        if (localSaved) {
+          setData(localSaved);
+          setErrorStatus(null);
+          setLoading(false);
+          return;
+        }
+        throw new Error('Gagal mengambil data dari server database');
+      }
+
+      const serverJson: AppData = await res.json();
+      let finalData = { ...serverJson };
+
+      // Preserve client-edited portfolio reels if saved in localStorage
+      if (localSaved) {
+        if (localSaved.portfolioReels && Array.isArray(localSaved.portfolioReels)) {
+          finalData.portfolioReels = localSaved.portfolioReels;
+        }
+      }
+
+      // Sync merged state to localStorage
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(finalData));
+      setData(finalData);
       setErrorStatus(null);
     } catch (err: any) {
       console.error(err);
+      const localSavedRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (localSavedRaw) {
+        try {
+          const localSaved = JSON.parse(localSavedRaw);
+          setData(localSaved);
+          setErrorStatus(null);
+          setLoading(false);
+          return;
+        } catch (e) {}
+      }
       setErrorStatus(err.message || 'Terjadi kesalahan jaringan.');
     } finally {
       setLoading(false);
