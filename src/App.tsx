@@ -119,11 +119,9 @@ export default function App() {
       const serverJson: AppData = await res.json();
       let finalData = { ...serverJson };
 
-      // Preserve client-edited portfolio reels if saved in localStorage
-      if (localSaved) {
-        if (localSaved.portfolioReels && Array.isArray(localSaved.portfolioReels)) {
-          finalData.portfolioReels = localSaved.portfolioReels;
-        }
+      // Preserve portfolioReels from localStorage ONLY if server data doesn't have any portfolioReels
+      if ((!finalData.portfolioReels || finalData.portfolioReels.length === 0) && localSaved?.portfolioReels && localSaved.portfolioReels.length > 0) {
+        finalData.portfolioReels = localSaved.portfolioReels;
       }
 
       // Sync merged state to localStorage

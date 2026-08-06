@@ -513,21 +513,6 @@ function readDb(): DatabaseSchema {
       }
 
       if (db.profile) {
-        if (db.profile.name === "Zendha Refitra") {
-          db.profile.name = "Aesthetic Creator";
-          db.profile.bio = DEFAULT_DB.profile.bio;
-          db.profile.instagram = DEFAULT_DB.profile.instagram;
-          db.profile.tiktok = DEFAULT_DB.profile.tiktok;
-          db.profile.youtube = DEFAULT_DB.profile.youtube;
-          db.profile.email = DEFAULT_DB.profile.email;
-          db.profile.contactPhone = DEFAULT_DB.profile.contactPhone || "+62-8123-456-789";
-          db.profile.whatsapp = DEFAULT_DB.profile.whatsapp;
-          if (db.profile.heroDescription && db.profile.heroDescription.includes("Zendha")) {
-            db.profile.heroDescription = DEFAULT_DB.profile.heroDescription;
-          }
-          changed = true;
-        }
-
         if (!db.profile.designSettings) {
           db.profile.designSettings = { ...DEFAULT_DB.profile.designSettings! };
           changed = true;

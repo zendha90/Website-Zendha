@@ -604,6 +604,9 @@ export default function AdminPanel({
       const data = await response.json();
       if (data.success) {
         showToast('Profile & Ratecard berhasil disimpan!');
+        if (data.profile) {
+          setProfileForm(data.profile);
+        }
         await onRefreshData();
       } else {
         showToast(data.message || 'Gagal mengupdate profile', 'error');
