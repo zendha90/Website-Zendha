@@ -520,7 +520,7 @@ export default function AdminPanel({
 
   const [isUploading, setIsUploading] = useState<{[key: string]: boolean}>({});
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetField: 'avatarUrl' | 'faviconUrl' | 'link' | 'project' | 'brand' | 'reel') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetField: 'avatarUrl' | 'faviconUrl' | 'link' | 'project' | 'brand' | 'reel' | 'portfolioCreatorAvatarUrl') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -553,6 +553,8 @@ export default function AdminPanel({
           showToast('Gambar berhasil diunggah!');
           if (targetField === 'avatarUrl') {
             setProfileForm(prev => ({ ...prev, avatarUrl: data.url }));
+          } else if (targetField === 'portfolioCreatorAvatarUrl') {
+            setProfileForm(prev => ({ ...prev, portfolioCreatorAvatarUrl: data.url }));
           } else if (targetField === 'faviconUrl') {
             setProfileForm(prev => ({ ...prev, faviconUrl: data.url }));
           } else if (targetField === 'link') {
@@ -3116,7 +3118,219 @@ export default function AdminPanel({
               </div>
             </div>
 
-            {/* 4. Collaboration CTA & Pop-up Modal */}
+            {/* 3. Custom Portfolio Creator Profile Block (Separated from General Account Profile) */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
+              <h3 className="text-xs font-mono font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
+                <User className="w-4 h-4 text-indigo-500" /> Identitas Creator / Profile Card (/portofolio)
+              </h3>
+              <p className="text-xs text-slate-400">Atur profil creator khusus halaman /portofolio (terpisah dari Profil Akun Linktree/Ratecard).</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Nama Creator Portofolio</label>
+                  <input
+                    type="text"
+                    value={profileForm.portfolioCreatorName || ''}
+                    placeholder={`Misal: ${profileForm.name || 'CREATOR NAME'}`}
+                    onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorName: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all font-bold uppercase"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1 font-mono">Nama publik creator yang tampil di kartu hero portofolio.</p>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Foto Avatar Portofolio</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      value={profileForm.portfolioCreatorAvatarUrl || ''}
+                      placeholder={profileForm.avatarUrl || "URL gambar..."}
+                      onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorAvatarUrl: e.target.value })}
+                      className="flex-1 px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none font-mono"
+                    />
+                    <label className="px-3.5 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-xs font-bold cursor-pointer transition-colors shrink-0 text-center select-none">
+                      {isUploading['portfolioCreatorAvatarUrl'] ? 'Uploading...' : 'Unggah File'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileUpload(e, 'portfolioCreatorAvatarUrl')}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1 font-mono">URL atau upload foto khusus untuk avatar portofolio.</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Bio / Peran Singkat Creator</label>
+                <input
+                  type="text"
+                  value={profileForm.portfolioCreatorBio || ''}
+                  placeholder="Senior Video Editor & Colorist"
+                  onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorBio: e.target.value })}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all leading-relaxed"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Instagram Portofolio</label>
+                  <input
+                    type="url"
+                    value={profileForm.portfolioCreatorInstagram || ''}
+                    placeholder={profileForm.instagram || "https://instagram.com/..."}
+                    onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorInstagram: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">TikTok Portofolio</label>
+                  <input
+                    type="url"
+                    value={profileForm.portfolioCreatorTiktok || ''}
+                    placeholder={profileForm.tiktok || "https://tiktok.com/@..."}
+                    onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorTiktok: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Email Portofolio</label>
+                  <input
+                    type="email"
+                    value={profileForm.portfolioCreatorEmail || ''}
+                    placeholder={profileForm.email || "email@domain.com"}
+                    onChange={(e) => setProfileForm({ ...profileForm, portfolioCreatorEmail: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:border-indigo-400 outline-none font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Bagian Section Process (02 // PROCESS) */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
+              <h3 className="text-xs font-mono font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
+                <Sliders className="w-4 h-4 text-indigo-500" /> Kustomisasi Bagian Process (02 // PROCESS)
+              </h3>
+              <p className="text-xs text-slate-400">Atur judul marker section dan 4 alur langkah kerja (Discovery, Editing, Sound & Color, Delivery).</p>
+
+              <div>
+                <label className="block text-[11px] font-mono font-bold text-slate-500 uppercase mb-1">Marker Sub-Judul Section</label>
+                <input
+                  type="text"
+                  value={profileForm.portfolioProcessMarker || ''}
+                  placeholder="02 // PROCESS"
+                  onChange={(e) => setProfileForm({ ...profileForm, portfolioProcessMarker: e.target.value })}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all font-mono uppercase"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                {/* Step 1 */}
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
+                  <div className="text-[11px] font-mono font-bold text-indigo-600 uppercase">Langkah 01</div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Langkah 01</label>
+                    <input
+                      type="text"
+                      value={profileForm.portfolioProcess1Title || ''}
+                      placeholder="Discovery & Strategy"
+                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess1Title: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 uppercase focus:border-indigo-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Langkah 01</label>
+                    <textarea
+                      rows={2}
+                      value={profileForm.portfolioProcess1Desc || ''}
+                      placeholder="Deep dive into the brand voice and narrative goals to establish a clear creative direction."
+                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess1Desc: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:border-indigo-500 outline-none leading-relaxed"
+                    />
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
+                  <div className="text-[11px] font-mono font-bold text-indigo-600 uppercase">Langkah 02</div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Langkah 02</label>
+                    <input
+                      type="text"
+                      value={profileForm.portfolioProcess2Title || ''}
+                      placeholder="Creative Editing"
+                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess2Title: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 uppercase focus:border-indigo-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Langkah 02</label>
+                    <textarea
+                      rows={2}
+                      value={profileForm.portfolioProcess2Desc || ''}
+                      placeholder="The technical craft of assembly, pacing, and rhythm to build a compelling visual story."
+                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess2Desc: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:border-indigo-500 outline-none leading-relaxed"
+                    />
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
+                  <div className="text-[11px] font-mono font-bold text-indigo-600 uppercase">Langkah 03</div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Langkah 03</label>
+                    <input
+                      type="text"
+                      value={profileForm.portfolioProcess3Title || ''}
+                      placeholder="Sound & Color"
+                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess3Title: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 uppercase focus:border-indigo-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Langkah 03</label>
+                    <textarea
+                      rows={2}
+                      value={profileForm.portfolioProcess3Desc || ''}
+                      placeholder="Applying the cinematic polish through professional color grading and immersive sound design."
+                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess3Desc: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:border-indigo-500 outline-none leading-relaxed"
+                    />
+                  </div>
+                </div>
+
+                {/* Step 4 */}
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
+                  <div className="text-[11px] font-mono font-bold text-indigo-600 uppercase">Langkah 04</div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Judul Langkah 04</label>
+                    <input
+                      type="text"
+                      value={profileForm.portfolioProcess4Title || ''}
+                      placeholder="Review & Delivery"
+                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess4Title: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 uppercase focus:border-indigo-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold text-slate-500 uppercase mb-1">Deskripsi Langkah 04</label>
+                    <textarea
+                      rows={2}
+                      value={profileForm.portfolioProcess4Desc || ''}
+                      placeholder="Collaborative refinement and final export in high-fidelity formats for all platforms."
+                      onChange={(e) => setProfileForm({ ...profileForm, portfolioProcess4Desc: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:border-indigo-500 outline-none leading-relaxed"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. Collaboration CTA & Pop-up Modal */}
             <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
               <h3 className="text-xs font-mono font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
                 <MessageSquare className="w-4 h-4 text-indigo-500" /> Bagian CTA & Modal Diskusi Project

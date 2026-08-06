@@ -176,6 +176,26 @@ export default function PortfolioView({
   const heroIndexMarker = profile.portfolioHeroIndexMarker || "00 // INDEX";
   const heroSubtitle = profile.portfolioHeroSubtitle || "VISUAL STORYTELLER";
   const heroDescription = profile.portfolioHeroDescription || "Precision editing for brands and creators. Crafting narratives through meticulous cut, color, and sound in a distraction-free technical environment.";
+  
+  // Custom Portfolio Creator Identity (separated from general profile)
+  const creatorName = profile.portfolioCreatorName || profile.name || "CREATOR";
+  const creatorAvatarUrl = profile.portfolioCreatorAvatarUrl || profile.avatarUrl;
+  const creatorBio = profile.portfolioCreatorBio || profile.bio;
+  const creatorInstagram = profile.portfolioCreatorInstagram ?? profile.instagram;
+  const creatorTiktok = profile.portfolioCreatorTiktok ?? profile.tiktok;
+  const creatorEmail = profile.portfolioCreatorEmail ?? profile.email;
+
+  // Custom Portfolio Process Section Properties
+  const processMarker = profile.portfolioProcessMarker || "02 // PROCESS";
+  const process1Title = profile.portfolioProcess1Title || "Discovery & Strategy";
+  const process1Desc = profile.portfolioProcess1Desc || "Deep dive into the brand voice and narrative goals to establish a clear creative direction.";
+  const process2Title = profile.portfolioProcess2Title || "Creative Editing";
+  const process2Desc = profile.portfolioProcess2Desc || "The technical craft of assembly, pacing, and rhythm to build a compelling visual story.";
+  const process3Title = profile.portfolioProcess3Title || "Sound & Color";
+  const process3Desc = profile.portfolioProcess3Desc || "Applying the cinematic polish through professional color grading and immersive sound design.";
+  const process4Title = profile.portfolioProcess4Title || "Review & Delivery";
+  const process4Desc = profile.portfolioProcess4Desc || "Collaborative refinement and final export in high-fidelity formats for all platforms.";
+
   const ctaTitle = profile.portfolioCtaTitle || "READY TO COLLABORATE?";
   const ctaDescription = profile.portfolioCtaDescription || "Available for freelance projects globally. Specialized in commercial, documentary, and narrative editing.";
   const ctaButtonText = profile.portfolioCtaButtonText || "GET IN TOUCH";
@@ -184,78 +204,14 @@ export default function PortfolioView({
   React.useEffect(() => {
     if (profile.portfolioPageTitle) {
       document.title = profile.portfolioPageTitle;
-    } else if (profile.name) {
-      document.title = `${profile.name} // Portfolio & Reels`;
+    } else if (creatorName) {
+      document.title = `${creatorName} // Portfolio & Reels`;
     }
-  }, [profile]);
+  }, [profile, creatorName]);
 
   return (
     <div className="min-h-screen bg-[#121414] text-[#e2e2e2] font-['Montserrat',sans-serif] selection:bg-[#c9c6c5] selection:text-[#121414] flex flex-col relative overflow-x-hidden" id="portfolio-view">
       
-      {/* TOP NAVIGATION BAR */}
-      <nav className="w-full top-0 border-b border-[#444748] bg-[#121414]/95 backdrop-blur-md sticky z-50">
-        <div className="flex justify-between items-center px-4 md:px-8 py-4 max-w-[1440px] mx-auto">
-          
-          {/* Logo / Brand Name */}
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={onNavigateToHome}
-              className="group flex items-center gap-2 px-2.5 py-1.5 bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#444748] text-xs font-['JetBrains_Mono',monospace] text-[#c4c7c7] transition-all cursor-pointer"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-              <span>LINKTREE</span>
-            </button>
-            <span className="text-[#444748] hidden sm:inline">/</span>
-            <div className="font-['Montserrat',sans-serif] text-lg md:text-xl font-bold tracking-tight text-white uppercase">
-              {studioName}
-            </div>
-          </div>
-
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8 font-['JetBrains_Mono',monospace] text-xs tracking-widest">
-            <a href="#work" className="text-[#c9c6c5] font-bold border-b border-[#c9c6c5] pb-1 uppercase">
-              REEL
-            </a>
-            <a href="#process" className="text-[#c4c7c7] font-medium hover:text-white transition-colors uppercase">
-              PROCESS
-            </a>
-            <button 
-              onClick={onNavigateToRatecard} 
-              className="text-[#c4c7c7] font-medium hover:text-white transition-colors cursor-pointer uppercase"
-            >
-              RATECARD
-            </button>
-            <button 
-              onClick={() => setShowHireModal(true)} 
-              className="text-[#c4c7c7] font-medium hover:text-white transition-colors cursor-pointer uppercase"
-            >
-              CONTACT
-            </button>
-          </div>
-
-          {/* Right Action Button */}
-          <div className="flex items-center space-x-3">
-            <button 
-              onClick={() => setShowHireModal(true)}
-              className="bg-[#b1cad7] hover:bg-[#cde6f4] text-[#1c333e] font-['JetBrains_Mono',monospace] text-xs font-bold px-5 py-2.5 uppercase tracking-widest transition-colors cursor-pointer"
-            >
-              HIRE ME
-            </button>
-
-            {onNavigateToAdmin && (
-              <button
-                onClick={onNavigateToAdmin}
-                className="p-2 bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#444748] text-[#8e9192] hover:text-white transition-colors cursor-pointer"
-                title="Admin Settings"
-              >
-                <SlidersHorizontal className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-        </div>
-      </nav>
-
       {/* MAIN CONTENT AREA */}
       <main className="flex-grow max-w-[1440px] mx-auto w-full px-4 md:px-8 py-10 md:py-16 space-y-16 md:space-y-24">
         
@@ -277,21 +233,23 @@ export default function PortfolioView({
           {/* Profile Creator Bar & Socials */}
           <div className="mt-8 pt-6 border-t border-[#282a2b] flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <img 
-                src={profile.avatarUrl} 
-                alt={profile.name || "Creator"}
-                className="w-12 h-12 rounded border border-[#444748] object-cover shrink-0"
-              />
+              {creatorAvatarUrl && (
+                <img 
+                  src={creatorAvatarUrl} 
+                  alt={creatorName}
+                  className="w-12 h-12 rounded border border-[#444748] object-cover shrink-0"
+                />
+              )}
               <div>
-                <div className="font-bold text-sm text-white uppercase">{profile.name}</div>
-                {profile.bio && <div className="text-xs font-['JetBrains_Mono',monospace] text-[#8e9192]">{profile.bio}</div>}
+                <div className="font-bold text-sm text-white uppercase">{creatorName}</div>
+                {creatorBio && <div className="text-xs font-['JetBrains_Mono',monospace] text-[#8e9192]">{creatorBio}</div>}
               </div>
             </div>
 
             <div className="flex flex-wrap gap-2 font-['JetBrains_Mono',monospace]">
-              {profile.instagram && (
+              {creatorInstagram && (
                 <a 
-                  href={profile.instagram} 
+                  href={creatorInstagram} 
                   target="_blank" 
                   rel="noreferrer"
                   className="px-3 py-1.5 bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#444748] text-xs text-[#c4c7c7] hover:text-white flex items-center gap-2 transition-colors"
@@ -300,9 +258,9 @@ export default function PortfolioView({
                   <span>INSTAGRAM</span>
                 </a>
               )}
-              {profile.tiktok && (
+              {creatorTiktok && (
                 <a 
-                  href={profile.tiktok} 
+                  href={creatorTiktok} 
                   target="_blank" 
                   rel="noreferrer"
                   className="px-3 py-1.5 bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#444748] text-xs text-[#c4c7c7] hover:text-white flex items-center gap-2 transition-colors"
@@ -311,9 +269,9 @@ export default function PortfolioView({
                   <span>TIKTOK</span>
                 </a>
               )}
-              {profile.email && (
+              {creatorEmail && (
                 <a 
-                  href={`mailto:${profile.email}`}
+                  href={`mailto:${creatorEmail}`}
                   className="px-3 py-1.5 bg-[#1a1c1c] hover:bg-[#282a2b] border border-[#444748] text-xs text-[#c4c7c7] hover:text-white flex items-center gap-2 transition-colors"
                 >
                   <Mail className="w-3.5 h-3.5 text-[#b1cad7]" />
@@ -347,40 +305,40 @@ export default function PortfolioView({
         {/* SECTION 02 // PROCESS */}
         <section id="process" className="space-y-8">
           <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] uppercase tracking-widest flex items-center">
-            <span>02 // PROCESS</span>
+            <span>{processMarker}</span>
             <div className="h-[1px] bg-[#444748] flex-grow ml-4"></div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             <div className="p-6 bg-[#1a1c1c] border border-[#444748] space-y-3">
               <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] font-bold">01.</div>
-              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">Discovery & Strategy</h3>
+              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">{process1Title}</h3>
               <p className="font-['Montserrat',sans-serif] text-xs text-[#c4c7c7] leading-relaxed">
-                Deep dive into the brand voice and narrative goals to establish a clear creative direction.
+                {process1Desc}
               </p>
             </div>
 
             <div className="p-6 bg-[#1a1c1c] border border-[#444748] space-y-3">
               <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] font-bold">02.</div>
-              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">Creative Editing</h3>
+              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">{process2Title}</h3>
               <p className="font-['Montserrat',sans-serif] text-xs text-[#c4c7c7] leading-relaxed">
-                The technical craft of assembly, pacing, and rhythm to build a compelling visual story.
+                {process2Desc}
               </p>
             </div>
 
             <div className="p-6 bg-[#1a1c1c] border border-[#444748] space-y-3">
               <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] font-bold">03.</div>
-              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">Sound & Color</h3>
+              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">{process3Title}</h3>
               <p className="font-['Montserrat',sans-serif] text-xs text-[#c4c7c7] leading-relaxed">
-                Applying the cinematic polish through professional color grading and immersive sound design.
+                {process3Desc}
               </p>
             </div>
 
             <div className="p-6 bg-[#1a1c1c] border border-[#444748] space-y-3">
               <div className="font-['JetBrains_Mono',monospace] text-xs text-[#c9c6c5] font-bold">04.</div>
-              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">Review & Delivery</h3>
+              <h3 className="font-['Montserrat',sans-serif] text-base font-bold text-white uppercase">{process4Title}</h3>
               <p className="font-['Montserrat',sans-serif] text-xs text-[#c4c7c7] leading-relaxed">
-                Collaborative refinement and final export in high-fidelity formats for all platforms.
+                {process4Desc}
               </p>
             </div>
           </div>
@@ -409,34 +367,9 @@ export default function PortfolioView({
       </main>
 
       {/* FOOTER */}
-      <footer className="w-full py-10 border-t border-[#444748] bg-[#0c0f0f] mt-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center px-4 md:px-8 max-w-[1440px] mx-auto gap-6 font-['JetBrains_Mono',monospace] text-xs">
-          <div className="font-['Montserrat',sans-serif] text-lg font-bold text-white tracking-tight uppercase">
-            {studioName}
-          </div>
-
-          <div className="flex flex-wrap gap-6 text-[#c4c7c7]">
-            {profile.instagram && (
-              <a href={profile.instagram} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                INSTAGRAM
-              </a>
-            )}
-            {profile.tiktok && (
-              <a href={profile.tiktok} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                TIKTOK
-              </a>
-            )}
-            <button onClick={onNavigateToHome} className="hover:text-white transition-colors cursor-pointer">
-              LINKTREE
-            </button>
-            <button onClick={onNavigateToRatecard} className="hover:text-white transition-colors cursor-pointer">
-              RATECARD
-            </button>
-          </div>
-
-          <div className="text-[#8e9192]">
-            © {new Date().getFullYear()} {studioName}. ALL RIGHTS RESERVED.
-          </div>
+      <footer className="w-full py-8 border-t border-[#444748] bg-[#0c0f0f] mt-auto">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 text-center font-['JetBrains_Mono',monospace] text-xs text-[#8e9192]">
+          © {new Date().getFullYear()} {studioName}. ALL RIGHTS RESERVED.
         </div>
       </footer>
 
