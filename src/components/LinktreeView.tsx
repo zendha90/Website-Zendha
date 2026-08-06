@@ -362,15 +362,7 @@ export default function LinktreeView({
                 </a>
               )}
 
-              <a
-                href="/portofolio"
-                onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/portofolio'); window.dispatchEvent(new Event('popstate')); }}
-                className="px-3 py-1.5 bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-mono text-[11px] font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer ml-auto sm:ml-0"
-                id="portfolio-btn"
-              >
-                <PlayCircle className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Portofolio IG Reels</span>
-              </a>
+
             </motion.div>
           </div>
         </div>

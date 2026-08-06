@@ -422,17 +422,6 @@ export default function PortfolioView({
                   <ArrowUpRight className="w-4 h-4" />
                 </a>
               )}
-
-              <button
-                onClick={() => { setShowHireModal(false); onNavigateToRatecard(); }}
-                className="w-full py-3.5 px-4 bg-[#334a55]/40 hover:bg-[#334a55]/60 border border-[#b1cad7]/30 text-[#a0b9c5] font-bold text-xs flex items-center justify-between transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Film className="w-4 h-4 text-[#b1cad7]" />
-                  <span>CEK PRICING RATECARD</span>
-                </div>
-                <ArrowUpRight className="w-4 h-4" />
-              </button>
             </div>
           </div>
         </div>
