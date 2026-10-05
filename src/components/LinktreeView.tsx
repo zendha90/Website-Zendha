@@ -210,9 +210,6 @@ export default function LinktreeView({
         profile.designSettings?.typography?.fontFamily === 'mono' ? '"JetBrains Mono", monospace' : '"Inter", sans-serif'
     }}>
       
-      {/* Decorative radial gradients - update color to match */}
-      <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-full max-w-7xl h-[400px] bg-indigo-50/20 rounded-full blur-[140px] pointer-events-none -z-10" />
-
       {/* Header Profile Landing Section */}
       <div 
         className={`flex flex-col mb-10 pb-8 border-b transition-all duration-500 ${
@@ -422,7 +419,15 @@ export default function LinktreeView({
                     exit={{ opacity: 0, scale: 0.95 }}
                     whileHover={getCardHoverStyle()}
                     transition={{ delay: Math.min(idx * 0.04, 0.2), duration: 0.3 }}
-                    className={`border p-3.5 flex items-center justify-between gap-4 transition-all duration-350 cursor-pointer overflow-hidden group select-none ${getButtonRoundedClass()} ${getButtonShadowClass()}`}
+                    className={`border p-3.5 flex items-center justify-between gap-4 transition-all duration-350 cursor-pointer overflow-hidden group select-none focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${getButtonRoundedClass()} ${getButtonShadowClass()}`}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLinkClickOrOpenMulti(link);
+                      }
+                    }}
                     onClick={(e) => handleLinkClickOrOpenMulti(link, e)}
                     id={`link-list-item-${link.id}`}
                     style={{ 
@@ -542,7 +547,15 @@ export default function LinktreeView({
                     exit={{ opacity: 0, scale: 0.95 }}
                     whileHover={getCardHoverStyle()}
                     transition={{ delay: Math.min(idx * 0.05, 0.25), duration: 0.3 }}
-                    className={`border transition-all duration-350 cursor-pointer overflow-hidden group flex flex-col relative ${getButtonRoundedClass()} ${getButtonShadowClass()}`}
+                    className={`border transition-all duration-350 cursor-pointer overflow-hidden group flex flex-col relative focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${getButtonRoundedClass()} ${getButtonShadowClass()}`}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLinkClickOrOpenMulti(link);
+                      }
+                    }}
                     onClick={(e) => handleLinkClickOrOpenMulti(link, e)}
                     id={`link-card-${link.id}`}
                     style={{ 
