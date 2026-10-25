@@ -253,7 +253,6 @@ export default function LinktreeView({
                 referrerPolicy="no-referrer"
               />
             </div>
-            <span className="absolute bottom-1 right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white animate-pulse" />
           </motion.div>
 
           <div className={`space-y-2 ${profile.designSettings?.header.layout === 'classic' ? 'text-left' : 'text-center'}`}>
@@ -303,7 +302,7 @@ export default function LinktreeView({
                   href={profile.whatsapp} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="p-2 bg-white text-slate-600 hover:text-emerald-500 rounded-xl border border-slate-100 shadow-xs hover:shadow-sm transition-all"
+                  className="inline-flex items-center justify-center w-12 h-12 bg-white text-slate-600 hover:text-emerald-500 rounded-xl border border-slate-100 shadow-xs hover:shadow-sm transition-all"
                   title="WhatsApp"
                   id="wa-link-icon"
                 >
@@ -315,7 +314,7 @@ export default function LinktreeView({
                   href={profile.instagram} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="p-2 bg-white text-slate-600 hover:text-pink-600 rounded-xl border border-slate-100 shadow-xs hover:shadow-sm transition-all"
+                  className="inline-flex items-center justify-center w-12 h-12 bg-white text-slate-600 hover:text-pink-600 rounded-xl border border-slate-100 shadow-xs hover:shadow-sm transition-all"
                   title="Instagram"
                   id="instg-link"
                 >
@@ -327,7 +326,7 @@ export default function LinktreeView({
                   href={profile.tiktok} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="p-2 bg-white text-slate-600 hover:text-slate-900 rounded-xl border border-slate-100 shadow-xs hover:shadow-sm transition-all"
+                  className="inline-flex items-center justify-center w-12 h-12 bg-white text-slate-600 hover:text-slate-900 rounded-xl border border-slate-100 shadow-xs hover:shadow-sm transition-all"
                   title="TikTok"
                   id="tiktok-link"
                 >
@@ -341,7 +340,7 @@ export default function LinktreeView({
                   href={profile.youtube} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="p-2 bg-white text-slate-600 hover:text-red-500 rounded-xl border border-slate-100 shadow-xs hover:shadow-sm transition-all"
+                  className="inline-flex items-center justify-center w-12 h-12 bg-white text-slate-600 hover:text-red-500 rounded-xl border border-slate-100 shadow-xs hover:shadow-sm transition-all"
                   title="YouTube"
                   id="yt-link"
                 >
@@ -351,7 +350,7 @@ export default function LinktreeView({
               {profile.email && (
                 <a 
                   href={`mailto:${profile.email}`}
-                  className="p-2 bg-white text-slate-600 hover:text-indigo-600 rounded-xl border border-slate-100 shadow-xs hover:shadow-sm transition-all"
+                  className="inline-flex items-center justify-center w-12 h-12 bg-white text-slate-600 hover:text-indigo-600 rounded-xl border border-slate-100 shadow-xs hover:shadow-sm transition-all"
                   title="Kirim Email"
                   id="mail-link"
                 >
@@ -367,7 +366,7 @@ export default function LinktreeView({
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-4" id="landing-main-bar">
         <div>
           <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest inline-flex items-center gap-1" style={{ color: profile.designSettings?.colors.buttons }}>
-            <Sparkles className="w-3 h-3 animate-pulse" /> Barang yang aku pakai di rumah
+            <Sparkles className="w-3 h-3" /> Barang yang aku pakai di rumah
           </span>
           <h2 className="text-xl font-black tracking-tight mt-1" style={{ color: profile.designSettings?.colors.title }}>
             Rekomendasi pilihan
@@ -376,7 +375,7 @@ export default function LinktreeView({
 
         {/* Dynamic Search Bar (Integrated minimally into landing layout) */}
         <div className="relative w-full sm:w-[260px] md:w-[320px]" id="search-container">
-          <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-400">
+          <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-600">
             <Search className="w-4 h-4" />
           </div>
           <input 
@@ -438,7 +437,7 @@ export default function LinktreeView({
                   >
                     <div className="flex items-center gap-3.5 min-w-0 flex-1">
                       {/* Sequential tag badge */}
-                      <span className="text-[10px] text-slate-400 font-mono font-black w-4 text-right select-none shrink-0">
+                      <span className="text-[10px] text-slate-600 font-mono font-black w-4 text-right select-none shrink-0">
                         {sequenceNumber}
                       </span>
 
@@ -459,7 +458,7 @@ export default function LinktreeView({
                         
                         {topClickedIds.includes(link.id) && link.clicks > 0 && (
                           <div className="absolute top-0.5 right-0.5 bg-orange-500 text-white p-0.5 rounded-full shadow-xs">
-                            <Flame className="w-2.5 h-2.5 animate-pulse" />
+                            <Flame className="w-2.5 h-2.5" />
                           </div>
                         )}
                       </div>
@@ -467,7 +466,7 @@ export default function LinktreeView({
                       {/* Descriptive metadata text */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="inline-flex items-center gap-1 text-[8px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                          <span className="inline-flex items-center gap-1 text-[8px] font-mono font-bold uppercase tracking-wider text-slate-600">
                             {getCategoryIcon(link.category)}
                             {link.category}
                           </span>
@@ -576,10 +575,10 @@ export default function LinktreeView({
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-indigo-50/40 to-slate-100/40 flex flex-col items-center justify-center p-3 sm:p-6 text-center select-none">
-                          <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-2rem bg-white border border-slate-150 flex items-center justify-center shadow-xs text-slate-400 group-hover:bg-indigo-50 transition-colors">
+                          <span className="w-8 h-8 sm:w-10 sm:h-10 rounded-2rem bg-white border border-slate-150 flex items-center justify-center shadow-xs text-slate-600 group-hover:bg-indigo-50 transition-colors">
                             {getCategoryIcon(link.category)}
                           </span>
-                          <span className="text-[8px] sm:text-[10px] uppercase tracking-widest font-mono font-bold text-slate-400 mt-2 sm:mt-3 block">{link.category}</span>
+                          <span className="text-[8px] sm:text-[10px] uppercase tracking-widest font-mono font-bold text-slate-600 mt-2 sm:mt-3 block">{link.category}</span>
                         </div>
                       )}
                       
@@ -598,7 +597,7 @@ export default function LinktreeView({
                       {/* Indicator for High-Clicks Products */}
                       {topClickedIds.includes(link.id) && link.clicks > 0 && (
                         <span className="absolute top-2 right-2 sm:top-3 sm:right-3 text-[7.5px] sm:text-[9px] text-white font-mono font-bold flex items-center gap-1 bg-slate-900/85 backdrop-blur-md px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg border border-white/5 shadow-md">
-                          <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-orange-400 animate-pulse" /> TERPOPULER
+                          <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-orange-400" /> TERPOPULER
                         </span>
                       )}
                     </div>
@@ -606,7 +605,7 @@ export default function LinktreeView({
                     {/* Card Descriptive Details */}
                     <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
                       <div>
-                        <span className="inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                        <span className="inline-flex items-center gap-1 text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-wider text-slate-600">
                           {getCategoryIcon(link.category)}
                           {link.category}
                         </span>
@@ -673,7 +672,7 @@ export default function LinktreeView({
             layout
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="py-16 text-center bg-white border border-slate-200/50 rounded-3xl shadow-xs text-slate-400 w-full"
+            className="py-16 text-center bg-white border border-slate-200/50 rounded-3xl shadow-xs text-slate-600 w-full"
             id="empty-state-search"
           >
             <p className="text-sm font-medium">Tidak ditemukan perlengkapan yang cocok dengan keyword Anda.</p>
@@ -707,7 +706,7 @@ export default function LinktreeView({
               {/* Header Close Button */}
               <button
                 onClick={() => setSelectedMultiLinkItem(null)}
-                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
+                className="absolute top-4 right-4 p-2 text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
                 id="close-multi-link-modal"
               >
                 <X className="w-5 h-5" />
@@ -757,7 +756,7 @@ export default function LinktreeView({
                         <span className="text-xs font-bold text-slate-800 group-hover:text-indigo-900 block truncate">
                           {selectedMultiLinkItem.buttonLabel || `Toko Utama (${selectedMultiLinkItem.category})`}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono block truncate">
+                        <span className="text-[10px] text-slate-600 font-mono block truncate">
                           {selectedMultiLinkItem.category}
                         </span>
                       </div>
@@ -785,7 +784,7 @@ export default function LinktreeView({
                           <span className="text-xs font-bold text-slate-800 group-hover:text-indigo-900 block truncate">
                             {label}
                           </span>
-                          <span className="text-[10px] text-slate-400 font-mono block truncate">
+                          <span className="text-[10px] text-slate-600 font-mono block truncate">
                             Link Opsi #{idx + 2}
                           </span>
                         </div>
@@ -803,7 +802,7 @@ export default function LinktreeView({
       </AnimatePresence>
 
       {/* Aesthetic Footer Block */}
-      <div className="text-center mt-16 text-[11px] text-slate-400 font-mono space-y-2 pb-8">
+      <div className="text-center mt-16 text-[11px] text-slate-600 font-mono space-y-2 pb-8">
         <p>© 2026 {profile?.name || "Creator Templates"}. All intellectual rights reserved.</p>
       </div>
     </div>

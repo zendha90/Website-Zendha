@@ -126,7 +126,7 @@ export default function RatecardView({
         }`}>
           <button 
             onClick={onNavigateBack}
-            className={`group inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase transition-all py-2 px-3.5 rounded-lg focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
+            className={`group inline-flex items-center justify-center min-h-11 gap-2 text-xs font-semibold tracking-wide uppercase transition-all py-2 px-3.5 rounded-lg focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
               isMinimalist 
                 ? 'text-[#322723] bg-white border border-[#DDD3C5] hover:bg-[#EFEAE2]' 
                 : 'text-slate-200 bg-white/5 border border-white/10 hover:bg-white/10'
@@ -260,7 +260,7 @@ export default function RatecardView({
                       href={profile.instagram} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
+                      className={`inline-flex items-center justify-center min-h-11 gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
                         isMinimalist 
                           ? 'bg-[#FAF8F5] text-[#322723] border-[#DDD3C5] hover:bg-[#EFEAE2]' 
                           : 'bg-white/5 text-slate-200 border-white/10 hover:bg-white/10'
@@ -275,7 +275,7 @@ export default function RatecardView({
                       href={profile.tiktok} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
+                      className={`inline-flex items-center justify-center min-h-11 gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
                         isMinimalist 
                           ? 'bg-[#FAF8F5] text-[#322723] border-[#DDD3C5] hover:bg-[#EFEAE2]' 
                           : 'bg-white/5 text-slate-200 border-white/10 hover:bg-white/10'
@@ -292,7 +292,7 @@ export default function RatecardView({
                       href={profile.youtube} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
+                      className={`inline-flex items-center justify-center min-h-11 gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
                         isMinimalist 
                           ? 'bg-[#FAF8F5] text-[#322723] border-[#DDD3C5] hover:bg-[#EFEAE2]' 
                           : 'bg-white/5 text-slate-200 border-white/10 hover:bg-white/10'
@@ -307,7 +307,7 @@ export default function RatecardView({
                       href={profile.whatsapp} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
+                      className={`inline-flex items-center justify-center min-h-11 gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
                         isMinimalist 
                           ? 'bg-[#FAF8F5] text-[#322723] border-[#DDD3C5] hover:bg-[#EFEAE2]' 
                           : 'bg-white/5 text-slate-200 border-white/10 hover:bg-white/10'
@@ -663,7 +663,7 @@ export default function RatecardView({
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <a 
                 href={`mailto:${profile.email || "creator@example.com"}?subject=Penawaran Kolaborasi Brand`}
-                className={`px-6 py-3 text-xs font-bold uppercase rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
+                className={`inline-flex items-center justify-center min-h-11 px-6 py-3 text-xs font-bold uppercase rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
                   isMinimalist 
                     ? 'bg-[#322723] text-white hover:bg-[#4E3F39]' 
                     : 'bg-white text-black hover:bg-slate-200'
@@ -677,7 +677,7 @@ export default function RatecardView({
                   href={profile.whatsapp} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="px-6 py-3 text-xs font-bold uppercase rounded-lg transition-colors bg-emerald-600 hover:bg-emerald-700 text-white inline-flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none"
+                  className="inline-flex items-center justify-center min-h-11 px-6 py-3 text-xs font-bold uppercase rounded-lg transition-colors bg-emerald-700 hover:bg-emerald-800 text-white gap-2 focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none"
                 >
                   <WhatsAppIcon className="w-4 h-4 text-white" />
                   <span>Hubungi via WhatsApp</span>

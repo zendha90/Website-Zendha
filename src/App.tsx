@@ -115,7 +115,7 @@ export default function App() {
       if (currentView === 'ratecard') {
         document.title = data.profile.ratecardTitle || `${data.profile.name} | Ratecard`;
       } else {
-        document.title = data.profile.linktreeTitle || `${data.profile.name} | Linkstree`;
+        document.title = data.profile.linktreeTitle || `${data.profile.name} | Linktree`;
       }
     } else {
       document.title = 'Creator Linktree & Ratecard';
@@ -138,6 +138,41 @@ export default function App() {
       }
     }
   }, [data?.profile?.faviconUrl]);
+
+  // Keep share metadata in step with the route. Crawlers read the static
+  // tags in index.html; this covers client-side navigation and refreshes.
+  useEffect(() => {
+    const isRatecard = currentView === 'ratecard';
+    const desc = isRatecard
+      ? 'Ratecard kolaborasi brand zendharefitra: paket Instagram Video, Story, Story Session, dan kunjungan toko atau event.'
+      : 'Rekomendasi barang home living yang aku pakai di rumah, plus ratecard kolaborasi brand.';
+    const url = isRatecard ? 'https://zendharefitra.com/ratecard' : 'https://zendharefitra.com/';
+
+    const setMeta = (attr: 'name' | 'property', key: string, value: string) => {
+      let el = document.head.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.content = value;
+    };
+
+    setMeta('name', 'description', desc);
+    setMeta('property', 'og:description', desc);
+    setMeta('property', 'og:url', url);
+    setMeta('property', 'og:title', document.title);
+    setMeta('name', 'twitter:description', desc);
+
+    let canonical = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = url;
+  }, [currentView, data?.profile?.name]);
+
 
   // Increment click counts in the background
   const registerClick = async (linkId: string) => {
