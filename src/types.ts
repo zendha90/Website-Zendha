@@ -48,6 +48,7 @@ export interface DesignSettings {
   hoverAnimation?: 'scale' | 'lift' | 'tilt' | 'none';
   linksSortOrder?: 'asc' | 'desc';
   ratecardTheme?: 'classic' | 'minimalist';
+  ratecardBackground?: 'solid' | 'editorial' | 'framed' | 'ambient' | 'grain';
 }
 
 export interface RatecardProfile {

@@ -238,7 +238,16 @@ export default function App() {
 
   const getAppBgStyle = () => {
     if (currentView === 'ratecard') {
-      return { backgroundColor: '#0B0B0F' };
+      const isMinimalist = data?.profile?.designSettings?.ratecardTheme !== 'classic';
+      if (!isMinimalist) {
+        return { backgroundColor: '#0B0B0F' };
+      }
+      const bg = data?.profile?.designSettings?.ratecardBackground;
+      if (bg === 'framed') return { backgroundColor: '#E5DDD0' };
+      if (bg === 'ambient') return { backgroundColor: '#F5EFE6' };
+      if (bg === 'solid') return { backgroundColor: '#F7F4EE' };
+      if (bg === 'grain') return { backgroundColor: '#F7F4EE' };
+      return { backgroundColor: '#FAF7F2' };
     }
     if (currentView === 'admin') {
       return { backgroundColor: '#f8fafc' };

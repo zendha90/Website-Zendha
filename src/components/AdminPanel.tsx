@@ -3207,33 +3207,16 @@ DB_NAME=nama_database_anda`}
                </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <label className="text-xs font-mono font-black text-indigo-600 uppercase tracking-widest flex items-center gap-2">
+            <div className="space-y-8">
+              {/* 1. Theme Color Category */}
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                   <Palette className="w-4 h-4 text-indigo-500" />
-                  Kategori Tema Ratecard Page
+                  Kategori Tema Warna Ratecard
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <button
-                    onClick={() => {
-                      const updatedDesign = {
-                        ...(profileForm.designSettings || {}),
-                        ratecardTheme: 'classic'
-                      };
-                      setProfileForm({ ...profileForm, designSettings: updatedDesign as any });
-                    }}
-                    className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-300 ${
-                      profileForm.designSettings?.ratecardTheme === 'classic' || !profileForm.designSettings?.ratecardTheme
-                        ? 'border-indigo-500 bg-indigo-50/50 text-indigo-700 ring-1 ring-indigo-500 shadow-sm'
-                        : 'border-slate-100 bg-white hover:border-slate-300 text-slate-500 shadow-xs'
-                    }`}
-                  >
-                    <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-sm mb-3 shadow-md">✨</div>
-                    <span className="text-sm font-bold font-sans">Classic Cyber Dark</span>
-                    <span className="text-xs opacity-65 text-center mt-1">Sains-fi neon berkilau & glowing orbs (Original)</span>
-                  </button>
-
-                  <button
+                    type="button"
                     onClick={() => {
                       const updatedDesign = {
                         ...(profileForm.designSettings || {}),
@@ -3241,28 +3224,191 @@ DB_NAME=nama_database_anda`}
                       };
                       setProfileForm({ ...profileForm, designSettings: updatedDesign as any });
                     }}
-                    className={`flex flex-col items-center justify-center p-6 rounded-2xl border transition-all duration-300 ${
-                      profileForm.designSettings?.ratecardTheme === 'minimalist'
-                        ? 'border-indigo-500 bg-indigo-50/50 text-indigo-700 ring-1 ring-indigo-500 shadow-sm'
-                        : 'border-slate-100 bg-white hover:border-slate-300 text-slate-500 shadow-xs'
+                    className={`flex items-start gap-4 p-5 rounded-2xl border text-left transition-all cursor-pointer ${
+                      profileForm.designSettings?.ratecardTheme === 'minimalist' || !profileForm.designSettings?.ratecardTheme
+                        ? 'border-indigo-600 bg-indigo-50/50 text-indigo-900 ring-2 ring-indigo-500/20 shadow-xs'
+                        : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-full bg-[#F4EFE6] border border-[#DDD3C5] flex items-center justify-center text-sm mb-3 shadow-md">🌿</div>
-                    <span className="text-sm font-bold font-sans">Minimalist Canva Cream</span>
-                    <span className="text-xs opacity-65 text-center mt-1">Editorial serif, warna krem hangat & cokelat kakao</span>
+                    <div className="w-10 h-10 rounded-xl bg-[#F7F4EE] border border-[#DDD3C5] flex items-center justify-center text-base shrink-0 shadow-xs">
+                      ☕
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold">Minimalist Warm Linen</span>
+                        {(profileForm.designSettings?.ratecardTheme === 'minimalist' || !profileForm.designSettings?.ratecardTheme) && (
+                          <span className="text-[10px] font-semibold bg-indigo-600 text-white px-2 py-0.5 rounded-md">Aktif</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        Nuansa krem hangat, font serif elegan, dan cokelat tanah. Sangat serasi untuk kreator home living & lifestyle.
+                      </p>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updatedDesign = {
+                        ...(profileForm.designSettings || {}),
+                        ratecardTheme: 'classic'
+                      };
+                      setProfileForm({ ...profileForm, designSettings: updatedDesign as any });
+                    }}
+                    className={`flex items-start gap-4 p-5 rounded-2xl border text-left transition-all cursor-pointer ${
+                      profileForm.designSettings?.ratecardTheme === 'classic'
+                        ? 'border-indigo-600 bg-indigo-50/50 text-indigo-900 ring-2 ring-indigo-500/20 shadow-xs'
+                        : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-[#0E0E13] border border-white/10 flex items-center justify-center text-base shrink-0 shadow-xs">
+                      🖤
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold">Classic Studio Charcoal</span>
+                        {profileForm.designSettings?.ratecardTheme === 'classic' && (
+                          <span className="text-[10px] font-semibold bg-indigo-600 text-white px-2 py-0.5 rounded-md">Aktif</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        Nuansa gelap studio modern, kontras teks putih tajam, dan aksen indigo terarah.
+                      </p>
+                    </div>
                   </button>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100">
+              {/* 2. Background Style Options */}
+              <div className="space-y-3 pt-4 border-t border-slate-100">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-indigo-500" />
+                    Pilihan Gaya Background Ratecard
+                  </label>
+                  <p className="text-xs text-slate-500">
+                    Pilih estetika latar belakang yang elegan dan profesional sesuai selera visual Anda.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                  {[
+                    {
+                      id: 'editorial',
+                      title: 'Editorial Studio Paper',
+                      badge: 'Rekomendasi',
+                      desc: 'Gradien pencahayaan studio halus dari sudut atas dan garis bingkai arsitektural di tepi viewport.',
+                      previewBg: 'bg-gradient-to-br from-[#FAF7F2] to-[#EFE7DC] border-[#DDD3C5]',
+                      previewAccent: 'border-r border-[#DDD3C5]'
+                    },
+                    {
+                      id: 'framed',
+                      title: 'Architectural Lookbook',
+                      badge: 'Framed',
+                      desc: 'Kanvas utama berbingkai rapi di atas margin netral hangat, mirip katalog arsitektur profesional.',
+                      previewBg: 'bg-[#ECE5D8] border-[#DDD3C5]',
+                      previewAccent: 'bg-[#FAF7F2] rounded-md border border-[#DDD3C5] m-1'
+                    },
+                    {
+                      id: 'ambient',
+                      title: 'Soft Ambient Horizon',
+                      badge: 'Studio Light',
+                      desc: 'Pencahayaan radial difus lembut di area hero profil yang mengarahkan perhatian secara alami.',
+                      previewBg: 'bg-[#F5EFE6] border-[#DDD3C5]',
+                      previewAccent: 'bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.9)_0%,transparent_70%)]'
+                    },
+                    {
+                      id: 'grain',
+                      title: 'Tactile Fine Grain',
+                      badge: 'Matte Texture',
+                      desc: 'Tekstur mikro plaster/kertas seni bertekstur matte yang menghilangkan kesan flat digital.',
+                      previewBg: 'bg-[#F7F4EE] border-[#DDD3C5]',
+                      previewAccent: 'bg-[radial-gradient(#61544E_1px,transparent_1px)] [background-size:8px_8px] opacity-20'
+                    },
+                    {
+                      id: 'solid',
+                      title: 'Solid Pure Minimalist',
+                      badge: 'Clean',
+                      desc: 'Warna latar polos tanpa gradien atau dekorasi, menghadirkan kesederhanaan murni yang tenang.',
+                      previewBg: 'bg-[#F7F4EE] border-[#DDD3C5]',
+                      previewAccent: ''
+                    }
+                  ].map((style) => {
+                    const isSelected = (profileForm.designSettings?.ratecardBackground || 'editorial') === style.id;
+                    return (
+                      <button
+                        key={style.id}
+                        type="button"
+                        onClick={() => {
+                          const updatedDesign = {
+                            ...(profileForm.designSettings || {}),
+                            ratecardTheme: profileForm.designSettings?.ratecardTheme || 'minimalist',
+                            ratecardBackground: style.id
+                          };
+                          setProfileForm({ ...profileForm, designSettings: updatedDesign as any });
+                        }}
+                        className={`flex flex-col p-4 rounded-2xl border text-left transition-all cursor-pointer relative ${
+                          isSelected
+                            ? 'border-indigo-600 bg-indigo-50/40 text-indigo-900 ring-2 ring-indigo-500/20 shadow-xs'
+                            : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                        }`}
+                      >
+                        {/* Mini Live Preview Swatch */}
+                        <div className={`w-full h-16 rounded-xl border relative overflow-hidden mb-3.5 shadow-2xs ${style.previewBg}`}>
+                          <div className={`w-full h-full ${style.previewAccent}`} />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-bold">{style.title}</span>
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md shrink-0 ${
+                            isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
+                          }`}>
+                            {isSelected ? 'Dipilih' : style.badge}
+                          </span>
+                        </div>
+
+                        <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                          {style.desc}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Save Button & Direct Preview */}
+              <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
                 <button
-                  onClick={() => saveProfile()}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  type="button"
+                  onClick={async () => {
+                    const ensuredDesign = {
+                      ...(profileForm.designSettings || {}),
+                      ratecardTheme: profileForm.designSettings?.ratecardTheme || 'minimalist',
+                      ratecardBackground: profileForm.designSettings?.ratecardBackground || 'editorial'
+                    };
+                    const updatedProfile = {
+                      ...profileForm,
+                      designSettings: ensuredDesign as any
+                    };
+                    setProfileForm(updatedProfile);
+                    await saveProfile(undefined, updatedProfile);
+                  }}
+                  className="w-full sm:flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
                   id="save-ratecard-theme-btn"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  Simpan Pilihan Tema Ratecard
+                  <Save className="w-4 h-4" />
+                  Simpan Perubahan Desain Ratecard
                 </button>
+                <a
+                  href="/ratecard"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-5 py-3.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs whitespace-nowrap"
+                  id="view-ratecard-preview-btn"
+                >
+                  <ExternalLink className="w-4 h-4 text-indigo-500" />
+                  Buka /ratecard di Tab Baru
+                </a>
               </div>
             </div>
           </div>

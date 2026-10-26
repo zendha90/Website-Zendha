@@ -112,13 +112,72 @@ export default function RatecardView({
     ? profile.termsOfService 
     : defaultTerms;
 
-  const isMinimalist = profile.designSettings?.ratecardTheme === 'minimalist';
+  const isMinimalist = profile.designSettings?.ratecardTheme !== 'classic';
+  const bgStyle = profile.designSettings?.ratecardBackground || 'editorial';
+
+  const getRootBgClasses = () => {
+    if (isMinimalist) {
+      switch (bgStyle) {
+        case 'solid':
+          return 'bg-[#F7F4EE] text-[#322723]';
+        case 'framed':
+          return 'bg-[#E5DDD0] text-[#322723]';
+        case 'ambient':
+          return 'bg-[#F4ECE1] text-[#322723]';
+        case 'grain':
+          return 'bg-[#F6F2EB] text-[#322723]';
+        case 'editorial':
+        default:
+          return 'bg-gradient-to-b from-[#FBF8F3] via-[#F5EFE6] to-[#ECE3D5] text-[#322723]';
+      }
+    } else {
+      switch (bgStyle) {
+        case 'solid':
+          return 'bg-[#0E0E13] text-[#F3F4F6]';
+        case 'framed':
+          return 'bg-[#08080B] text-[#F3F4F6]';
+        case 'ambient':
+          return 'bg-[#0B0B0F] text-[#F3F4F6]';
+        case 'grain':
+          return 'bg-[#0E0E13] text-[#F3F4F6]';
+        case 'editorial':
+        default:
+          return 'bg-gradient-to-b from-[#13131A] via-[#0E0E14] to-[#09090C] text-[#F3F4F6]';
+      }
+    }
+  };
 
   return (
-    <div className={`w-full min-h-screen ${
-      isMinimalist ? 'bg-[#F7F4EE] text-[#322723]' : 'bg-[#0E0E13] text-[#F3F4F6]'
-    } font-sans antialiased flex flex-col relative`}>
+    <div className={`w-full min-h-screen ${getRootBgClasses()} font-sans antialiased flex flex-col relative overflow-x-hidden`}>
       
+      {/* Background Style Layers */}
+      {bgStyle === 'editorial' && (
+        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+          <div className={`absolute inset-y-0 left-4 sm:left-10 w-px ${isMinimalist ? 'bg-[#D6CABE]/70' : 'bg-white/[0.06]'}`} />
+          <div className={`absolute inset-y-0 right-4 sm:right-10 w-px ${isMinimalist ? 'bg-[#D6CABE]/70' : 'bg-white/[0.06]'}`} />
+          <div className={`absolute top-0 left-10 w-96 h-48 rounded-full blur-3xl ${isMinimalist ? 'bg-white/70' : 'bg-indigo-500/10'}`} />
+        </div>
+      )}
+
+      {bgStyle === 'ambient' && (
+        <div className="pointer-events-none absolute top-0 inset-x-0 h-[560px] z-0 overflow-hidden" aria-hidden="true">
+          <div className={`w-full h-full ${
+            isMinimalist
+              ? 'bg-[radial-gradient(ellipse_100%_75%_at_50%_0%,rgba(255,255,255,0.95)_0%,rgba(255,250,242,0.6)_45%,transparent_100%)]'
+              : 'bg-[radial-gradient(ellipse_100%_75%_at_50%_0%,rgba(255,255,255,0.12)_0%,rgba(11,11,15,0)_100%)]'
+          }`} />
+        </div>
+      )}
+
+      {bgStyle === 'grain' && (
+        <div 
+          className={`pointer-events-none fixed inset-0 z-0 ${
+            isMinimalist ? 'opacity-25 bg-[radial-gradient(#5C4F48_1px,transparent_1px)]' : 'opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)]'
+          } [background-size:10px_10px]`} 
+          aria-hidden="true"
+        />
+      )}
+
       {/* Top Navigation Bar */}
       <header className="w-full relative z-20 border-b border-inherit">
         <div className={`max-w-6xl mx-auto px-4 sm:px-8 py-5 flex items-center justify-between ${
@@ -151,7 +210,13 @@ export default function RatecardView({
       </header>
 
       {/* Main Content Area */}
-      <main className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-10 space-y-20 flex-grow relative z-10">
+      <main className={`w-full max-w-6xl mx-auto px-4 sm:px-8 py-10 space-y-20 flex-grow relative z-10 ${
+        bgStyle === 'framed' 
+          ? isMinimalist 
+            ? 'bg-[#FAF7F2] rounded-3xl border border-[#DDD3C5] shadow-[0_4px_24px_rgba(50,39,35,0.04)] my-6 sm:my-8'
+            : 'bg-[#121217] rounded-3xl border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.4)] my-6 sm:my-8'
+          : ''
+      }`}>
         
         {/* Hero Section */}
         <section className="pt-4 pb-8 flex flex-col items-center text-center" id="creator-hero">
