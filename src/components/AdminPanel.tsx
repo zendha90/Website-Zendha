@@ -451,7 +451,7 @@ export default function AdminPanel({
     };
   };
 
-  // ================= AFFILIATE LINKS OPERATIONS =================
+  // AFFILIATE LINKS operations
 
   const saveLink = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -561,7 +561,7 @@ export default function AdminPanel({
     reader.readAsDataURL(file);
   };
 
-  // ================= PROFILE OPERATIONS =================
+  // PROFILE operations
 
   const saveProfile = async (e?: React.FormEvent, profileToSave?: RatecardProfile) => {
     if (e) e.preventDefault();
@@ -592,7 +592,7 @@ export default function AdminPanel({
     }
   };
 
-  // ================= BACKUP & RESTORE OPERATIONS =================
+  // BACKUP & RESTORE operations
 
   const handleExportDatabase = async () => {
     try {
@@ -704,7 +704,7 @@ export default function AdminPanel({
     }
   };
 
-  // ================= SERVICES OPERATIONS =================
+  // SERVICES operations
 
   const saveService = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -795,7 +795,7 @@ export default function AdminPanel({
     setIsAddingService(false);
   };
 
-  // ================= PROJECTS OPERATIONS =================
+  // PROJECTS operations
 
   const saveProject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -863,7 +863,7 @@ export default function AdminPanel({
   };
 
 
-  // ================= BRANDS & LOGOS OPERATIONS =================
+  // BRANDS & LOGOS operations
 
   const saveBrand = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -998,7 +998,7 @@ export default function AdminPanel({
             <Sliders className="w-6 h-6 text-indigo-400" />
           </div>
           <div>
-            <h1 className="text-lg md:text-xl font-display font-bold">Selamat Datang di Admin Link {profileForm.name || 'Kreator'}!</h1>
+            <h1 className="text-lg md:text-xl font-display font-bold">Selamat Datang di Admin Link {profileForm.name || 'Kreator'}! 👋</h1>
           </div>
         </div>
         <div className="flex gap-2.5">
@@ -1155,9 +1155,7 @@ export default function AdminPanel({
         {/* Main Content Area */}
         <main className="flex-1 min-w-0">
 
-      {/* ======================================================== */}
       {/* 1. MANAGE AFFILIATE LINKS VIEW TAB */}
-      {/* ======================================================== */}
       {activeTab === 'links' && (() => {
         const renderLinkForm = () => {
           if (!editingLink) return null;
@@ -1591,9 +1589,7 @@ export default function AdminPanel({
       })()}
 
 
-      {/* ======================================================== */}
       {/* 2. MANAGE RATEBOARD RATECARD CONFIG TAB */}
-      {/* ======================================================== */}
       {activeTab === 'ratecard' && (
         <div className="space-y-6" id="tab-content-ratecard-hero">
           <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
@@ -2025,9 +2021,7 @@ export default function AdminPanel({
         </div>
       )}
 
-      {/* ======================================================== */}
       {/* 3. MANAGE RATEBOARD SERVICES VIEW TAB */}
-      {/* ======================================================== */}
       {activeTab === 'services' && (
         <div className="space-y-6" id="tab-content-services">
           
@@ -2309,9 +2303,7 @@ export default function AdminPanel({
       )}
 
 
-      {/* ======================================================== */}
       {/* 3. MANAGE RATEBOARD PROFILE INFO VIEW TAB */}
-      {/* ======================================================== */}
       {activeTab === 'profile' && (
         <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm" id="tab-content-profile">
           <div className="mb-6">
@@ -2483,7 +2475,7 @@ export default function AdminPanel({
                   </div>
                   <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 mt-2 text-[11px] text-slate-500 leading-relaxed font-sans space-y-1.5 shadow-3xs">
                     <p className="font-semibold text-slate-700 flex items-center gap-1">
-                      Rekomendasi Format &amp; Rasio Gambar Favicon:
+                      💡 Rekomendasi Format &amp; Rasio Gambar Favicon:
                     </p>
                     <ul className="list-disc list-inside space-y-1 pl-1">
                       <li><strong className="text-indigo-600">Aspek Rasio:</strong> Wajib menggunakan aspek rasio persegi rata <strong className="text-slate-700 font-mono">1:1</strong> (Contoh ukuran piksel ideal: <span className="font-mono text-[10px]">16x16</span>, <span className="font-mono text-[10px]">32x32</span>, <span className="font-mono text-[10px]">48x48</span>, atau <span className="font-mono text-[10px]">192x192</span>).</li>
@@ -2508,9 +2500,7 @@ export default function AdminPanel({
       )}
 
 
-      {/* ======================================================== */}
       {/* 4. MANAGE RECENT PROJECTS VIEW TAB (VIRAL VIDEOS) */}
-      {/* ======================================================== */}
       {activeTab === 'projects' && (
         <div className="space-y-6" id="tab-content-projects">
           
@@ -2664,7 +2654,7 @@ export default function AdminPanel({
                             {proj.category}
                           </span>
                           <span className="text-[10px] font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">
-                            {proj.views} Views
+                            ✨ {proj.views} Views
                           </span>
                         </div>
                         <h3 className="font-display font-bold text-slate-800 text-sm mt-1.5 leading-snug">
@@ -2711,9 +2701,7 @@ export default function AdminPanel({
         </div>
       )}
 
-      {/* ======================================================== */}
       {/* 4.5. MANAGE BRANDS & LOGOS TAB */}
-      {/* ======================================================== */}
       {activeTab === 'brands' && (
         <div className="space-y-6" id="tab-content-brands">
           <div className="flex justify-between items-center bg-slate-50 border border-slate-100 rounded-3xl p-6 shadow-xs flex-col sm:flex-row gap-4">
@@ -3027,7 +3015,7 @@ export default function AdminPanel({
 
           </div>
 
-          {/* STRATEGI MIGRASI MYSQL / HOSTING CPANEL */}
+          {/* Strategi Migrasi MySQL / Hosting cPanel */}
           <div className="mt-8 pt-8 border-t border-slate-150 space-y-4">
             <div className="flex items-center gap-2">
               <Server className="w-5 h-5 text-indigo-600" />
@@ -3240,7 +3228,7 @@ DB_NAME=nama_database_anda`}
                         : 'border-slate-100 bg-white hover:border-slate-300 text-slate-500 shadow-xs'
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-sm mb-3 shadow-md"></div>
+                    <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-sm mb-3 shadow-md">✨</div>
                     <span className="text-sm font-bold font-sans">Classic Cyber Dark</span>
                     <span className="text-xs opacity-65 text-center mt-1">Sains-fi neon berkilau & glowing orbs (Original)</span>
                   </button>
@@ -3259,7 +3247,7 @@ DB_NAME=nama_database_anda`}
                         : 'border-slate-100 bg-white hover:border-slate-300 text-slate-500 shadow-xs'
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-full bg-[#F4EFE6] border border-[#DDD3C5] flex items-center justify-center text-sm mb-3 shadow-md"></div>
+                    <div className="w-10 h-10 rounded-full bg-[#F4EFE6] border border-[#DDD3C5] flex items-center justify-center text-sm mb-3 shadow-md">🌿</div>
                     <span className="text-sm font-bold font-sans">Minimalist Canva Cream</span>
                     <span className="text-xs opacity-65 text-center mt-1">Editorial serif, warna krem hangat & cokelat kakao</span>
                   </button>
@@ -3834,7 +3822,7 @@ DB_NAME=nama_database_anda`}
                 </div>
               </div>
               <span className="text-xs font-mono font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-100 self-start sm:self-auto select-none">
-                {dateLabel}
+                📅 {dateLabel}
               </span>
             </div>
 
@@ -4080,9 +4068,7 @@ DB_NAME=nama_database_anda`}
       );
     })()}
 
-      {/* ======================================================== */}
       {/* 9. VERSION HISTORY / SYSTEM LOGS VIEW TAB */}
-      {/* ======================================================== */}
       {(activeTab as any) === 'history' && (
         <div className="space-y-6" id="tab-content-history">
           <div className="flex items-center justify-between">

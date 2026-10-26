@@ -41,7 +41,7 @@ const BrandLogoList = ({ brands = [], isMinimalist = false }: { brands?: Ratecar
   if (activeBrands.length === 0) {
     return (
       <div className={`w-full py-8 text-center text-sm rounded-xl border border-dashed ${
-        isMinimalist ? 'border-[#DDD3C5] text-[#8E7E74]' : 'border-white/10 text-slate-400'
+        isMinimalist ? 'border-[#DDD3C5] text-[#61544E]' : 'border-white/10 text-slate-400'
       }`}>
         Belum ada riwayat kolaborasi brand yang ditambahkan.
       </div>
@@ -153,12 +153,12 @@ export default function RatecardView({
       {/* Main Content Area */}
       <main className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-10 space-y-20 flex-grow relative z-10">
         
-        {/* ================= HERO SECTION ================= */}
+        {/* Hero Section */}
         <section className="pt-4 pb-8 flex flex-col items-center text-center" id="creator-hero">
           <div className="space-y-4 max-w-3xl mx-auto">
             
             <p className={`text-xs font-semibold tracking-wider uppercase ${
-              isMinimalist ? 'text-[#8E7E74]' : 'text-indigo-400'
+              isMinimalist ? 'text-[#61544E]' : 'text-indigo-400'
             }`}>
               {profile.heroTagline || "Kreator Konten & Home Living"}
             </p>
@@ -171,7 +171,7 @@ export default function RatecardView({
             >
               {profile.heroTitle1 || `${profile.name || "Kreator"} Rate Card`}
               {profile.heroTitleHighlight ? (
-                <span className={`block mt-1 ${isMinimalist ? 'text-[#8E7E74] font-normal italic' : 'text-indigo-400'}`}>
+                <span className={`block mt-1 ${isMinimalist ? 'text-[#61544E] font-normal italic' : 'text-indigo-400'}`}>
                   {profile.heroTitleHighlight}
                 </span>
               ) : null}
@@ -207,7 +207,7 @@ export default function RatecardView({
               <div className="flex-1 space-y-4">
                 <div>
                   <span className={`text-xs font-semibold uppercase tracking-wider block ${
-                    isMinimalist ? 'text-[#8E7E74]' : 'text-indigo-400'
+                    isMinimalist ? 'text-[#61544E]' : 'text-indigo-400'
                   }`}>
                     {profile.studioDirectorTitle || "Content Creator"}
                   </span>
@@ -229,7 +229,7 @@ export default function RatecardView({
                 }`}>
                   <div>
                     <span className={`block text-xs uppercase tracking-wider ${
-                      isMinimalist ? 'text-[#8E7E74]' : 'text-slate-400'
+                      isMinimalist ? 'text-[#61544E]' : 'text-slate-400'
                     }`}>
                       Domisili
                     </span>
@@ -241,7 +241,7 @@ export default function RatecardView({
                   </div>
                   <div>
                     <span className={`block text-xs uppercase tracking-wider ${
-                      isMinimalist ? 'text-[#8E7E74]' : 'text-slate-400'
+                      isMinimalist ? 'text-[#61544E]' : 'text-slate-400'
                     }`}>
                       Tahun Aktif
                     </span>
@@ -323,7 +323,7 @@ export default function RatecardView({
           </div>
         </section>
 
-        {/* ================= STATS SECTION ================= */}
+        {/* Stats Section */}
         {hasConfiguredStats && (
           <section className="space-y-6" id="stats-section">
             <div className={`border-b pb-4 ${isMinimalist ? 'border-[#DDD3C5]' : 'border-white/10'}`}>
@@ -369,7 +369,7 @@ export default function RatecardView({
                       </h3>
                       {stat.desc && (
                         <p className={`text-[11px] mt-1 leading-snug ${
-                          isMinimalist ? 'text-[#8E7E74]' : 'text-slate-400'
+                          isMinimalist ? 'text-[#61544E]' : 'text-slate-400'
                         }`}>
                           {stat.desc}
                         </p>
@@ -382,7 +382,7 @@ export default function RatecardView({
           </section>
         )}
 
-        {/* ================= INSTAGRAM PROJECTS SECTION ================= */}
+        {/* Instagram Projects Section */}
         <section className="space-y-6" id="projects-section">
           <div className={`border-b pb-4 ${isMinimalist ? 'border-[#DDD3C5]' : 'border-white/10'}`}>
             <h2 className={`text-2xl sm:text-3xl font-bold tracking-tight ${
@@ -405,7 +405,7 @@ export default function RatecardView({
                   key={project.id || idx}
                   className={`group overflow-hidden rounded-xl border transition-all flex flex-col justify-between focus-visible:ring-2 focus-visible:ring-indigo-500 outline-none ${
                     isMinimalist 
-                      ? 'bg-white border-[#DDD3C5] hover:border-[#8E7E74]' 
+                      ? 'bg-white border-[#DDD3C5] hover:border-[#61544E]' 
                       : 'bg-[#15151C] border-white/10 hover:border-white/20'
                   }`}
                 >
@@ -446,7 +446,7 @@ export default function RatecardView({
               ))
             ) : (
               <div className={`col-span-full py-12 text-center text-sm border border-dashed rounded-xl ${
-                isMinimalist ? 'border-[#DDD3C5] text-[#8E7E74]' : 'border-white/10 text-slate-400'
+                isMinimalist ? 'border-[#DDD3C5] text-[#61544E]' : 'border-white/10 text-slate-400'
               }`}>
                 Belum ada contoh konten video yang ditambahkan.
               </div>
@@ -454,7 +454,7 @@ export default function RatecardView({
           </div>
         </section>
 
-        {/* ================= PLACEMENTS RATE CARD SECTION ================= */}
+        {/* Placements Rate Card Section */}
         <section className="space-y-6 scroll-mt-20" id="pricing-section">
           <div className={`border-b pb-4 ${isMinimalist ? 'border-[#DDD3C5]' : 'border-white/10'}`}>
             <h2 className={`text-2xl sm:text-3xl font-bold tracking-tight ${
@@ -485,7 +485,7 @@ export default function RatecardView({
                     }`}>
                       <div>
                         <span className={`text-xs font-semibold uppercase tracking-wider block ${
-                          isMinimalist ? 'text-[#8E7E74]' : 'text-indigo-400'
+                          isMinimalist ? 'text-[#61544E]' : 'text-indigo-400'
                         }`}>
                           {rate.category || 'Paket Kolaborasi'}
                         </span>
@@ -508,7 +508,7 @@ export default function RatecardView({
                     {/* Deliverables */}
                     <div className="space-y-3">
                       <span className={`text-xs font-semibold uppercase tracking-wider block ${
-                        isMinimalist ? 'text-[#8E7E74]' : 'text-slate-400'
+                        isMinimalist ? 'text-[#61544E]' : 'text-slate-400'
                       }`}>
                         Cakupan Pekerjaan (Deliverables)
                       </span>
@@ -520,7 +520,7 @@ export default function RatecardView({
                           .map((bullet, bIdx) => (
                             <li key={bIdx} className="flex items-start gap-2.5 leading-relaxed">
                               <CheckCircle className={`w-4 h-4 shrink-0 mt-0.5 ${
-                                isMinimalist ? 'text-[#8E7E74]' : 'text-indigo-400'
+                                isMinimalist ? 'text-[#61544E]' : 'text-indigo-400'
                               }`} />
                               <span>{bullet}.</span>
                             </li>
@@ -535,7 +535,7 @@ export default function RatecardView({
                         isMinimalist ? 'border-[#DDD3C5]/60' : 'border-white/10'
                       }`}>
                         <span className={`text-xs font-semibold uppercase tracking-wider block mb-2 ${
-                          isMinimalist ? 'text-[#8E7E74]' : 'text-slate-400'
+                          isMinimalist ? 'text-[#61544E]' : 'text-slate-400'
                         }`}>
                           Biaya Tambahan (Opsional)
                         </span>
@@ -554,7 +554,7 @@ export default function RatecardView({
               ))
             ) : (
               <div className={`col-span-full py-12 text-center text-sm border border-dashed rounded-xl ${
-                isMinimalist ? 'border-[#DDD3C5] text-[#8E7E74]' : 'border-white/10 text-slate-400'
+                isMinimalist ? 'border-[#DDD3C5] text-[#61544E]' : 'border-white/10 text-slate-400'
               }`}>
                 Belum ada data paket layanan yang aktif.
               </div>
@@ -562,7 +562,7 @@ export default function RatecardView({
           </div>
         </section>
 
-        {/* ================= BRANDS WORKED WITH ================= */}
+        {/* Brands Section */}
         <section className={`rounded-2xl p-6 sm:p-8 space-y-6 border ${
           isMinimalist ? 'bg-white border-[#DDD3C5]' : 'bg-[#15151C] border-white/10'
         }`}>
@@ -572,7 +572,7 @@ export default function RatecardView({
             }`}>
               {profile.brandsTitle || "Brand yang Pernah Bekerja Sama"}
             </h2>
-            <p className={`text-xs ${isMinimalist ? 'text-[#8E7E74]' : 'text-slate-400'}`}>
+            <p className={`text-xs ${isMinimalist ? 'text-[#61544E]' : 'text-slate-400'}`}>
               Daftar brand mitra yang pernah berkolaborasi
             </p>
           </div>
@@ -580,7 +580,7 @@ export default function RatecardView({
           <BrandLogoList brands={brands} isMinimalist={isMinimalist} />
         </section>
 
-        {/* ================= TERMS & CONDITIONS ================= */}
+        {/* Terms & Conditions Section */}
         <section className="space-y-6" id="terms-section">
           <div className={`border-b pb-4 ${isMinimalist ? 'border-[#DDD3C5]' : 'border-white/10'}`}>
             <h2 className={`text-2xl sm:text-3xl font-bold tracking-tight ${
@@ -604,7 +604,7 @@ export default function RatecardView({
                 }`}
               >
                 <span className={`w-2 h-2 rounded-full mt-2 shrink-0 ${
-                  isMinimalist ? 'bg-[#8E7E74]' : 'bg-indigo-400'
+                  isMinimalist ? 'bg-[#61544E]' : 'bg-indigo-400'
                 }`} />
                 <p className={`text-xs sm:text-sm leading-relaxed ${
                   isMinimalist ? 'text-[#554944]' : 'text-slate-200'
@@ -616,7 +616,7 @@ export default function RatecardView({
           </div>
         </section>
 
-        {/* ================= CONTACT SECTION ================= */}
+        {/* Contact Section */}
         <section className="scroll-mt-20" id="contact-section">
           <div className={`rounded-2xl p-6 sm:p-12 text-center space-y-6 border ${
             isMinimalist ? 'bg-white border-[#DDD3C5]' : 'bg-[#15151C] border-white/10'
@@ -640,9 +640,9 @@ export default function RatecardView({
             }`}>
               <div>
                 <span className={`text-xs font-semibold uppercase tracking-wider block ${
-                  isMinimalist ? 'text-[#8E7E74]' : 'text-slate-400'
+                  isMinimalist ? 'text-[#61544E]' : 'text-slate-400'
                 }`}>
-                  WhatsApp Resmi
+                  WhatsApp
                 </span>
                 <p className="text-sm font-bold mt-1">
                   {profile.contactPhone || "Belum diatur"}
@@ -650,9 +650,9 @@ export default function RatecardView({
               </div>
               <div>
                 <span className={`text-xs font-semibold uppercase tracking-wider block ${
-                  isMinimalist ? 'text-[#8E7E74]' : 'text-slate-400'
+                  isMinimalist ? 'text-[#61544E]' : 'text-slate-400'
                 }`}>
-                  Lokasi / Domicile
+                  Lokasi
                 </span>
                 <p className="text-sm font-bold mt-1">
                   {profile.domicile || "Indonesia"}
@@ -692,7 +692,7 @@ export default function RatecardView({
       {/* Footer */}
       <footer className={`w-full border-t py-8 text-center text-xs ${
         isMinimalist 
-          ? 'bg-[#FAF8F5] border-[#DDD3C5] text-[#8E7E74]' 
+          ? 'bg-[#FAF8F5] border-[#DDD3C5] text-[#61544E]' 
           : 'bg-[#0B0B0F] border-white/10 text-slate-400'
       }`}>
         <p>© {new Date().getFullYear()} {profile.name || "Kreator"}. Seluruh hak cipta dilindungi.</p>

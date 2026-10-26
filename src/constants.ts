@@ -11,7 +11,7 @@ export const PREDEFINED_THEMES: { [key: string]: Omit<DesignSettings, 'theme'> }
     header: { layout: 'classic', titleStyle: 'text' },
     typography: { fontFamily: 'display' },
     buttons: { style: 'rounded-2xl', shadow: 'hard' },
-    colors: { background: '#0f172a', buttons: '#6366f1', buttonText: '#FFFFFF', pageText: '#cbd5e1', title: '#FFFFFF' }
+    colors: { background: '#0f172a', buttons: '#4f46e5', buttonText: '#FFFFFF', pageText: '#cbd5e1', title: '#FFFFFF' }
   },
   forestZen: {
     header: { layout: 'classic', titleStyle: 'text' },
@@ -35,6 +35,6 @@ export const PREDEFINED_THEMES: { [key: string]: Omit<DesignSettings, 'theme'> }
     header: { layout: 'classic', titleStyle: 'text' },
     typography: { fontFamily: 'mono' },
     buttons: { style: 'rounded-2xl', shadow: 'hard' },
-    colors: { background: '#2e1065', buttons: '#a855f7', buttonText: '#FFFFFF', pageText: '#e9d5ff', title: '#FFFFFF' }
+    colors: { background: '#2e1065', buttons: '#9333ea', buttonText: '#FFFFFF', pageText: '#e9d5ff', title: '#FFFFFF' }
   }
 };

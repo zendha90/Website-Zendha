@@ -16,7 +16,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
 
-  // Simple, super robust client router based on window path routing
+  // Client router based on window path routing
   const [currentView, setCurrentView] = useState<'home' | 'ratecard' | 'admin'>(() => {
     const path = window.location.pathname;
     if (path === '/ratecard') return 'ratecard';
