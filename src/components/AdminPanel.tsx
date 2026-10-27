@@ -3214,7 +3214,7 @@ DB_NAME=nama_database_anda`}
                   <Palette className="w-4 h-4 text-indigo-500" />
                   Kategori Tema Warna Ratecard
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <button
                     type="button"
                     onClick={() => {
@@ -3273,6 +3273,37 @@ DB_NAME=nama_database_anda`}
                       </div>
                       <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                         Nuansa gelap studio modern, kontras teks putih tajam, dan aksen indigo terarah.
+                      </p>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updatedDesign = {
+                        ...(profileForm.designSettings || {}),
+                        ratecardTheme: 'ink'
+                      };
+                      setProfileForm({ ...profileForm, designSettings: updatedDesign as any });
+                    }}
+                    className={`flex items-start gap-4 p-5 rounded-2xl border text-left transition-all cursor-pointer ${
+                      profileForm.designSettings?.ratecardTheme === 'ink'
+                        ? 'border-indigo-600 bg-indigo-50/50 text-indigo-900 ring-2 ring-indigo-500/20 shadow-xs'
+                        : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-black border border-neutral-900 flex items-center justify-center text-base shrink-0 shadow-xs text-white">
+                      ✒️
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold">Ink (Barton Editorial)</span>
+                        {profileForm.designSettings?.ratecardTheme === 'ink' && (
+                          <span className="text-[10px] font-semibold bg-indigo-600 text-white px-2 py-0.5 rounded-md">Aktif</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                        Tipografi bold kontras tinggi, garis hairline arsitektural ala Barton Road, alur 4 langkah kerja sama, dan kartu partnership hitam pekat.
                       </p>
                     </div>
                   </button>

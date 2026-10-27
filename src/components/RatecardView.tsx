@@ -11,6 +11,7 @@ import {
   Layers
 } from 'lucide-react';
 import { RatecardProfile, RatecardService, RatecardProject, RatecardBrand } from '../types';
+import InkRatecardView from './InkRatecardView';
 
 interface RatecardViewProps {
   profile: RatecardProfile;
@@ -92,6 +93,19 @@ export default function RatecardView({
   onNavigateBack,
   onNavigateToAdmin
 }: RatecardViewProps) {
+  // If the active theme is "Ink" (inspired by Barton Road Library of Things)
+  if (profile.designSettings?.ratecardTheme === 'ink') {
+    return (
+      <InkRatecardView
+        profile={profile}
+        services={services}
+        projects={projects}
+        brands={brands}
+        onNavigateBack={onNavigateBack}
+        onNavigateToAdmin={onNavigateToAdmin}
+      />
+    );
+  }
   
   // Real stats: only display if the creator has configured them
   const hasConfiguredStats = Boolean(profile.stats && profile.stats.length > 0);

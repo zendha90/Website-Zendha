@@ -47,7 +47,7 @@ export interface DesignSettings {
   cardOpacity?: number;
   hoverAnimation?: 'scale' | 'lift' | 'tilt' | 'none';
   linksSortOrder?: 'asc' | 'desc';
-  ratecardTheme?: 'classic' | 'minimalist';
+  ratecardTheme?: 'classic' | 'minimalist' | 'ink';
   ratecardBackground?: 'solid' | 'editorial' | 'framed' | 'ambient' | 'grain';
 }
 

@@ -238,9 +238,12 @@ export default function App() {
 
   const getAppBgStyle = () => {
     if (currentView === 'ratecard') {
-      const isMinimalist = data?.profile?.designSettings?.ratecardTheme !== 'classic';
-      if (!isMinimalist) {
+      const theme = data?.profile?.designSettings?.ratecardTheme || 'minimalist';
+      if (theme === 'classic') {
         return { backgroundColor: '#0B0B0F' };
+      }
+      if (theme === 'ink') {
+        return { backgroundColor: '#FFFFFF' };
       }
       const bg = data?.profile?.designSettings?.ratecardBackground;
       if (bg === 'framed') return { backgroundColor: '#E5DDD0' };
